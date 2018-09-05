@@ -35,13 +35,13 @@
 
 #define N 0 /* Not implemented */
 
-/* BIT DATA ACCESS */
+/* Bit Data Access */
 #define configFC01      N	/* READ_COILS */
 #define configFC02      N   /* READ_DISCRETE_INPUTS */
 #define configFC05      1   /* WRITE_SINGLE_COIL */
 #define configFC15      N   /* WRITE_MULTIPLE_COILS */
 
-/* WORD DATA ACCESS */
+/* Word Data Access */
 #define configFC03      1   /* READ_HOLDING_REGISTERS */
 #define configFC04      1   /* READ_INPUT_REGISTER */
 #define configFC06      1   /* WRITE_SINGLE_REGISTER */
@@ -50,11 +50,11 @@
 #define configFC23      N   /* READ_WRITE_MULTIPLE_REGISTERS */
 #define configFC24      N   /* READ_FIFO_QUEUE */
 
-/* FILE RECORD DATA ACCESS */
+/* File Record Data Access */
 #define configFC20      N   /* READ_FILE_RECORD */
 #define configFC21      N   /* WRITE_FILE_RECORD */
 
-/* DIAGNOSTICS */
+/* Diagnostics */
 #define configFC07      N   /* READ_EXCEPTION_STATUS */
 #define configFC08      0   /* DIAGNOSTIC */
 #define configFC11      N   /* GET_COM_EVENT_COUNTER */

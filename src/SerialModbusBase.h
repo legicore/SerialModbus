@@ -27,7 +27,7 @@
  * @typedef MBData_t
  *          TODO
  */
-typedef struct
+typedef struct MBData_s
 {
     uint8_t id;
     uint8_t functionCode;
@@ -47,15 +47,15 @@ MBData_t;
  * @typedef MBFunctionCode_t
  *          TODO
  */
-typedef enum
+typedef enum MBFunctionCode_e
 {
-    /* BIT DATA ACCESS */
+    /* Bit Data Access */
     READ_COILS                    = 1,
     READ_DISCRETE_INPUTS          = 2,
     WRITE_SINGLE_COIL             = 5,
     WRITE_MULTIPLE_COILS          = 15,
 
-    /* WORD DATA ACCESS */
+    /* Word Data Access */
     READ_HOLDING_REGISTERS        = 3,
     READ_INPUT_REGISTERS          = 4,
     WRITE_SINGLE_REGISTER         = 6,
@@ -64,11 +64,11 @@ typedef enum
     READ_WRITE_MULTIPLE_REGISTERS = 23,
     READ_FIFO_QUEUE               = 24,
 
-    /* FILE RECORD DATA ACCESS */
+    /* File Record Data Access */
     READ_FILE_RECORD              = 20,
     WRITE_FILE_RECORD             = 21,
 
-    /* DIAGNOSTICS */
+    /* Diagnostics */
     READ_EXCEPTION_STATUS         = 7,
     DIAGNOSTIC                    = 8,
     GET_COM_EVENT_COUNTER         = 11,
@@ -83,9 +83,8 @@ MBFunctionCode_t;
  * @typedef MBSubFunctionCode_t
  *          TODO
  */
-typedef enum
+typedef enum MBSubFunctionCode_e
 {
-    /* DIAGNISTICS */
     RETURN_QUERY_DATA                      = 0x00,
     RESTART_COMMUNICATIONS_OPTION          = 0x01,
     RETURN_DIAGNOSTIC_REGISTER             = 0x02,
@@ -110,7 +109,7 @@ MBSubFunctionCode_t;
  * @typedef MBException_t
  *          TODO
  */
-typedef enum
+typedef enum MBException_e
 {
     OK = 0x00,
     

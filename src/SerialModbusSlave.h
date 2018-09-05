@@ -25,7 +25,7 @@
  * @typedef MBSlaveState_t
  *          TODO
  */
-typedef enum
+typedef enum MBSlaveState_e
 {
     SLAVE_IDLE,
     CHECKING_REQUEST,
