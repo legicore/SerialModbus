@@ -37,6 +37,8 @@ SerialModbusBase::SerialModbusBase()
     {
         ulInterFrameDelayUs = configINTER_FRAME_DELAY_US;
         ulTimerInterFrameDelayUs = 0;
+        ulInterCharacterTimeoutUs = configINTER_CHARACTER_TIMEOUT_US;
+        ulTimerInterCharacterTimeoutUs = 0;
     }
     #endif
     
@@ -119,21 +121,21 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
+MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLength )
 {
     uint16_t usTempChecksum;
 
-    if( ( pucFrame == NULL ) || ( pxFrameLength == NULL ) )
+    if( pucFrame == NULL )
     {
         return NOK_NULL_POINTER;
     }
     
     #if( configMODE == configMODE_RTU )
     {
-        usTempChecksum = usCRC16( pucFrame, *pxFrameLength - 2 );
-        if( pucFrame[ *pxFrameLength - 2 ] == lowByte( usTempChecksum ) )
+        usTempChecksum = usCRC16( pucFrame, xFrameLength - 2 );
+        if( pucFrame[ xFrameLength - 2 ] == lowByte( usTempChecksum ) )
         {
-            if( pucFrame[ *pxFrameLength - 1 ] == highByte( usTempChecksum ) )
+            if( pucFrame[ xFrameLength - 1 ] == highByte( usTempChecksum ) )
             {
                 return OK;
             }
@@ -143,15 +145,15 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t * pxFram
 
     #if( configMODE == configMODE_ASCII )
     {
-        usTempChecksum = ( uint16_t ) ucLRC( pucFrame, *pxFrameLength - 1 );
-        if( pucFrame[ *pxFrameLength - 1 ] == ( uint8_t ) usTempChecksum )
+        usTempChecksum = ( uint16_t ) ucLRC( pucFrame, xFrameLength - 1 );
+        if( pucFrame[ xFrameLength - 1 ] == ( uint8_t ) usTempChecksum )
         {
             return OK;
         }
     }
     #endif
     
-    return NOK_CHECKSUM;
+    return NOK;
 }
 /*-----------------------------------------------------------*/
 
@@ -342,9 +344,25 @@ void SerialModbusBase::vStartInterFrameDelay( void )
 /*-----------------------------------------------------------*/
 
 #if( configMODE == configMODE_RTU )
-boolean SerialModbusBase::bTimeoutInterFrameDelay( void )
+void SerialModbusBase::vStartInterCharacterTimeout( void )
+{
+    ulTimerInterCharacterTimeoutUs = micros();
+}
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+bool SerialModbusBase::bTimeoutInterFrameDelay( void )
 {
     return ( micros() - ulTimerInterFrameDelayUs ) > ulInterFrameDelayUs;
+}
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
+{
+    return ( micros() - ulTimerInterCharacterTimeoutUs ) > ulInterCharacterTimeoutUs;
 }
 #endif
 /*-----------------------------------------------------------*/
@@ -413,7 +431,6 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
     else if( pxSerialSoftware != NULL )
     {
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
-        pxSerialSoftware->flush();
     }
 
     if( vSerialCtrlRx != NULL )

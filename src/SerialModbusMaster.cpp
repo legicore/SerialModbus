@@ -53,13 +53,13 @@ void SerialModbusMaster::vStartResponseTimeout( void )
 }
 /*-----------------------------------------------------------*/
 
-boolean SerialModbusMaster::bTimeoutTurnaroundDelay( void )
+bool SerialModbusMaster::bTimeoutTurnaroundDelay( void )
 {
     return ( micros() - ulTimerTurnaroundDelayUs ) > ulTurnaroundDelayUs;
 }
 /*-----------------------------------------------------------*/
 
-boolean SerialModbusMaster::bTimeoutResponseTimeout( void )
+bool SerialModbusMaster::bTimeoutResponseTimeout( void )
 {
     return ( micros() - ulTimerResponseTimeoutUs ) > ulResponseTimeoutUs;
 }
@@ -259,6 +259,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                             if( ucREPLY_ID == ucREQUEST_ID )
                             {
                                 vStartInterFrameDelay();
+                                vStartInterCharacterTimeout();
                                 break;
                             }
                         }
@@ -279,25 +280,35 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
                 else
                 {
-                    vSetState( PROCESSING_ERROR );
                     xSetException( NOK_RX_OVERFLOW );
+                    vSetState( PROCESSING_ERROR );
                     break;
                 }
                 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    vSetState( PROCESSING_ERROR );
                     xSetException( NOK_NO_REPLY );
+                    vSetState( PROCESSING_ERROR );
                     break;
                 }
-                
+
+                /* Check if the start of a frame has been received. */
                 if( xReplyLength > 0 )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
-                        if( bTimeoutInterFrameDelay() == true )
+                        if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            vSetState( PROCESSING_REPLY );
+                            if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
+                            {
+                                while( bTimeoutInterFrameDelay() != true );
+                                vSetState( PROCESSING_REPLY );
+                            }
+                            else
+                            {
+                                xSetException( NOK_CHECKSUM );
+                                vSetState( PROCESSING_ERROR );
+                            }
                         }
                     }
                     #endif
@@ -329,56 +340,49 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
             case PROCESSING_REPLY :
             {
-                if( xCheckChecksum( pucReplyFrame, &xReplyLength ) == OK )
+                switch( ucREPLY_FUNCTION_CODE )
                 {
-                    switch( ucREPLY_FUNCTION_CODE )
-                    {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-                        case READ_HOLDING_REGISTERS :
-                        case READ_INPUT_REGISTERS :
-                        {
-                            vHandler03_04();
-                            break;
-                        }
+                    case READ_HOLDING_REGISTERS :
+                    case READ_INPUT_REGISTERS :
+                    {
+                        vHandler03_04();
+                        break;
+                    }
 #endif
 #if( configFC05 == 1 )
-                        case WRITE_SINGLE_COIL :
-                        {
-                            vHandler05();
-                            break;
-                        }
+                    case WRITE_SINGLE_COIL :
+                    {
+                        vHandler05();
+                        break;
+                    }
 #endif
 #if( configFC06 == 1 )
-                        case WRITE_SINGLE_REGISTER :
-                        {
-                            vHandler06();
-                            break;
-                        }
+                    case WRITE_SINGLE_REGISTER :
+                    {
+                        vHandler06();
+                        break;
+                    }
 #endif
 #if( configFC16 == 1 )
-                        case WRITE_MULTIPLE_REGISTERS :
-                        {
-                            vHandler16();
-                            break;
-                        }
-#endif
-                        default :
-                        {
-                            /* Check for Error Code */
-                            if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
-                            {
-                                xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
-                                vSetState( PROCESSING_ERROR );
-                            }
-                        }
-                    }
-
-                    if( xState != PROCESSING_ERROR )
+                    case WRITE_MULTIPLE_REGISTERS :
                     {
-                        vSetState( MASTER_IDLE );
+                        vHandler16();
+                        break;
+                    }
+#endif
+                    default :
+                    {
+                        /* Check for Error Code */
+                        if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
+                        {
+                            xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
+                            vSetState( PROCESSING_ERROR );
+                        }
                     }
                 }
-                else
+
+                if( xState != PROCESSING_ERROR )
                 {
                     vSetState( MASTER_IDLE );
                 }

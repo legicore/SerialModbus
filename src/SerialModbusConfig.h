@@ -26,8 +26,8 @@
 
 /*-----------------------------------------------------------*/
 
-#define configINTER_CHARACTER_TIMEOUT_US	1500    /* Orig. 750 */
-#define configINTER_FRAME_DELAY_US          3500    /* Orig. 1750 */
+#define configINTER_CHARACTER_TIMEOUT_US	750
+#define configINTER_FRAME_DELAY_US          1750
 #define configTURNAROUND_DELAY_US           200000
 #define configRESPONSE_TIMEOUT_US           1000000
 

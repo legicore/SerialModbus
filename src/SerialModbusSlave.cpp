@@ -98,6 +98,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             {
                                 /* Start the inter frame delay */
                                 vStartInterFrameDelay();
+                                vStartInterCharacterTimeout();
                             }
                             #endif
 
@@ -121,14 +122,23 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     }
                 }
 
-                /* Check if the start of the frame has been received */
+                /* Check if the start of a frame has been received. */
                 if( xRequestLength > 0 )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
-                        if( bTimeoutInterFrameDelay() == true )
+                        if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            vSetState( CHECKING_REQUEST );
+                            if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
+                            {
+                                while( bTimeoutInterFrameDelay() != true );
+                                vSetState( CHECKING_REQUEST );
+                            }
+                            else
+                            {
+                                xSetException( NOK_CHECKSUM );
+                                vSetState( FORMATTING_ERROR_REPLY );
+                            }
                         }
                     }
                     #endif
@@ -157,30 +167,26 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case CHECKING_REQUEST :
             {
-                if( xCheckChecksum( pucRequestFrame, &xRequestLength ) == OK )
+                incCPT1();
+
+                if( bScanDataList() == true )
                 {
-                    incCPT1();
-
-                    if( ( bCheckSlaveId( ucREQUEST_ID ) == true ) || ( ucREQUEST_ID == configID_BROADCAST ) )
-                    {
-                        incCPT4();
-                        vSetState( PROCESSING_REQUIRED_ACTION );
-                        break;
-                    }
+                    vSetState( PROCESSING_REQUIRED_ACTION );
                 }
-
-                vClearRequestFrame();
-                vClearReplyFrame();
-                                
-                vSetState( SLAVE_IDLE );
+                else
+                {
+                    vSetState( FORMATTING_ERROR_REPLY );
+                }
 
                 break;
             }
 
             case PROCESSING_REQUIRED_ACTION :
             {
-                if( bScanDataList() == true )
+                if( ( bCheckSlaveId( ucREQUEST_ID ) == true ) || ( ucREQUEST_ID == configID_BROADCAST ) )
                 {
+                    incCPT4();
+
                     switch( ucREQUEST_FUNCTION_CODE )
                     {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )

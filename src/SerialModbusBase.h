@@ -180,7 +180,7 @@ protected:
     MBException_t xException;
     MBException_t xSetException( MBException_t xExceptionPar );
     MBStatus_t xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLen );
-    MBStatus_t xCheckChecksum( uint8_t * pucFrame, size_t * pxFrameLen );
+    MBStatus_t xCheckChecksum( uint8_t * pucFrame, size_t xFrameLen );
     void vClearRequestFrame( void );
     void vClearReplyFrame( void );
     bool bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength );
@@ -200,9 +200,13 @@ protected:
 #if( configMODE == configMODE_RTU )
     uint16_t usCRC16( uint8_t * pucData, size_t xDataLength );
     uint32_t ulInterFrameDelayUs;
+    uint32_t ulInterCharacterTimeoutUs;
     uint32_t ulTimerInterFrameDelayUs;
+    uint32_t ulTimerInterCharacterTimeoutUs;
     void vStartInterFrameDelay( void );
+    void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void );
+    bool bTimeoutInterCharacterTimeout( void );
 #endif
 #if( configMODE == configMODE_ASCII )
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
