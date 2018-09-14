@@ -102,7 +102,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 
 SerialModbusSlave::SerialModbusSlave()
 {
-    vSetState( SLAVE_IDLE );
+    xState = SLAVE_IDLE;
 
     #if( configFC08 == 1 )
     {
@@ -200,7 +200,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                             #if( configMODE == configMODE_ASCII )
                             {
-                                if( pucRequestFrame[ 0 ] != ':' )
+                                if( pucRequestFrame[ 0 ] != ( uint8_t ) ':' )
                                 {
                                     vClearRequestFrame();
                                     break;
@@ -245,10 +245,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     #if( configMODE == configMODE_ASCII )
                     {
                         /* Check for Newline (frame end) */
-                        if( pucRequestFrame[ xRequestLength - 1 ] == cAsciiInputDelimiter )
+                        if( pucRequestFrame[ xRequestLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
                             /* Check for Carriage Return (frame end) */
-                            if( pucRequestFrame[ xRequestLength - 2 ] == '\r' )
+                            if( pucRequestFrame[ xRequestLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* Convert the frame from rtu to ascii format */
                                 xAsciiToRtu( pucReplyFrame, &xReplyLength );
@@ -598,8 +598,8 @@ void SerialModbusSlave::handler08( void )
             if( ( isAscii( mbREQUEST_INPUT_DELIMITER_HI ) == true ) &&
                 ( mbREQUEST_INPUT_DELIMITER_LO            == 0x00 ) )
             {
-                asciicAsciiInputDelimiter = mbREQUEST_INPUT_DELIMITER_HI;
-                mbREPLY_INPUT_DELIMITER_HI = asciicAsciiInputDelimiter;
+                cAsciiInputDelimiter = ( char ) mbREQUEST_INPUT_DELIMITER_HI;
+                mbREPLY_INPUT_DELIMITER_HI = ( uint8_t ) cAsciiInputDelimiter;
                 mbREPLY_INPUT_DELIMITER_LO = mbREQUEST_INPUT_DELIMITER_LO;
 
                 xReplyLength = xRequestLength;

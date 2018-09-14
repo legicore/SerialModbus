@@ -187,7 +187,9 @@ protected:
 #if( configPROCESS_LOOP_HOOK == 1 )
     void (*vProcessLoopHook)( void );
 #endif
+#if( ( configMODE == configMODE_ASCII ) || ( configFC08 == 1 ) )
     char cAsciiInputDelimiter;
+#endif
 };
 /*-----------------------------------------------------------*/
 

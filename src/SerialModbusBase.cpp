@@ -33,9 +33,10 @@ SerialModbusBase::SerialModbusBase()
     pxSerial = NULL;
     pxSerialSoftware = NULL;
 
-    setSerialCtrl( NULL, NULL );
+    vSerialCtrlTx = NULL;
+    vSerialCtrlRx = NULL;
 
-    xSetException( OK );
+    xException = OK;
 
     #if( configMODE == configMODE_RTU )
     {
@@ -48,7 +49,7 @@ SerialModbusBase::SerialModbusBase()
 
     #if( configPROCESS_LOOP_HOOK == 1 )
     {
-        setProcessLoopHook( NULL );
+        vProcessLoopHook = NULL;
     }
     #endif
 
@@ -189,8 +190,8 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
         return NOK_NULL_POINTER;
     }
 
-    pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = cAsciiInputDelimiter;
-    pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = '\r';
+    pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
+    pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = ( uint8_t ) '\r';
 
     for( size_t i = *pxFrameLength - 1; i >= 0; i-- )
     {

@@ -27,7 +27,7 @@
 
 SerialModbusMaster::SerialModbusMaster()
 {
-    vSetState( MASTER_IDLE );
+    xState = MASTER_IDLE;
 
     xReplyDataSize = 0;
 
@@ -296,7 +296,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
                         #if( configMODE == configMODE_ASCII )
                         {
-                            if( pucReplyFrame[ 0 ] == ':' )
+                            if( pucReplyFrame[ 0 ] == ( uint8_t ) ':' )
                             {
                                 break;
                             }
@@ -345,10 +345,10 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     #if( configMODE == configMODE_ASCII )
                     {
                         /* Check for Newline (frame end) */
-                        if( pucReplyFrame[ mbReplyLength - 1 ] == cAsciiInputDelimiter )
+                        if( pucReplyFrame[ mbReplyLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
                             /* Check for Carriage Return (frame end) */
-                            if( pucReplyFrame[ mbReplyLength - 2 ] == '\r' )
+                            if( pucReplyFrame[ mbReplyLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* Convert the frame from rtu to ascii format */
                                 xAsciiToRtu( pucReplyFrame, &mbReplyLength );
