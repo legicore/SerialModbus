@@ -53,7 +53,7 @@ typedef struct MBRequest_s
 MBRequest_t;
 
 /** TODO */
-#define REQUEST_MAP_END { 0x00, 0x00, 0x0000, NULL, 0, NULL }
+#define REQUEST_MAP_END { configID_SLAVE_MAX, 0x00, 0x0000, NULL, 0, NULL }
 
 /*-----------------------------------------------------------*/
 

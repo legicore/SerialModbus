@@ -33,30 +33,30 @@
 typedef enum MBFunctionCode_e
 {
     /* Bit Data Access */
-    READ_COILS                    = 1,
-    READ_DISCRETE_INPUTS          = 2,
-    WRITE_SINGLE_COIL             = 5,
-    WRITE_MULTIPLE_COILS          = 15,
+    READ_COILS                      = 1,
+    READ_DISCRETE_INPUTS            = 2,
+    WRITE_SINGLE_COIL               = 5,
+    WRITE_MULTIPLE_COILS            = 15,
 
     /* Word Data Access */
-    READ_HOLDING_REGISTERS        = 3,
-    READ_INPUT_REGISTERS          = 4,
-    WRITE_SINGLE_REGISTER         = 6,
-    WRITE_MULTIPLE_REGISTERS      = 16,
-    MASK_WRITE_REGISTER           = 22,
-    READ_WRITE_MULTIPLE_REGISTERS = 23,
-    READ_FIFO_QUEUE               = 24,
+    READ_HOLDING_REGISTERS          = 3,
+    READ_INPUT_REGISTERS            = 4,
+    WRITE_SINGLE_REGISTER           = 6,
+    WRITE_MULTIPLE_REGISTERS        = 16,
+    MASK_WRITE_REGISTER             = 22,
+    READ_WRITE_MULTIPLE_REGISTERS   = 23,
+    READ_FIFO_QUEUE                 = 24,
 
     /* File Record Data Access */
-    READ_FILE_RECORD              = 20,
-    WRITE_FILE_RECORD             = 21,
+    READ_FILE_RECORD                = 20,
+    WRITE_FILE_RECORD               = 21,
 
     /* Diagnostics */
-    READ_EXCEPTION_STATUS         = 7,
-    DIAGNOSTIC                    = 8,
-    GET_COM_EVENT_COUNTER         = 11,
-    GET_COM_EVENT_LOG             = 12,
-    REPORT_SLAVE_ID               = 17
+    READ_EXCEPTION_STATUS           = 7,
+    DIAGNOSTIC                      = 8,
+    GET_COM_EVENT_COUNTER           = 11,
+    GET_COM_EVENT_LOG               = 12,
+    REPORT_SLAVE_ID                 = 17
 }
 MBFunctionCode_t;
 
@@ -65,21 +65,21 @@ MBFunctionCode_t;
 /** TODO */
 typedef enum MBSubFunctionCode_e
 {
-    RETURN_QUERY_DATA                      = 0x00,
-    RESTART_COMMUNICATIONS_OPTION          = 0x01,
-    RETURN_DIAGNOSTIC_REGISTER             = 0x02,
-    CHANGE_ASCII_INPUT_DELIMITER           = 0x03,
-    FORCE_LISTEN_ONLY_MODE                 = 0x04,
-    CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER = 0x0A,
-    RETURN_BUS_MESSAGE_COUNT               = 0x0B,
-    RETURN_BUS_COMMUNICATION_ERROR_COUNT   = 0x0C,
-    RETURN_BUS_EXCEPTION_ERROR_COUNT       = 0x0D,
-    RETURN_SLAVE_MESSAGE_COUNT             = 0x0E,
-    RETURN_SLAVE_NO_RESPONSE_COUNT         = 0x0F,
-    RETURN_SLAVE_NAK_COUNT                 = 0x10,
-    RETURN_SLAVE_BUSY_COUNT                = 0x11,
-    RETURN_BUS_CHARACTER_OVERRUN_COUNT     = 0x12,
-    CLEAR_OVERRUN_COUNTER_AND_FLAG         = 0x14
+    RETURN_QUERY_DATA                       = 0x00,
+    RESTART_COMMUNICATIONS_OPTION           = 0x01,
+    RETURN_DIAGNOSTIC_REGISTER              = 0x02,
+    CHANGE_ASCII_INPUT_DELIMITER            = 0x03,
+    FORCE_LISTEN_ONLY_MODE                  = 0x04,
+    CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER  = 0x0A,
+    RETURN_BUS_MESSAGE_COUNT                = 0x0B,
+    RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 0x0C,
+    RETURN_BUS_EXCEPTION_ERROR_COUNT        = 0x0D,
+    RETURN_SLAVE_MESSAGE_COUNT              = 0x0E,
+    RETURN_SLAVE_NO_RESPONSE_COUNT          = 0x0F,
+    RETURN_SLAVE_NAK_COUNT                  = 0x10,
+    RETURN_SLAVE_BUSY_COUNT                 = 0x11,
+    RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 0x12,
+    CLEAR_OVERRUN_COUNTER_AND_FLAG          = 0x14
 }
 MBSubFunctionCode_t;
 
@@ -88,7 +88,8 @@ MBSubFunctionCode_t;
 /** TODO */
 typedef enum MBException_e
 {
-    OK = 0x00,
+    OK  = 0x00,
+    NOK = 0xFF,
 
     /* Stansard exception codes */
     ILLEGAL_FUNCTION                        = 0x01,
@@ -102,20 +103,18 @@ typedef enum MBException_e
     GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
 
     /* Non-standard exception codes */
-    NOK_RX_OVERFLOW    = 0x10,
-    NOK_NO_REPLY       = 0x12,
-    NOK_BYTE_COUNT     = 0x13,
-    NOK_COIL_VALUE     = 0x14,
-    NOK_OUTPUT_VALUE   = 0x15,
-    NOK_OUTPUT_ADDRESS = 0x16,
-    NOK_QUANTITY       = 0x19,
-    NOK_NULL_POINTER   = 0x1A,
-    NOK_CHECKSUM       = 0x1B,
-    NOK_LIST_ENTRY     = 0x1C,
-    NOK_PROCESS_STATE  = 0x1D,
-    NOK_ACCESS_RIGHT   = 0x1E,
-    
-    NOK = 0xFF
+    NOK_RX_OVERFLOW     = 0x10,
+    NOK_NO_REPLY        = 0x12,
+    NOK_BYTE_COUNT      = 0x13,
+    NOK_COIL_VALUE      = 0x14,
+    NOK_OUTPUT_VALUE    = 0x15,
+    NOK_OUTPUT_ADDRESS  = 0x16,
+    NOK_QUANTITY        = 0x19,
+    NOK_NULL_POINTER    = 0x1A,
+    NOK_CHECKSUM        = 0x1B,
+    NOK_REQUEST_ENTRY   = 0x1C,
+    NOK_PROCESS_STATE   = 0x1D,
+    NOK_REGISTER_ACCESS = 0x1E
 }
 MBException_t;
 

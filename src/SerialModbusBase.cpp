@@ -158,7 +158,9 @@ uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
                 usCrc ^= 0xA001;
             }
             else
+            {
                 usCrc >>= 1;
+            }
         }
     }
 

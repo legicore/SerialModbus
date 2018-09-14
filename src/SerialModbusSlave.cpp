@@ -450,7 +450,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                     /* While register access rights are not a standard feature
                     of Modbus we will send a error reply with a non standard
                     exception code. */
-                    xSetException( NOK_ACCESS_RIGHT );
+                    xSetException( NOK_REGISTER_ACCESS );
                     return NOK;
                 }
             }

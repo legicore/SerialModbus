@@ -43,6 +43,7 @@ MBSlaveState_t;
 /** TODO */
 typedef enum MBAccess_e
 {
+    NA = 0b00,
     RD = 0b01,
     WR = 0b10,
     RW = 0b11
@@ -61,7 +62,7 @@ typedef struct MBRegister_s
 MBRegister_t;
 
 /** TODO */
-#define REGISTER_MAP_END { ( MBAccess_t ) 0b00, 0x0000, NULL, 0, NULL }
+#define REGISTER_MAP_END { NA, 0x0000, NULL, 0, NULL }
 
 /*-----------------------------------------------------------*/
 

@@ -122,19 +122,19 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 
 MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 {
-    xSetException( OK );
-
     if( request == NULL )
     {
         return xSetException( NOK_NULL_POINTER );
     }
 
-    if( request->id            > configID_SLAVE_MAX ||
-        request->functionCode == 0x00               ||
-        request->address      == 0x0000             ||
-        request->objectSize    < 1                  )
+    xSetException( OK );
+
+    if( ( request->id            > configID_SLAVE_MAX ) ||
+        ( request->functionCode == 0x00               ) ||
+        ( request->address      == 0x0000             ) ||
+        ( request->objectSize   == 0                  ) )
     {
-        return xSetException( NOK_LIST_ENTRY );
+        return xSetException( NOK_REQUEST_ENTRY );
     }
 
     vClearRequestFrame();
@@ -190,7 +190,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             }
             else
             {
-                return xSetException( NOK_LIST_ENTRY );
+                return xSetException( NOK_REQUEST_ENTRY );
             }
 
             break;
