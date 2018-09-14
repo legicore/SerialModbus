@@ -128,7 +128,7 @@ The API (Application Programming Interface) was designed to be sleak, simple and
 ### Modbus Data
 
 ```C++
-typedef struct MBData_s
+typedef struct MBRequest_s
 {
     uint8_t id;
     uint8_t functionCode;
@@ -137,7 +137,23 @@ typedef struct MBData_s
     size_t objectSize;
     void (*action)( void );
 }
-MBData_t;
+MBRequest_t;
+
+#define REQUEST_MAP_END { 0x00, 0x00, 0x0000, NULL, 0, NULL }
+```
+
+```C++
+typedef struct MBRegister_s
+{
+    MBAccess_t access;
+    uint16_t address;
+    uint16_t * object;
+    size_t objectSize;
+    void (*action)( void );
+}
+MBRegister_t;
+
+#define REGISTER_MAP_END { ( MBAccess_t ) 0b00, 0x0000, NULL, 0, NULL }
 ```
 
 ### Common Methods
@@ -198,6 +214,23 @@ MBData_t;
 * Sets a new turnaround delay value.
     * `timeMs` : The new timeout value in milliseconds.
 
+## Usage Hints
+
+The following points are intended to prevent incorrect usage of the library, show possible error sources and avoid frustration and general errors.
+
+### 1. Slaves Register Address Range
+
+The developer is responsible for the distribution of the slave registers.
+The following slave register map would be processed without errors but lead to faulty behavior.
+```C++
+const MBRegister_t xRegisterMap[] = {
+    { WR, 0x1001, obj1, 3, NULL },
+    { WR, 0x1002, obj2, 1, NULL }, // FAULTY ADDRESS !!!
+    REGISTER_MAP_END
+};
+```
+> The first entry has the address value 0x1001 and has a object size of 3 - this covers the address values 0x1001, 0x1002 and 0x1003.
+The second entry address lies in the address range of the first entry and must at least have the address value 0x1004!
 # Remarks
 
 1. Because of the limited timing capabilities of the standard Arduino Platform the Modbus "Inter Character Timeout" (*t1.5*) is not implemented.
