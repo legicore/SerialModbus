@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusBase.h
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __SERIAL_MODBUS_BASE_H__
 #define __SERIAL_MODBUS_BASE_H__
@@ -23,30 +29,7 @@
 
 /*-----------------------------------------------------------*/
 
-/**
- * @typedef MBData_t
- *          TODO
- */
-typedef struct MBData_s
-{
-    uint8_t id;
-    uint8_t functionCode;
-    uint16_t address;
-    uint16_t * object;
-    size_t objectSize;
-    void (*action)( void );
-}
-MBData_t;
-
 /** TODO */
-#define DATA_LIST_END { 0x00, 0x00, 0x0000, NULL, 0, NULL }
-
-/*-----------------------------------------------------------*/
-
-/**
- * @typedef MBFunctionCode_t
- *          TODO
- */
 typedef enum MBFunctionCode_e
 {
     /* Bit Data Access */
@@ -79,10 +62,7 @@ MBFunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-/**
- * @typedef MBSubFunctionCode_t
- *          TODO
- */
+/** TODO */
 typedef enum MBSubFunctionCode_e
 {
     RETURN_QUERY_DATA                      = 0x00,
@@ -105,10 +85,7 @@ MBSubFunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-/**
- * @typedef MBException_t
- *          TODO
- */
+/** TODO */
 typedef enum MBException_e
 {
     OK = 0x00,
@@ -136,34 +113,27 @@ typedef enum MBException_e
     NOK_CHECKSUM       = 0x1B,
     NOK_LIST_ENTRY     = 0x1C,
     NOK_PROCESS_STATE  = 0x1D,
+    NOK_ACCESS_RIGHT   = 0x1E,
     
     NOK = 0xFF
 }
 MBException_t;
 
-/**
- * @typedef MBStatus_t
- *          TODO
- */
+/** TODO */
 typedef MBException_t MBStatus_t;
 
 /*-----------------------------------------------------------*/
 
+/** TODO */
 class SerialModbusBase
 {
 public:
 
     SerialModbusBase();
-#if defined(__AVR_ATmega640__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__) || (__AVR_ATmega328P__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__)
-    void begin( uint32_t baud, HardwareSerial * serial = &Serial, uint8_t config = SERIAL_8N1 );
-#elif defined(__AVR_ATmega32U4__) || defined(__AVR_ATmega16U4__)
-    void begin( uint32_t baud, HardwareSerial * serial = &Serial1, uint8_t config = SERIAL_8N1 );
-#endif
-    void begin( uint32_t baud, SoftwareSerial * serial );
     void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
-    void setDataList( const MBData_t * dataList );
 #if( configMODE == configMODE_RTU )
     void setInterFrameDelay( uint32_t timeMs );
+    void setInterCharacterTimeout( uint32_t timeMs );
 #endif
 #if( configPROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
@@ -175,8 +145,6 @@ protected:
     uint8_t pucReplyFrame[ configMAX_FRAME_SIZE ];
     size_t xRequestLength;
     size_t xReplyLength;
-    size_t xDataListIndex;
-    MBData_t * pxDataList;
     MBException_t xException;
     MBException_t xSetException( MBException_t xExceptionPar );
     MBStatus_t xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLen );

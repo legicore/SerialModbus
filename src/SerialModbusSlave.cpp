@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusSlave.cpp
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
 #include <string.h>
@@ -17,6 +23,81 @@
 #include "SerialModbusBase.h"
 #include "SerialModbusSlave.h"
 
+/*-----------------------------------------------------------*/
+
+typedef struct MBAccessRights_s
+{
+    unsigned uxAccess       : 2;
+    unsigned uxFunctionCode : 6;
+}
+MBAccessRights_t;
+
+static const MBAccessRights_t pxAccessRights[] = {
+
+    /* Bit Data Access */
+#if( configFC01 == 1 )
+    { RD, READ_COILS },
+#endif
+#if( configFC02 == 1 )
+    { RD, READ_DISCRETE_INPUTS },
+#endif
+#if( configFC05 == 1 )
+    { WR, WRITE_SINGLE_COIL },
+#endif
+#if( configFC15 == 1 )
+    { WR, WRITE_MULTIPLE_COILS },
+#endif
+
+    /* Word Data Access */
+#if( configFC03 == 1 )
+    { RD, READ_HOLDING_REGISTERS },
+#endif
+#if( configFC04 == 1 )
+    { RD, READ_INPUT_REGISTERS },
+#endif
+#if( configFC06 == 1 )
+    { WR, WRITE_SINGLE_REGISTER },
+#endif
+#if( configFC16 == 1 )
+    { WR, WRITE_MULTIPLE_REGISTERS },
+#endif
+#if( configFC22 == 1 )
+    { WR, MASK_WRITE_REGISTER },
+#endif
+#if( configFC23 == 1 )
+    { RW, READ_WRITE_MULTIPLE_REGISTERS },
+#endif
+#if( configFC24 == 1 )
+    { RD, READ_FIFO_QUEUE },
+#endif
+    /* File Record Data Access */
+#if( configFC20 == 1 )
+    { RD, READ_FILE_RECORD },
+#endif
+#if( configFC21 == 1 )
+    { WR, WRITE_FILE_RECORD },
+#endif
+
+    /* Diagnostics */
+#if( configFC07 == 1 )
+    { RD, READ_EXCEPTION_STATUS },
+#endif
+#if( configFC08 == 1 )
+    { RW, DIAGNOSTIC },
+#endif
+#if( configFC11 == 1 )
+    { RD, GET_COM_EVENT_COUNTER },
+#endif
+#if( configFC12 == 1 )
+    { RD, GET_COM_EVENT_LOG },
+#endif
+#if( configFC17 == 1 )
+    { RD, REPORT_SLAVE_ID },
+#endif
+
+    /* Marks the end of the list. */
+    { 0b00, 0b000000 }
+};
 /*-----------------------------------------------------------*/
 
 SerialModbusSlave::SerialModbusSlave()
@@ -37,6 +118,27 @@ SerialModbusSlave::SerialModbusSlave()
     #endif
 
     bListenOnlyMode = false;
+
+    pxRegisterMap = NULL;
+    xRegisterMapIndex = 0;
+
+    ucSlaveId = configID_SLAVE_MAX;
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
+{
+    ucSlaveId = slaveId;
+	pxSerial = serial;
+    pxSerial->begin( baud, config );
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
+{
+    ucSlaveId = slaveId;
+	pxSerialSoftware = serial;
+    pxSerialSoftware->begin( baud );
 }
 /*-----------------------------------------------------------*/
 
@@ -46,18 +148,9 @@ void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::bCheckSlaveId( uint8_t ucRequestId )
+void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 {
-    for( size_t i = 0; pxDataList[ i ].functionCode != 0x00; i++ )
-    {
-        if( ( ucRequestId == pxDataList[ i ].id ) || ( ucRequestId == configID_BROADCAST ) )
-        {
-            ucSlaveId = ucRequestId;
-            return true;
-        }
-    }
-            
-    return false;
+    pxRegisterMap = registerMap;
 }
 /*-----------------------------------------------------------*/
 
@@ -96,9 +189,12 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             #if( configMODE == configMODE_RTU )
                             {
-                                /* Start the inter frame delay */
-                                vStartInterFrameDelay();
-                                vStartInterCharacterTimeout();
+                                if( ucREQUEST_ID == ucSlaveId )
+                                {
+                                    vStartInterFrameDelay();
+                                    vStartInterCharacterTimeout();
+                                    break;
+                                }
                             }
                             #endif
 
@@ -111,6 +207,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 }
                             }
                             #endif
+
+                            vClearRequestFrame();
+                            break;
                         }
                     }
                     else
@@ -136,8 +235,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             }
                             else
                             {
-                                xSetException( NOK_CHECKSUM );
-                                vSetState( FORMATTING_ERROR_REPLY );
+                                vClearRequestFrame();
+                                vSetState( SLAVE_IDLE );
                             }
                         }
                     }
@@ -169,7 +268,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             {
                 incCPT1();
 
-                if( bScanDataList() == true )
+                if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == OK )
                 {
                     vSetState( PROCESSING_REQUIRED_ACTION );
                 }
@@ -182,54 +281,51 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             }
 
             case PROCESSING_REQUIRED_ACTION :
-            {
-                if( ( bCheckSlaveId( ucREQUEST_ID ) == true ) || ( ucREQUEST_ID == configID_BROADCAST ) )
-                {
-                    incCPT4();
+        {
+                incCPT4();
 
-                    switch( ucREQUEST_FUNCTION_CODE )
-                    {
+                switch( ucREQUEST_FUNCTION_CODE )
+                {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-                        case READ_HOLDING_REGISTERS :
-                        case READ_INPUT_REGISTERS :
-                        {
-                            vHandler03_04();
-                            break;
-                        }
+                    case READ_HOLDING_REGISTERS :
+                    case READ_INPUT_REGISTERS :
+                    {
+                        vHandler03_04();
+                        break;
+                    }
 #endif
 #if( configFC05 == 1 )
-                        case WRITE_SINGLE_COIL :
-                        {
-                            vHandler05();
-                            break;
-                        }
+                    case WRITE_SINGLE_COIL :
+                    {
+                        vHandler05();
+                        break;
+                    }
 #endif
 #if( configFC06 == 1 )
-                        case WRITE_SINGLE_REGISTER :
-                        {
-                            vHandler06();
-                            break;
-                        }
+                    case WRITE_SINGLE_REGISTER :
+                    {
+                        vHandler06();
+                        break;
+                    }
 #endif
 #if( configFC08 == 1 )
-                        case DIAGNOSTIC :
-                        {
-                            vHandler08();
-                            break;
-                        }
+                    case DIAGNOSTIC :
+                    {
+                        vHandler08();
+                        break;
+                    }
 #endif
 #if( configFC16 == 1 )
-                        case WRITE_MULTIPLE_REGISTERS :
-                        {
-                            vHandler16();
-                            break;
-                        }
+                    case WRITE_MULTIPLE_REGISTERS :
+                    {
+                        vHandler16();
+                        break;
+                    }
 #endif
-                        default :
-                        {
-                            incCPT3();
-                            xSetException( ILLEGAL_FUNCTION );
-                        }
+                    default :
+                    {
+                        incCPT3();
+                        xSetException( ILLEGAL_FUNCTION );
                     }
                 }
                 
@@ -258,8 +354,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     vClearReplyFrame();
                 }
                 
-                xSetException( OK );
                 vClearRequestFrame();
+                xSetException( OK );
                 vSetState( SLAVE_IDLE );
 
                 break;
@@ -313,37 +409,62 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::bScanDataList( void )
+MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
 {
-    bool bFunctionCode = false;
-    
-    for( size_t i = 0; pxDataList[ i ].functionCode != 0x00; i++ )
+    /* Do nothing if the register map is not set. */
+    if( pxRegisterMap == NULL )
     {
-        if( ( pxDataList[ i ].id == ucSlaveId ) || ( ucSlaveId == configID_BROADCAST ) )
+        return NOK;
+    }
+
+    /* Reset the register map index. */
+    xRegisterMapIndex = 0;
+
+    /* Before we find a matching register map entry the exception will be set by
+    default. If successful the exception is reset to 'OK' or will be overwritten
+    if another error occurs. Otherwise it persists which means that we could not
+    find a matching register map entry. */
+    xSetException( ILLEGAL_DATA_ADDRESS );
+
+    /* Scan the register map and check if the request address value lies in the
+    range of one of the mapped register entries. */
+    for( ; pxRegisterMap[ xRegisterMapIndex ].address != 0x0000; xRegisterMapIndex++ )
+    {
+        if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
+            ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].objectSize ) ) )
         {
-            if( pxDataList[ i ].functionCode == ucREQUEST_FUNCTION_CODE )
+            /* Scan the access rights map for the request function code. */
+            for( size_t i = 0; pxAccessRights[ i ].uxAccess != 0b00; i++ )
             {
-                bFunctionCode = true;
-                
-                if( ( usREQUEST_ADDRESS >= pxDataList[ i ].address ) &&
-                    ( usREQUEST_ADDRESS <  pxDataList[ i ].address + ( uint16_t ) pxDataList[ i ].objectSize ) )
+                if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].uxFunctionCode )
                 {
-                    xDataListIndex = i;
-                    return true;
+                    /* Check if the type of the request function code has the
+                    right to access the destination register. */
+                    if( ( pxRegisterMap[ xRegisterMapIndex ].access & ( MBAccess_t ) pxAccessRights[ i ].uxAccess ) != 0 )
+                    {
+                        /* Reset the exception which was set from the start. */
+                        xSetException( OK );
+                        return OK;
+                    }
+
+                    /* While register access rights are not a standard feature
+                    of Modbus we will send a error reply with a non standard
+                    exception code. */
+                    xSetException( NOK_ACCESS_RIGHT );
+                    return NOK;
                 }
             }
+
+            /* We could not find the function code in the access rights map so
+            we set the exception and abort the for loop. */
+            xSetException( ILLEGAL_FUNCTION );
+            break;
         }
-    }
-    
-    if( bFunctionCode == false )
-    {
-        return true;
     }
 
     incCPT3();
-    xSetException( ILLEGAL_DATA_ADDRESS );
-    
-    return false;
+
+    return NOK;
 }
 /*-----------------------------------------------------------*/
 
@@ -354,14 +475,14 @@ void SerialModbusSlave::vHandler03_04( void )
 
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007D ) )
     {
-        xOffset = ( size_t ) usREQUEST_ADDRESS - pxDataList[ xDataListIndex ].address;
+        xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
         
-        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxDataList[ xDataListIndex ].objectSize )
+        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
         {
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxDataList[ xDataListIndex ].object[ i + xOffset ] );
-                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxDataList[ xDataListIndex ].object[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
             }
             
             ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -369,9 +490,9 @@ void SerialModbusSlave::vHandler03_04( void )
             
             xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
 
-            if( pxDataList[ xDataListIndex ].action != NULL )
+            if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
             {
-                (*pxDataList[ xDataListIndex ].action)();
+                (*pxRegisterMap[ xRegisterMapIndex ].action)();
             }
             
             return;
@@ -388,7 +509,7 @@ void SerialModbusSlave::vHandler05( void )
 {
     if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
     {
-        pxDataList[ xDataListIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
+        pxRegisterMap[ xRegisterMapIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
         
         ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
         ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
@@ -398,9 +519,9 @@ void SerialModbusSlave::vHandler05( void )
         
         xReplyLength = 6;
 
-        if( pxDataList[ xDataListIndex ].action != NULL )
+        if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
         {
-            (*pxDataList[ xDataListIndex ].action)();
+            (*pxRegisterMap[ xRegisterMapIndex ].action)();
         }
         
         return;
@@ -414,9 +535,9 @@ void SerialModbusSlave::vHandler05( void )
 #if( configFC06 == 1 )
 void SerialModbusSlave::vHandler06( void )
 {
-	size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxDataList[ xDataListIndex ].address;
+	size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 	
-	pxDataList[ xDataListIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
+	pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
 	
 	ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
 	ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
@@ -426,9 +547,9 @@ void SerialModbusSlave::vHandler06( void )
 	
 	xReplyLength = 6;
 
-	if( pxDataList[ xDataListIndex ].action != NULL )
+	if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
 	{
-		(*pxDataList[ xDataListIndex ].action)();
+        (*pxRegisterMap[ xRegisterMapIndex ].action)();
 	}
 }
 #endif
@@ -687,8 +808,8 @@ bool SerialModbusSlave::diagRegGet( size_t bit )
     {
         if( bitRead( diagnosticRegister, bit ) == 1 )
         {
-			return true;
-		}
+            return true;
+        }
     }
 
     return false;
@@ -733,15 +854,15 @@ void SerialModbusSlave::vHandler16( void )
 
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007B ) )
     {
-        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxDataList[ xDataListIndex ].address );
+        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
 
-        if( ( size_t ) ( usREQUEST_QUANTITY + xOffset ) <= pxDataList[ xDataListIndex ].objectSize )
+        if( ( size_t ) ( usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
         {
             if( ucREQUEST_BYTE_COUNT_2 == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
             {
                 for( size_t i = 0; i < usREQUEST_QUANTITY; i++ )
                 {
-                    pxDataList[ xDataListIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
+                    pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
                 }
                 
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -752,9 +873,9 @@ void SerialModbusSlave::vHandler16( void )
                 
                 xReplyLength = 6;
 
-                if( pxDataList[ xDataListIndex ].action != NULL )
+                if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
                 {
-                    (*pxDataList[ xDataListIndex ].action)();
+                    (*pxRegisterMap[ xRegisterMapIndex ].action)();
                 }
                 
                 return;

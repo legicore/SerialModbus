@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusMaster.cpp
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
 #include <string.h>
@@ -25,13 +31,30 @@ SerialModbusMaster::SerialModbusMaster()
 
     xReplyDataSize = 0;
     
-    pxRequestData = NULL;
+    pxRequest = NULL;
     
     ulTurnaroundDelayUs = configTURNAROUND_DELAY_US;
     ulResponseTimeoutUs = configRESPONSE_TIMEOUT_US;
     
     ulTimerResponseTimeoutUs = 0;
     ulTimerTurnaroundDelayUs = 0;
+
+    pxRequestMap = NULL;
+    xRequestMapIndex = 0;
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
+{
+    pxSerial = serial;
+    pxSerial->begin( baud, config );
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
+{
+    pxSerialSoftware = serial;
+    pxSerialSoftware->begin( baud );
 }
 /*-----------------------------------------------------------*/
 
@@ -77,27 +100,27 @@ void SerialModbusMaster::setTurnaroundDelay( uint32_t timeMs )
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::xProcessDataList( void )
+MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 {
-    if( pxDataList != NULL )
+    if( pxRequestMap != NULL )
     {
-        if( pxDataList[ xDataListIndex ].functionCode == 0x00 )
+        if( pxRequestMap[ xRequestMapIndex ].functionCode == 0x00 )
         {
-            xDataListIndex = 0;
+            xRequestMapIndex = 0;
         }
         
-        return setRequest( &pxDataList[ xDataListIndex++ ] );
+        return setRequest( &pxRequestMap[ xRequestMapIndex++ ] );
     }
     else
     {
-        xDataListIndex = 0;
+        xRequestMapIndex = 0;
     }
     
     return OK;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::setRequest( MBData_t * request )
+MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 {
     xSetException( OK );
     
@@ -175,19 +198,25 @@ MBStatus_t SerialModbusMaster::setRequest( MBData_t * request )
 #endif
         default:
         {
-			return xSetException( ILLEGAL_FUNCTION );
+            return xSetException( ILLEGAL_FUNCTION );
         }
     }
     
-    pxRequestData = request;
+    pxRequest = request;
 
     return xSetChecksum( pucRequestFrame, &xRequestLength );
 }
 /*-----------------------------------------------------------*/
 
+void SerialModbusMaster::setRequestMap( const MBRequest_t * requestMap )
+{
+    pxRequestMap = requestMap;
+}
+/*-----------------------------------------------------------*/
+
 MBStatus_t SerialModbusMaster::processModbus( void )
 {
-    if( xProcessDataList() != OK )
+    if( xProcessRequestMap() != OK )
     {
         vSetState( PROCESSING_ERROR );
     }
@@ -438,7 +467,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
     
     switch( ucREPLY_FUNCTION_CODE )
     {
-#if( configFC03 == 1 || configFC04 == 1 )
+#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
         case READ_HOLDING_REGISTERS:
         case READ_INPUT_REGISTERS:
         {
@@ -481,21 +510,21 @@ void SerialModbusMaster::vHandler03_04( void )
     /* Check the response byte count */
     if( ucREPLY_BYTE_COUNT == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
     {
-        if( pxRequestData->object != NULL )
+        if( pxRequest->object != NULL )
         {
-            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequestData->address );
+            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
             
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pxRequestData->object[ i + xOffset ] = usReplyWord( i );
+                pxRequest->object[ i + xOffset ] = usReplyWord( i );
             }
         }
         
         xReplyDataSize = ( size_t ) usREQUEST_QUANTITY;
 
-        if( pxRequestData->action != NULL )
+        if( pxRequest->action != NULL )
         {
-            (*pxRequestData->action)();
+            (*pxRequest->action)();
         }
     }
     else
@@ -518,9 +547,9 @@ void SerialModbusMaster::vHandler05( void )
         {
             xReplyDataSize = 1;
 
-            if( pxRequestData->action != NULL )
+            if( pxRequest->action != NULL )
             {
-                (*pxRequestData->action)();
+                (*pxRequest->action)();
             }
         }
         else
@@ -549,9 +578,9 @@ void SerialModbusMaster::vHandler06( void )
         {
             xReplyDataSize = 1;
 
-            if( pxRequestData->action != NULL )
+            if( pxRequest->action != NULL )
             {
-                (*pxRequestData->action)();
+                (*pxRequest->action)();
             }
         }
         else
@@ -580,9 +609,9 @@ void SerialModbusMaster::vHandler16( void )
         {
             xReplyDataSize = 0;
 
-            if( pxRequestData->action != NULL )
+            if( pxRequest->action != NULL )
             {
-                (*pxRequestData->action)();
+                (*pxRequest->action)();
             }
         }
         else

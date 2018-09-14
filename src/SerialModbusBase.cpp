@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusBase.cpp
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
 #include <string.h>
@@ -31,8 +37,6 @@ SerialModbusBase::SerialModbusBase()
     
     xSetException( OK );
 
-    setDataList( NULL );
-
     #if( configMODE == configMODE_RTU )
     {
         ulInterFrameDelayUs = configINTER_FRAME_DELAY_US;
@@ -56,39 +60,18 @@ SerialModbusBase::SerialModbusBase()
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
-{
-	pxSerial = serial;
-    pxSerial->begin( baud, config );
-}
-/*-----------------------------------------------------------*/
-
-void SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
-{
-	pxSerialSoftware = serial;
-    pxSerialSoftware->begin( baud );
-}
-/*-----------------------------------------------------------*/
-
-void SerialModbusBase::setDataList( const MBData_t * dataList )
-{
-    if( dataList != NULL )
-    {
-        pxDataList = ( MBData_t * ) dataList;
-    }
-    else
-    {
-        pxDataList = NULL;
-    }
-    
-    xDataListIndex = 0;
-}
-/*-----------------------------------------------------------*/
-
 #if( configMODE == configMODE_RTU )
 void SerialModbusBase::setInterFrameDelay( uint32_t timeMs )
 {
     ulInterFrameDelayUs = timeMs * 1000;
+}
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+void SerialModbusBase::setInterCharacterTimeout( uint32_t timeMs )
+{
+    ulInterCharacterTimeoutUs = timeMs * 1000;
 }
 #endif
 /*-----------------------------------------------------------*/

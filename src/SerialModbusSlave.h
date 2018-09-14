@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusSlave.h
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __SERIAL_MODBUS_SLAVE_H__
 #define __SERIAL_MODBUS_SLAVE_H__
@@ -16,15 +22,14 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <Arduino.h>
+#include <SoftwareSerial.h>
 
 #include "SerialModbusBase.h"
 
 /*-----------------------------------------------------------*/
 
-/**
- * @typedef MBSlaveState_t
- *          TODO
- */
+/** TODO */
 typedef enum MBSlaveState_e
 {
     SLAVE_IDLE,
@@ -35,22 +40,54 @@ typedef enum MBSlaveState_e
 }
 MBSlaveState_t;
 
+/** TODO */
+typedef enum MBAccess_e
+{
+    RD = 0b01,
+    WR = 0b10,
+    RW = 0b11
+}
+MBAccess_t;
+
+/** TODO */
+typedef struct MBRegister_s
+{
+    MBAccess_t access;
+    uint16_t address;
+    uint16_t * object;
+    size_t objectSize;
+    void (*action)( void );
+}
+MBRegister_t;
+
+/** TODO */
+#define REGISTER_MAP_END { ( MBAccess_t ) 0b00, 0x0000, NULL, 0, NULL }
+
 /*-----------------------------------------------------------*/
 
+/** TODO */
 class SerialModbusSlave : public SerialModbusBase
 {
 public:
 
     SerialModbusSlave();
+#if defined( __AVR_ATmega640__ ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || ( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__ ) || defined( __AVR_ATmega8__ )
+    void begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial = &Serial, uint8_t config = SERIAL_8N1 );
+#elif defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    void begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial = &Serial1, uint8_t config = SERIAL_8N1 );
+#endif
+    void begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
     MBStatus_t processModbus( void );
+    void setRegisterMap( const MBRegister_t * registerMap );
 
 private:
 
     uint8_t ucSlaveId;
-    bool bCheckSlaveId( uint8_t ucRequestId );
     MBSlaveState_t xState;
     void vSetState( MBSlaveState_t xStatePar );
-    bool bScanDataList( void );
+    const MBRegister_t * pxRegisterMap;
+    size_t xRegisterMapIndex;
+    MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
 #if( configFC03 == 1 || configFC04 == 1 )
     void vHandler03_04( void );
 #endif

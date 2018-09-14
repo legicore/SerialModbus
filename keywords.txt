@@ -20,12 +20,14 @@ MBStatus_t	KEYWORD1
 
 begin	KEYWORD2
 setSerialCtrl	KEYWORD2
-setDataList	KEYWORD2
+setRequestMap	KEYWORD2
+setRegisterMap	KEYWORD2
 setRequest	KEYWORD2
 processModbus	KEYWORD2
 getReplyDataSize	KEYWORD2
 getReplyData	KEYWORD2
 setInterFrameDelay	KEYWORD2
+setInterCharacterTimeout	KEYWORD2
 setResponseTimeout	KEYWORD2
 setTurnaroundDelay	KEYWORD2
 setProcessLoopHook	KEYWORD2
@@ -34,10 +36,17 @@ setProcessLoopHook	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-DATA_LIST_END	LITERAL1
+REQUEST_MAP_END	LITERAL1
+REGISTER_MAP_END	LITERAL1
 
 COIL_ON	LITERAL1
 COIL_OFF	LITERAL1
+
+OK	LITERAL1
+
+RD	LITERAL1
+WR	LITERAL1
+RW	LITERAL1
 
 #READ_COILS	LITERAL1
 #READ_DISCRETE_INPUTS	LITERAL1

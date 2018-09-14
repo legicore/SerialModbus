@@ -1,12 +1,18 @@
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusConfig.h
  *
- * @author      legicore
+ * @author      Martin Legleiter
  *
- * @brief       xxx
+ * @brief       TODO
+ * 
+ * @copyright   2018 Martin Legleiter
+ * 
+ * @license     Use of this source code is governed by an MIT-style
+ *              license that can be found in the LICENSE file or at
+ *              @see https://opensource.org/licenses/MIT.
  */
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __SERIAL_MODBUS_CONFIG_H__
 #define __SERIAL_MODBUS_CONFIG_H__
@@ -22,11 +28,11 @@
 #define configID_BROADCAST              0
 #define configID_SLAVE_MAX              247
 
-#define configASCII_INPUT_DELIMITER		'\n'
+#define configASCII_INPUT_DELIMITER	    '\n'
 
 /*-----------------------------------------------------------*/
 
-#define configINTER_CHARACTER_TIMEOUT_US	750
+#define configINTER_CHARACTER_TIMEOUT_US    750
 #define configINTER_FRAME_DELAY_US          1750
 #define configTURNAROUND_DELAY_US           200000
 #define configRESPONSE_TIMEOUT_US           1000000
@@ -36,7 +42,7 @@
 #define N 0 /* Not implemented */
 
 /* Bit Data Access */
-#define configFC01      N	/* READ_COILS */
+#define configFC01      N   /* READ_COILS */
 #define configFC02      N   /* READ_DISCRETE_INPUTS */
 #define configFC05      1   /* WRITE_SINGLE_COIL */
 #define configFC15      N   /* WRITE_MULTIPLE_COILS */
@@ -65,7 +71,7 @@
 
 /*-----------------------------------------------------------*/
 
-#define configPROCESS_LOOP_HOOK		1
+#define configPROCESS_LOOP_HOOK 1
 
 /*-----------------------------------------------------------*/
 
