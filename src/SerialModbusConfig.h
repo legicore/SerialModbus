@@ -28,7 +28,7 @@
 #define configID_BROADCAST              0
 #define configID_SLAVE_MAX              247
 
-#define configASCII_INPUT_DELIMITER	    '\n'
+#define configASCII_INPUT_DELIMITER     '\n'
 
 /*-----------------------------------------------------------*/
 

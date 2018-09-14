@@ -34,7 +34,7 @@ SerialModbusBase::SerialModbusBase()
     pxSerialSoftware = NULL;
 
     setSerialCtrl( NULL, NULL );
-    
+
     xSetException( OK );
 
     #if( configMODE == configMODE_RTU )
@@ -45,7 +45,7 @@ SerialModbusBase::SerialModbusBase()
         ulTimerInterCharacterTimeoutUs = 0;
     }
     #endif
-    
+
     #if( configPROCESS_LOOP_HOOK == 1 )
     {
         setProcessLoopHook( NULL );
@@ -84,7 +84,7 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
     {
         return NOK_NULL_POINTER;
     }
-    
+
     #if( configMODE == configMODE_RTU )
     {
         usTempChecksum = usCRC16( pucFrame, *pxFrameLength );
@@ -99,7 +99,7 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
         pucFrame[ (*pxFrameLength)++ ] = ( uint8_t ) usTempChecksum;
     }
     #endif
-    
+
     return OK;
 }
 /*-----------------------------------------------------------*/
@@ -112,7 +112,7 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
     {
         return NOK_NULL_POINTER;
     }
-    
+
     #if( configMODE == configMODE_RTU )
     {
         usTempChecksum = usCRC16( pucFrame, xFrameLength - 2 );
@@ -135,7 +135,7 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
         }
     }
     #endif
-    
+
     return NOK;
 }
 /*-----------------------------------------------------------*/
@@ -160,7 +160,7 @@ uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
                 usCrc >>= 1;
         }
     }
-    
+
     return usCrc;
 }
 #endif
@@ -188,7 +188,7 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
     {
         return NOK_NULL_POINTER;
     }
-    
+
     pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = cAsciiInputDelimiter;
     pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = '\r';
 
@@ -201,7 +201,7 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
     pucFrame[ 0 ] = ':';
 
     *pxFrameLength = ( *pxFrameLength * 2 ) + 3;
-    
+
     return OK;
 }
 #endif
@@ -214,14 +214,14 @@ MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLe
     {
         return NOK_NULL_POINTER;
     }
-    
+
     *pxFrameLength = ( *pxFrameLength - 3 ) / 2;
 
     for( size_t i = 0; i < *pxFrameLength; i++ )
     {
         pucFrame[ i ] = ucAsciiToByte( pucFrame[ ( i * 2 ) + 1 ], pucFrame[ ( i * 2 ) + 2 ] );
     }
-    
+
     return OK;
 }
 #endif

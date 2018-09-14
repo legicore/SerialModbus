@@ -30,12 +30,12 @@ SerialModbusMaster::SerialModbusMaster()
     vSetState( MASTER_IDLE );
 
     xReplyDataSize = 0;
-    
+
     pxRequest = NULL;
-    
+
     ulTurnaroundDelayUs = configTURNAROUND_DELAY_US;
     ulResponseTimeoutUs = configRESPONSE_TIMEOUT_US;
-    
+
     ulTimerResponseTimeoutUs = 0;
     ulTimerTurnaroundDelayUs = 0;
 
@@ -108,14 +108,14 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
         {
             xRequestMapIndex = 0;
         }
-        
+
         return setRequest( &pxRequestMap[ xRequestMapIndex++ ] );
     }
     else
     {
         xRequestMapIndex = 0;
     }
-    
+
     return OK;
 }
 /*-----------------------------------------------------------*/
@@ -123,12 +123,12 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 {
     xSetException( OK );
-    
+
     if( request == NULL )
     {
         return xSetException( NOK_NULL_POINTER );
     }
-    
+
     if( request->id            > configID_SLAVE_MAX ||
         request->functionCode == 0x00               ||
         request->address      == 0x0000             ||
@@ -136,14 +136,14 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
     {
         return xSetException( NOK_LIST_ENTRY );
     }
-	
+
     vClearRequestFrame();
-    
+
     pucRequestFrame[ 0 ] = request->id;
     pucRequestFrame[ 1 ] = request->functionCode;
     pucRequestFrame[ 2 ] = highByte( request->address );
     pucRequestFrame[ 3 ] =  lowByte( request->address );
-    
+
     switch( request->functionCode )
     {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
@@ -153,7 +153,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             pucRequestFrame[ 4 ] = highByte( request->objectSize );
             pucRequestFrame[ 5 ] =  lowByte( request->objectSize );
             xRequestLength = 6;
-            
+
             break;
         }
 #endif
@@ -164,7 +164,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             pucRequestFrame[ 4 ] = highByte( request->object[ 0 ] );
             pucRequestFrame[ 5 ] =  lowByte( request->object[ 0 ] );
             xRequestLength = 6;
-            
+
             break;
         }
 #endif
@@ -176,9 +176,9 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             pucRequestFrame[ 5 ] =  lowByte( request->objectSize );
             /* Byte-Count */
             pucRequestFrame[ 6 ] = ( uint8_t ) request->objectSize * 2;
-            
+
             xRequestLength = 7;
-            
+
             if( request->object != NULL )
             {
                 for( size_t i = 0; i < request->objectSize; i++ )
@@ -192,7 +192,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             {
                 return xSetException( NOK_LIST_ENTRY );
             }
-            
+
             break;
         }
 #endif
@@ -201,7 +201,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             return xSetException( ILLEGAL_FUNCTION );
         }
     }
-    
+
     pxRequest = request;
 
     return xSetChecksum( pucRequestFrame, &xRequestLength );
@@ -220,7 +220,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
     {
         vSetState( PROCESSING_ERROR );
     }
-    
+
     do
     {
         /* Get the current state and select the associated action. */
@@ -313,7 +313,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
-                
+
                 if( bTimeoutResponseTimeout() == true )
                 {
                     xSetException( NOK_NO_REPLY );
@@ -436,7 +436,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 vSetState( MASTER_IDLE );
             }
         }
-        
+
         #if( configPROCESS_LOOP_HOOK == 1 )
         {
             if( ( vProcessLoopHook != NULL ) && ( xState != MASTER_IDLE ) )
@@ -447,7 +447,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
         #endif
     }
     while( xState != MASTER_IDLE );
-    
+
     return xException;
 }
 /*-----------------------------------------------------------*/
@@ -464,7 +464,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
     {
         return 0;
     }
-    
+
     switch( ucREPLY_FUNCTION_CODE )
     {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
@@ -519,7 +519,7 @@ void SerialModbusMaster::vHandler03_04( void )
                 pxRequest->object[ i + xOffset ] = usReplyWord( i );
             }
         }
-        
+
         xReplyDataSize = ( size_t ) usREQUEST_QUANTITY;
 
         if( pxRequest->action != NULL )

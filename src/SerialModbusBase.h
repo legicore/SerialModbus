@@ -89,7 +89,7 @@ MBSubFunctionCode_t;
 typedef enum MBException_e
 {
     OK = 0x00,
-    
+
     /* Stansard exception codes */
     ILLEGAL_FUNCTION                        = 0x01,
     ILLEGAL_DATA_ADDRESS                    = 0x02,

@@ -103,7 +103,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 SerialModbusSlave::SerialModbusSlave()
 {
     vSetState( SLAVE_IDLE );
-    
+
     #if( configFC08 == 1 )
     {
         cpt1_busMsgCnt      = 0;
@@ -129,7 +129,7 @@ SerialModbusSlave::SerialModbusSlave()
 void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
 {
     ucSlaveId = slaveId;
-	pxSerial = serial;
+    pxSerial = serial;
     pxSerial->begin( baud, config );
 }
 /*-----------------------------------------------------------*/
@@ -137,7 +137,7 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * 
 void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
 {
     ucSlaveId = slaveId;
-	pxSerialSoftware = serial;
+    pxSerialSoftware = serial;
     pxSerialSoftware->begin( baud );
 }
 /*-----------------------------------------------------------*/
@@ -328,7 +328,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         xSetException( ILLEGAL_FUNCTION );
                     }
                 }
-                
+
                 if( xException == OK )
                 {
                     vSetState( FORMATTING_NORMAL_REPLY );
@@ -353,20 +353,20 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     incCPT5();
                     vClearReplyFrame();
                 }
-                
+
                 vClearRequestFrame();
                 xSetException( OK );
                 vSetState( SLAVE_IDLE );
 
                 break;
-           }
+            }
 
             case FORMATTING_ERROR_REPLY :
             {
                 if( ucREQUEST_ID != configID_BROADCAST )
                 {
                     incCPT3();
-                    
+
                     ucREPLY_ID            = ucSlaveId;
                     ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
                     ucREPLY_ERROR_CODE    = ( uint8_t ) xException;
@@ -379,7 +379,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                 {
                     vClearReplyFrame();
                 }
-                
+
                 xSetException( OK );
                 vClearRequestFrame();
                 vSetState( SLAVE_IDLE );
@@ -393,7 +393,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                 vSetState( SLAVE_IDLE );
             }
         }
-        
+
         #if( configPROCESS_LOOP_HOOK == 1 )
         {
             if( ( vProcessLoopHook != NULL ) && ( xState != SLAVE_IDLE ) )
@@ -404,7 +404,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
         #endif
     }
     while( xState != SLAVE_IDLE );
-    
+
     return xException;
 }
 /*-----------------------------------------------------------*/
@@ -476,7 +476,7 @@ void SerialModbusSlave::vHandler03_04( void )
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007D ) )
     {
         xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
-        
+
         if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
         {
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
@@ -484,17 +484,17 @@ void SerialModbusSlave::vHandler03_04( void )
                 pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
                 pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
             }
-            
+
             ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
             ucREPLY_BYTE_COUNT    = ( uint8_t ) usREQUEST_QUANTITY * 2;
-            
+
             xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
 
             if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
             {
                 (*pxRegisterMap[ xRegisterMapIndex ].action)();
             }
-            
+
             return;
         }
     }
@@ -510,20 +510,20 @@ void SerialModbusSlave::vHandler05( void )
     if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
     {
         pxRegisterMap[ xRegisterMapIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
-        
+
         ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
         ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
         ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
         ucREPLY_COIL_VALUE_HI = ucREQUEST_COIL_VALUE_HI;
         ucREPLY_COIL_VALUE_LO = ucREQUEST_COIL_VALUE_LO;
-        
+
         xReplyLength = 6;
 
         if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
         {
             (*pxRegisterMap[ xRegisterMapIndex ].action)();
         }
-        
+
         return;
     }
 
@@ -535,22 +535,22 @@ void SerialModbusSlave::vHandler05( void )
 #if( configFC06 == 1 )
 void SerialModbusSlave::vHandler06( void )
 {
-	size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
-	
-	pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
-	
-	ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
-	ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
-	ucREPLY_ADDRESS_LO        = ucREQUEST_ADDRESS_LO;
-	ucREPLY_REGISTER_VALUE_HI = ucREQUEST_REGISTER_VALUE_HI;
-	ucREPLY_REGISTER_VALUE_LO = ucREQUEST_REGISTER_VALUE_LO;
-	
-	xReplyLength = 6;
+    size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
-	if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
-	{
+    pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
+
+    ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
+    ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
+    ucREPLY_ADDRESS_LO        = ucREQUEST_ADDRESS_LO;
+    ucREPLY_REGISTER_VALUE_HI = ucREQUEST_REGISTER_VALUE_HI;
+    ucREPLY_REGISTER_VALUE_LO = ucREQUEST_REGISTER_VALUE_LO;
+
+    xReplyLength = 6;
+
+    if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+    {
         (*pxRegisterMap[ xRegisterMapIndex ].action)();
-	}
+    }
 }
 #endif
 /*-----------------------------------------------------------*/
@@ -864,20 +864,20 @@ void SerialModbusSlave::vHandler16( void )
                 {
                     pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
                 }
-                
+
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
                 ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
                 ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
                 ucREPLY_QUANTITY_HI   = ucREQUEST_QUANTITY_HI;
                 ucREPLY_QUANTITY_LO   = ucREQUEST_QUANTITY_LO;
-                
+
                 xReplyLength = 6;
 
                 if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
                 {
                     (*pxRegisterMap[ xRegisterMapIndex ].action)();
                 }
-                
+
                 return;
             }
         }
