@@ -6,13 +6,13 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-SerialModbusMaster	KEYWORD1	SerialModbusMaster
-SerialModbusSlave	KEYWORD1	SerialModbusSlave
-MBData_t	KEYWORD1	MBData_t
-MBFunctionCode_t	KEYWORD1	MBFunctionCode_t
-MBSubFunctionCode_t	KEYWORD1	MBSubFunctionCode_t
-MBException_t	KEYWORD1	MBException_t
-MBStatus_t	KEYWORD1	MBStatus_t
+SerialModbusMaster	KEYWORD1
+SerialModbusSlave	KEYWORD1
+MBData_t	KEYWORD1
+MBFunctionCode_t	KEYWORD1
+MBSubFunctionCode_t	KEYWORD1
+MBException_t	KEYWORD1
+MBStatus_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
