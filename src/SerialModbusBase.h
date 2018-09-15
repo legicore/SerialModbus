@@ -88,8 +88,7 @@ MBSubFunctionCode_t;
 /** TODO */
 typedef enum MBException_e
 {
-    OK  = 0x00,
-    NOK = 0xFF,
+    OK = 0x00,
 
     /* Stansard exception codes */
     ILLEGAL_FUNCTION                        = 0x01,
@@ -103,7 +102,7 @@ typedef enum MBException_e
     GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
 
     /* Non-standard exception codes */
-    NOK_RX_OVERFLOW     = 0x10,
+    NOK_BUFFER_OVERFLOW = 0x10,
     NOK_NO_REPLY        = 0x12,
     NOK_BYTE_COUNT      = 0x13,
     NOK_COIL_VALUE      = 0x14,
@@ -114,7 +113,9 @@ typedef enum MBException_e
     NOK_CHECKSUM        = 0x1B,
     NOK_REQUEST_ENTRY   = 0x1C,
     NOK_PROCESS_STATE   = 0x1D,
-    NOK_REGISTER_ACCESS = 0x1E
+    NOK_REGISTER_ACCESS = 0x1E,
+
+    NOK = 0xFF
 }
 MBException_t;
 

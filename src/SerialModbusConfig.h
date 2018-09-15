@@ -23,12 +23,12 @@
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
-#define configMAX_FRAME_SIZE            64
+#define configMAX_FRAME_SIZE            ( 64 )
 
-#define configID_BROADCAST              0
-#define configID_SLAVE_MAX              247
+#define configID_BROADCAST              ( ( uint8_t ) 0 )
+#define configID_SLAVE_MAX              ( ( uint8_t ) 247 )
 
-#define configASCII_INPUT_DELIMITER     '\n'
+#define configASCII_INPUT_DELIMITER     ( '\n' )
 
 /*-----------------------------------------------------------*/
 

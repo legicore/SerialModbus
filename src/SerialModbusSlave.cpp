@@ -174,11 +174,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     }
                     #endif
 
-                    if( bListenOnlyMode == false )
-                    {
-                        vSendData( pucReplyFrame, xReplyLength );
-                    }
-                    
+                    vSendData( pucReplyFrame, xReplyLength );
                     vClearReplyFrame();
                 }
                 else
@@ -189,7 +185,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             #if( configMODE == configMODE_RTU )
                             {
-                                if( ucREQUEST_ID == ucSlaveId )
+                                if( ( ucREQUEST_ID == ucSlaveId          ) ||
+                                    ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
                                     vStartInterFrameDelay();
                                     vStartInterCharacterTimeout();
@@ -214,8 +211,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     else
                     {
                         incCPT8();
-                        xSetException( NOK_RX_OVERFLOW );
-                        vSetState( FORMATTING_ERROR_REPLY );
+                        incCPT2();
+                        xSetException( NOK_BUFFER_OVERFLOW );
+                        vClearRequestFrame();
                         break;
                     }
                 }
@@ -234,6 +232,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             }
                             else
                             {
+                                incCPT2();
                                 vClearRequestFrame();
                                 vSetState( SLAVE_IDLE );
                             }
@@ -252,7 +251,19 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 /* Convert the frame from rtu to ascii format */
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
-                                vSetState( CHECKING_REQUEST );
+                                if( ( ucREQUEST_ID == ucSlaveId          ) ||
+                                    ( ucREQUEST_ID == configID_BROADCAST ) )
+                                {
+                                    if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
+                                    {
+                                        vSetState( CHECKING_REQUEST );
+                                        break;
+                                    }
+
+                                    incCPT2();
+                                }
+
+                                vClearRequestFrame();
                             }
                         }
                     }
@@ -264,7 +275,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case CHECKING_REQUEST :
             {
-                incCPT1();
+                incCPT4();
 
                 if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == OK )
                 {
@@ -280,8 +291,6 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case PROCESSING_REQUIRED_ACTION :
         {
-                incCPT4();
-
                 switch( ucREQUEST_FUNCTION_CODE )
                 {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
@@ -322,38 +331,43 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 #endif
                     default :
                     {
-                        incCPT3();
                         xSetException( ILLEGAL_FUNCTION );
                     }
                 }
 
-                if( xException == OK )
+                if( ucREQUEST_ID != configID_BROADCAST )
                 {
-                    vSetState( FORMATTING_NORMAL_REPLY );
+                    if( bListenOnlyMode == false )
+                    {
+                        if( xException == OK )
+                        {
+                            vSetState( FORMATTING_NORMAL_REPLY );
+                        }
+                        else
+                        {
+                            vSetState( FORMATTING_ERROR_REPLY );
+                        }
+
+                        break;
+                    }
                 }
                 else
                 {
-                    vSetState( FORMATTING_ERROR_REPLY );
+                    incCPT5();
                 }
+
+                vClearRequestFrame();
+                vSetState( SLAVE_IDLE );
 
                 break;
             }
 
             case FORMATTING_NORMAL_REPLY :
             {
-                if( ucREQUEST_ID != configID_BROADCAST )
-                {
-                    ucREPLY_ID = ucSlaveId;
-                    xSetChecksum( pucReplyFrame, &xReplyLength );
-                }
-                else
-                {
-                    incCPT5();
-                    vClearReplyFrame();
-                }
+                ucREPLY_ID = ucSlaveId;
+                xSetChecksum( pucReplyFrame, &xReplyLength );
 
                 vClearRequestFrame();
-                xSetException( OK );
                 vSetState( SLAVE_IDLE );
 
                 break;
@@ -361,24 +375,16 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case FORMATTING_ERROR_REPLY :
             {
-                if( ucREQUEST_ID != configID_BROADCAST )
-                {
-                    incCPT3();
+                incCPT3();
 
-                    ucREPLY_ID            = ucSlaveId;
-                    ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
-                    ucREPLY_ERROR_CODE    = ( uint8_t ) xException;
+                ucREPLY_ID            = ucSlaveId;
+                ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
+                ucREPLY_ERROR_CODE    = ( uint8_t ) xException;
 
-                    xReplyLength = 3;
+                xReplyLength = 3;
 
-                    xSetChecksum( pucReplyFrame, &xReplyLength );
-                }
-                else
-                {
-                    vClearReplyFrame();
-                }
+                xSetChecksum( pucReplyFrame, &xReplyLength );
 
-                xSetException( OK );
                 vClearRequestFrame();
                 vSetState( SLAVE_IDLE );
 

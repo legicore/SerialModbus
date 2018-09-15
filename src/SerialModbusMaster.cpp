@@ -309,7 +309,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
                 else
                 {
-                    xSetException( NOK_RX_OVERFLOW );
+                    xSetException( NOK_BUFFER_OVERFLOW );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
@@ -356,8 +356,14 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
                                 if( ucREPLY_ID == ucREQUEST_ID )
                                 {
-                                    vSetState( PROCESSING_REPLY );
+                                    if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
+                                    {
+                                        vSetState( PROCESSING_REPLY );
+                                        break;
+                                    }
                                 }
+
+                                vClearReplyFrame();
                             }
                         }
                     }
