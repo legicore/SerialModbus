@@ -195,13 +195,13 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
     pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
     pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = ( uint8_t ) '\r';
 
-    for( size_t i = *pxFrameLength - 1; i >= 0; i-- )
+    for( size_t i = *pxFrameLength - 1; ( i + 1 ) > 0; i-- )
     {
         pucFrame[ ( i * 2 ) + 2 ] = ucByteToAsciiLo( pucFrame[ i ] );
         pucFrame[ ( i * 2 ) + 1 ] = ucByteToAsciiHi( pucFrame[ i ] );
     }
 
-    pucFrame[ 0 ] = ':';
+    pucFrame[ 0 ] = ( uint8_t ) ':';
 
     *pxFrameLength = ( *pxFrameLength * 2 ) + 3;
 

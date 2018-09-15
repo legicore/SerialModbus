@@ -233,7 +233,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 #if( configMODE == configMODE_ASCII )
                 {
                     /* Convert request to ascii and update the pdu length */
-                    xRtuToAscii( pucRequestFrame, &mbRequestLength );
+                    xRtuToAscii( pucRequestFrame, &xRequestLength );
                 }
                 #endif
 
@@ -345,16 +345,16 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     #if( configMODE == configMODE_ASCII )
                     {
                         /* Check for Newline (frame end) */
-                        if( pucReplyFrame[ mbReplyLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
+                        if( pucReplyFrame[ xReplyLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
                             /* Check for Carriage Return (frame end) */
-                            if( pucReplyFrame[ mbReplyLength - 2 ] == ( uint8_t ) '\r' )
+                            if( pucReplyFrame[ xReplyLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* Convert the frame from rtu to ascii format */
-                                xAsciiToRtu( pucReplyFrame, &mbReplyLength );
-                                xAsciiToRtu( pucRequestFrame, &mbRequestLength );
+                                xAsciiToRtu( pucReplyFrame, &xReplyLength );
+                                xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
-                                if( ucREPLY_ID == configREQUEST_ID )
+                                if( ucREPLY_ID == ucREQUEST_ID )
                                 {
                                     vSetState( PROCESSING_REPLY );
                                 }

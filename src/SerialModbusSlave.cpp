@@ -200,9 +200,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                             #if( configMODE == configMODE_ASCII )
                             {
-                                if( pucRequestFrame[ 0 ] != ( uint8_t ) ':' )
+                                if( pucRequestFrame[ 0 ] == ( uint8_t ) ':' )
                                 {
-                                    vClearRequestFrame();
                                     break;
                                 }
                             }
@@ -251,7 +250,6 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             if( pucRequestFrame[ xRequestLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* Convert the frame from rtu to ascii format */
-                                xAsciiToRtu( pucReplyFrame, &xReplyLength );
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
                                 vSetState( CHECKING_REQUEST );
