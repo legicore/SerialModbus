@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusSlave.cpp
- *
+ * 
  * @author      Martin Legleiter
- *
+ * 
  * @brief       TODO
  * 
- * @copyright   2018 Martin Legleiter
+ * @copyright   (c) 2018 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -290,7 +290,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             }
 
             case PROCESSING_REQUIRED_ACTION :
-        {
+            {
                 switch( ucREQUEST_FUNCTION_CODE )
                 {
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )

@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * @file        SerialModbusBase.h
- *
+ * 
  * @author      Martin Legleiter
- *
+ * 
  * @brief       TODO
  * 
- * @copyright   2018 Martin Legleiter
+ * @copyright   (c) 2018 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
