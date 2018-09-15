@@ -9,6 +9,8 @@
 SerialModbusMaster	KEYWORD1
 SerialModbusSlave	KEYWORD1
 MBAccess_t	KEYWORD1
+MBRegister_t	KEYWORD1
+MBRequest_t	KEYWORD1
 MBFunctionCode_t	KEYWORD1
 MBSubFunctionCode_t	KEYWORD1
 MBException_t	KEYWORD1
