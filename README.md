@@ -46,15 +46,13 @@ The header file `SerialModbusConfig.h` holds serveral defines to configure the b
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
-#define configMAX_FRAME_SIZE            64
+#define configMAX_FRAME_SIZE            ( 64 )
 
-#define configID_BROADCAST              0
-#define configID_SLAVE_MAX              247
+#define configID_BROADCAST              ( ( uint8_t ) 0 )
+#define configID_SLAVE_MAX              ( ( uint8_t ) 247 )
 
-#define configASCII_INPUT_DELIMITER     '\n'
+#define configASCII_INPUT_DELIMITER     ( '\n' )
 ```
-
-> Maybe apart from the `configMODE` it is recommended to **not** change this settings!
 
 ## Usage
 
@@ -72,16 +70,16 @@ SerialModbusSlave Slave;
 
 ### Timings
 
-These timing values are the default timing values for the library. They will be initialized when a new object of the type `SerialModbusMaster` or `SerialModbusSlave` is declared. The defaut values are based on the official Modbus specification but could be changed in the setup phase ( or even during runtime ) via the API methods `setInterFrameDelay()`, `setTurnaroundDelay()` and `setResponseTimeout()` ( see chapter *Common Methods* below ).
+These timing values are the default timing values for the library. They will be initialized when a new object of the type `SerialModbusMaster` or `SerialModbusSlave` is declared. The defaut values are based on the official Modbus specification but could be changed in the setup phase ( or even during runtime ) via the API methods `setInterCharacterTimeout()`, `setInterFrameDelay()`, `setTurnaroundDelay()` and `setResponseTimeout()` ( see chapter *API* ).
 
 ```C++
-#define configINTER_CHARACTER_TIMEOUT_US    1500    /* Orig. 750 */
-#define configINTER_FRAME_DELAY_US          3500    /* Orig. 1750 */
+#define configINTER_CHARACTER_TIMEOUT_US    750
+#define configINTER_FRAME_DELAY_US          1750
 #define configTURNAROUND_DELAY_US           200000
 #define configRESPONSE_TIMEOUT_US           1000000
 ```
 
-> Because of the limited timing capabilities of the standard Arduino platform the Modbus "Inter Character Timeout" (*t1.5*) is not implemented.
+> For data rates lower than 19200 Baud the inter character timeout must be doubled. This could be done in the config header or via the `setInterCharacterTimeout()` methode in the code (which is the recommended way).
 
 ### Function Codes
 
@@ -158,20 +156,6 @@ MBRegister_t;
 
 ### Common Methods
 
-> `void begin( uint32_t baud, HardwareSerial * serial, uint8_t config );`
-* TODO
-    * `baud` : The value of the desired baud rate.
-    * `serial` : A pointer to the desired Arduino (hardware) serial port.
-        * Default value for Arduino UNO : `&Serial`.
-        * Default value for Arduino Mega and Leonardo : `&Serial1`.
-    * `config` : The configuration byte of the Arduino (hardware) serial port.
-        * Default value : `SERIAL_8N1`.
-
-> `void begin( uint32_t baud, SoftwareSerial * serial );`
-* TODO
-    * `baud` : The value of the desired baud rate.
-    * `serial` : A pointer to the desired software serial port.
-
 > `void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );`
 * This method sets control functions for the serial communication ( and is **mendatory** dependent on the type of the library integration and the used transceiver IC type ). Modbus is mostly used within RS-485 networks and the usual transceivers. The developer has to provide the control functions to set the transceiver to the appropriate RX or TX mode.
     * `serialCtrlTx` : Function pointer ( `void(*)( void )` ) to the applicable TX control function.
@@ -192,7 +176,39 @@ MBRegister_t;
 > `MBStatus_t processModbus( void );`
 * TODO
 
+### Slave Specific Methodes
+
+> `void begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config );`
+* TODO
+    * `slaveId` : The desired slave ID.
+    * `baud` : The value of the desired baud rate.
+    * `serial` : A pointer to the desired Arduino (hardware) serial port.
+        * Default value for Arduino UNO : `&Serial`.
+        * Default value for Arduino Mega and Leonardo : `&Serial1`.
+    * `config` : The configuration byte of the Arduino (hardware) serial port.
+        * Default value : `SERIAL_8N1` (8 data bits, no parity, 1 stop bit).
+
+> `void begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );`
+* TODO
+    * `slaveId` : The desired slave ID.
+    * `baud` : The value of the desired baud rate.
+    * `serial` : A pointer to the desired software serial port.
+
 ### Master Specific Methodes
+
+> `void begin( uint32_t baud, HardwareSerial * serial, uint8_t config );`
+* TODO
+    * `baud` : The value of the desired baud rate.
+    * `serial` : A pointer to the desired Arduino (hardware) serial port.
+        * Default value for Arduino UNO : `&Serial`.
+        * Default value for Arduino Mega and Leonardo : `&Serial1`.
+    * `config` : The configuration byte of the Arduino (hardware) serial port.
+        * Default value : `SERIAL_8N1` (8 data bits, no parity, 1 stop bit).
+
+> `void begin( uint32_t baud, SoftwareSerial * serial );`
+* TODO
+    * `baud` : The value of the desired baud rate.
+    * `serial` : A pointer to the desired software serial port.
 
 > `MBStatus_t setRequest( MBData_t * request );`
 * TODO
@@ -231,9 +247,6 @@ const MBRegister_t xRegisterMap[] = {
 ```
 > The first entry has the address value 0x1001 and has a object size of 3 - this covers the address values 0x1001, 0x1002 and 0x1003.
 The second entry address lies in the address range of the first entry and must at least have the address value 0x1004!
-# Remarks
-
-1. Because of the limited timing capabilities of the standard Arduino Platform the Modbus "Inter Character Timeout" (*t1.5*) is not implemented.
 
 # Todo
 

@@ -210,6 +210,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     }
                     else
                     {
+                        /* Receive buffer overflow -> Increment the bus
+                        charakter overrun counter and the bus communication
+                        error counter. */
                         incCPT8();
                         incCPT2();
                         xSetException( NOK_BUFFER_OVERFLOW );
@@ -232,8 +235,16 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             }
                             else
                             {
+                                /* Checksum error -> Increment the bus
+                                communication error counter and clear the
+                                request frame. */
                                 incCPT2();
                                 vClearRequestFrame();
+
+                                /* We go directly back to the idle state
+                                because we don't want to send any kind of reply.
+                                It would threaten a bus collision if every slave
+                                would send an error reply. */
                                 vSetState( SLAVE_IDLE );
                             }
                         }
@@ -242,15 +253,19 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                     #if( configMODE == configMODE_ASCII )
                     {
-                        /* Check for Newline (frame end) */
+                        /* Check for the end of the frame which is in the
+                        default configuration marked by a carriage return (0x3A)
+                        followed by a line feed (0x0A - which is variable). */
                         if( pucRequestFrame[ xRequestLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
-                            /* Check for Carriage Return (frame end) */
                             if( pucRequestFrame[ xRequestLength - 2 ] == ( uint8_t ) '\r' )
                             {
-                                /* Convert the frame from rtu to ascii format */
+                                /* Convert the request frame from ASCII to RTU
+                                format and update the request length. */
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
+                                /* Check if the received request is dedicated to
+                                us or if it is a broadcast. */
                                 if( ( ucREQUEST_ID == ucSlaveId          ) ||
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
@@ -260,9 +275,13 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                         break;
                                     }
 
+                                    /* Checksum error -> Increment the bus
+                                    communication error counter. */
                                     incCPT2();
                                 }
 
+                                /* If the received request is not dedicated to
+                                us or we encounter a checksum error */
                                 vClearRequestFrame();
                             }
                         }
@@ -400,6 +419,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
         #if( configPROCESS_LOOP_HOOK == 1 )
         {
+            /* The process loop hook will only be executed when the state
+            mashine is not in the idle state. Otherwise the loop hook would be
+            execetued with every run through processModbus(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != SLAVE_IDLE ) )
             {
                 (*vProcessLoopHook)();
@@ -452,10 +474,10 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                     }
 
                     /* While register access rights are not a standard feature
-                    of Modbus we will send a error reply with a non standard
-                    exception code. */
+                    of Modbus we will set a non standard exception and abort
+                    the for loop. */
                     xSetException( NOK_REGISTER_ACCESS );
-                    return NOK;
+                    break;
                 }
             }
 
@@ -465,8 +487,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             break;
         }
     }
-
-    incCPT3();
 
     return NOK;
 }

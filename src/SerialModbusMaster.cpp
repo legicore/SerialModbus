@@ -445,6 +445,9 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
         #if( configPROCESS_LOOP_HOOK == 1 )
         {
+            /* The process loop hook will only be executed when the state
+            mashine is not in the idle state. Otherwise the loop hook would be
+            execetued with every run through processModbus(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != MASTER_IDLE ) )
             {
                 (*vProcessLoopHook)();
