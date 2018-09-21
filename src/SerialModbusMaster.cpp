@@ -48,6 +48,12 @@ void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t 
 {
     pxSerial = serial;
     pxSerial->begin( baud, config );
+
+    #if( configMODE == configMODE_RTU )
+    {
+        bCalculateTimeouts( baud, config );
+    }
+    #endif
 }
 /*-----------------------------------------------------------*/
 
@@ -55,6 +61,12 @@ void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
 {
     pxSerialSoftware = serial;
     pxSerialSoftware->begin( baud );
+
+    #if( configMODE == configMODE_RTU )
+    {
+        bCalculateTimeouts( baud, SERIAL_8N1 );
+    }
+    #endif
 }
 /*-----------------------------------------------------------*/
 

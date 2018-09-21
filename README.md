@@ -70,13 +70,11 @@ SerialModbusSlave Slave;
 
 ### Timings
 
-These timing values are the default timing values for the library. They will be initialized when a new object of the type `SerialModbusMaster` or `SerialModbusSlave` is declared. The defaut values are based on the official Modbus specification but could be changed in the setup phase ( or even during runtime ) via the API methods `setInterCharacterTimeout()`, `setInterFrameDelay()`, `setTurnaroundDelay()` and `setResponseTimeout()` ( see chapter *API* ).
+These timing values are the default timing values for the library. They will be initialized when a new object of the type `SerialModbusMaster` or `SerialModbusSlave` is declared. The defaut values are based on the official Modbus specification but could be changed in the setup phase ( or even during runtime ) via the API methods `setTurnaroundDelay()` and `setResponseTimeout()` ( see chapter *API* ).
 
 ```C++
-#define configINTER_CHARACTER_TIMEOUT_US    750
-#define configINTER_FRAME_DELAY_US          1750
-#define configTURNAROUND_DELAY_US           200000
-#define configRESPONSE_TIMEOUT_US           1000000
+#define configTURNAROUND_DELAY_US   200000
+#define configRESPONSE_TIMEOUT_US   1000000
 ```
 
 > For data rates lower than 19200 Baud the inter character timeout must be doubled. This could be done in the config header or via the `setInterCharacterTimeout()` methode in the code (which is the recommended way).

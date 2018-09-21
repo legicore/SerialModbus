@@ -40,9 +40,9 @@ SerialModbusBase::SerialModbusBase()
 
     #if( configMODE == configMODE_RTU )
     {
-        ulInterFrameDelayUs = configINTER_FRAME_DELAY_US;
-        ulTimerInterFrameDelayUs = 0;
-        ulInterCharacterTimeoutUs = configINTER_CHARACTER_TIMEOUT_US;
+        ulInterFrameDelayUs            = 0;
+        ulTimerInterFrameDelayUs       = 0;
+        ulInterCharacterTimeoutUs      = 0;
         ulTimerInterCharacterTimeoutUs = 0;
     }
     #endif
@@ -59,22 +59,6 @@ SerialModbusBase::SerialModbusBase()
     }
     #endif
 }
-/*-----------------------------------------------------------*/
-
-#if( configMODE == configMODE_RTU )
-void SerialModbusBase::setInterFrameDelay( uint32_t timeMs )
-{
-    ulInterFrameDelayUs = timeMs * 1000;
-}
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configMODE == configMODE_RTU )
-void SerialModbusBase::setInterCharacterTimeout( uint32_t timeMs )
-{
-    ulInterCharacterTimeoutUs = timeMs * 1000;
-}
-#endif
 /*-----------------------------------------------------------*/
 
 MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
@@ -424,3 +408,24 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         (*vSerialCtrlRx)();
     }
 }
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint8_t ucConfig )
+{
+    bool bNbrOfBits = 0.0;
+
+    if( ulBaud >= 19200 )
+    {
+        ulInterCharacterTimeoutUs = 750;
+        ulInterFrameDelayUs       = 1750;
+    }
+    else
+    {
+        ulInterCharacterTimeoutUs = 16500000 / ulBaud;
+        ulInterFrameDelayUs       = 38500000 / ulBaud;
+    }
+
+    return true;
+}
+#endif

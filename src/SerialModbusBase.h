@@ -131,10 +131,6 @@ public:
 
     SerialModbusBase();
     void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
-#if( configMODE == configMODE_RTU )
-    void setInterFrameDelay( uint32_t timeMs );
-    void setInterCharacterTimeout( uint32_t timeMs );
-#endif
 #if( configPROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
 #endif
@@ -175,6 +171,7 @@ protected:
     void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void );
     bool bTimeoutInterCharacterTimeout( void );
+    bool bCalculateTimeouts( uint32_t ulBaud, uint8_t ucConfig );
 #endif
 #if( configMODE == configMODE_ASCII )
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
