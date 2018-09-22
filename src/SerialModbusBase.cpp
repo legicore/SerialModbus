@@ -411,10 +411,8 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 /*-----------------------------------------------------------*/
 
 #if( configMODE == configMODE_RTU )
-bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint8_t ucConfig )
+void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
 {
-    bool bNbrOfBits = 0.0;
-
     if( ulBaud >= 19200 )
     {
         ulInterCharacterTimeoutUs = 750;
@@ -425,7 +423,5 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint8_t ucConfig )
         ulInterCharacterTimeoutUs = 16500000 / ulBaud;
         ulInterFrameDelayUs       = 38500000 / ulBaud;
     }
-
-    return true;
 }
 #endif

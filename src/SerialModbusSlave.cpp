@@ -134,7 +134,7 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * 
 
     #if( configMODE == configMODE_RTU )
     {
-        bCalculateTimeouts( baud, config );
+        vCalculateTimeouts( baud );
     }
     #endif
 }
@@ -148,7 +148,7 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * 
 
     #if( configMODE == configMODE_RTU )
     {
-        bCalculateTimeouts( baud, SERIAL_8N1 );
+        vCalculateTimeouts( baud );
     }
     #endif
 }

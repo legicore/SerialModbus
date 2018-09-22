@@ -51,7 +51,7 @@ void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t 
 
     #if( configMODE == configMODE_RTU )
     {
-        bCalculateTimeouts( baud, config );
+        vCalculateTimeouts( baud );
     }
     #endif
 }
@@ -64,7 +64,7 @@ void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
 
     #if( configMODE == configMODE_RTU )
     {
-        bCalculateTimeouts( baud, SERIAL_8N1 );
+        vCalculateTimeouts( baud );
     }
     #endif
 }

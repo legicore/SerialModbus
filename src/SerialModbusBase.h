@@ -171,7 +171,7 @@ protected:
     void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void );
     bool bTimeoutInterCharacterTimeout( void );
-    bool bCalculateTimeouts( uint32_t ulBaud, uint8_t ucConfig );
+    void vCalculateTimeouts( uint32_t ulBaud );
 #endif
 #if( configMODE == configMODE_ASCII )
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
