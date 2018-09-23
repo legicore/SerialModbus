@@ -424,8 +424,13 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                         if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
                         {
                             xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
-                            vSetState( PROCESSING_ERROR );
                         }
+                        else
+                        {
+                            xSetException( ILLEGAL_FUNCTION );
+                        }
+
+                        vSetState( PROCESSING_ERROR );
                     }
                 }
 
