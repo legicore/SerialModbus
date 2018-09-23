@@ -136,7 +136,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 {
     if( request == NULL )
     {
-        return xSetException( NOK_NULL_POINTER );
+        return xSetException( ILLEGAL_REQUEST );
     }
 
     xSetException( OK );
@@ -146,7 +146,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
         ( request->address      == 0x0000             ) ||
         ( request->objectSize   == 0                  ) )
     {
-        return xSetException( NOK_REQUEST_ENTRY );
+        return xSetException( ILLEGAL_REQUEST );
     }
 
     vClearRequestFrame();
@@ -202,7 +202,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             }
             else
             {
-                return xSetException( NOK_REQUEST_ENTRY );
+                return xSetException( ILLEGAL_REQUEST );
             }
 
             break;
@@ -321,14 +321,14 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
                 else
                 {
-                    xSetException( NOK_BUFFER_OVERFLOW );
+                    xSetException( CHARACTER_OVERRUN );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    xSetException( NOK_NO_REPLY );
+                    xSetException( NO_REPLY );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
@@ -347,7 +347,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                             }
                             else
                             {
-                                xSetException( NOK_CHECKSUM );
+                                xSetException( ILLEGAL_CHECKSUM );
                                 vSetState( PROCESSING_ERROR );
                             }
                         }
@@ -455,7 +455,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
             default :
             {
-                xSetException( NOK_PROCESS_STATE );
+                xSetException( ILLEGAL_STATE );
                 vSetState( MASTER_IDLE );
             }
         }
@@ -555,8 +555,8 @@ void SerialModbusMaster::vHandler03_04( void )
     }
     else
     {
+        xSetException( ILLEGAL_BYTE_COUNT );
         vSetState( PROCESSING_ERROR );
-        xSetException( NOK_BYTE_COUNT );
     }
 }
 #endif
@@ -580,14 +580,14 @@ void SerialModbusMaster::vHandler05( void )
         }
         else
         {
+            xSetException( ILLEGAL_COIL_VALUE );
             vSetState( PROCESSING_ERROR );
-            xSetException( NOK_COIL_VALUE );
         }
     }
     else
     {
+        xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
-        xSetException( NOK_OUTPUT_ADDRESS );
     }
 }
 #endif
@@ -611,14 +611,14 @@ void SerialModbusMaster::vHandler06( void )
         }
         else
         {
+            xSetException( ILLEGAL_OUTPUT_VALUE );
             vSetState( PROCESSING_ERROR );
-            xSetException( NOK_OUTPUT_VALUE );
         }
     }
     else
     {
+        xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
-        xSetException( NOK_OUTPUT_ADDRESS );
     }
 }
 #endif
@@ -642,14 +642,14 @@ void SerialModbusMaster::vHandler16( void )
         }
         else
         {
+            xSetException( ILLEGAL_QUANTITY );
             vSetState( PROCESSING_ERROR );
-            xSetException( NOK_QUANTITY );
         }
     }
     else
     {
+        xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
-        xSetException( NOK_OUTPUT_ADDRESS );
     }
 }
 #endif

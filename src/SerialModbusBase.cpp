@@ -65,9 +65,9 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
 {
     uint16_t usTempChecksum;
 
-    if( ( pucFrame == NULL ) || ( pxFrameLength == NULL ) )
+    if( *pxFrameLength == 0 )
     {
-        return NOK_NULL_POINTER;
+        return NOK;
     }
 
     #if( configMODE == configMODE_RTU )
@@ -93,9 +93,9 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
 {
     uint16_t usTempChecksum;
 
-    if( pucFrame == NULL )
+    if( xFrameLength == 0 )
     {
-        return NOK_NULL_POINTER;
+        return NOK;
     }
 
     #if( configMODE == configMODE_RTU )
@@ -171,9 +171,9 @@ uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 #if( configMODE == configMODE_ASCII )
 MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( pxFrameLength == NULL ) )
+    if( *pxFrameLength == 0 )
     {
-        return NOK_NULL_POINTER;
+        return NOK;
     }
 
     pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
@@ -197,9 +197,9 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
 #if( configMODE == configMODE_ASCII )
 MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( pxFrameLength == NULL ) )
+    if( *pxFrameLength == 0 )
     {
-        return NOK_NULL_POINTER;
+        return NOK;
     }
 
     *pxFrameLength = ( *pxFrameLength - 3 ) / 2;

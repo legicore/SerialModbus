@@ -30,6 +30,9 @@
 
 #define configASCII_INPUT_DELIMITER     ( '\n' )
 
+#define configPROCESS_LOOP_HOOK         1
+#define configEXTENDED_EXCEPTION_CODES  1
+
 /*-----------------------------------------------------------*/
 
 #define configTURNAROUND_DELAY_US   200000
@@ -66,10 +69,6 @@
 #define configFC17      N   /* REPORT_SLAVE_ID */
 
 #undef N /* Not implemented */
-
-/*-----------------------------------------------------------*/
-
-#define configPROCESS_LOOP_HOOK 1
 
 /*-----------------------------------------------------------*/
 

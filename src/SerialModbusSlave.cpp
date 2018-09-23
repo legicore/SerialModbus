@@ -227,7 +227,15 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         error counter. */
                         incCPT8();
                         incCPT2();
-                        xSetException( NOK_BUFFER_OVERFLOW );
+                        #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                        {
+                            xSetException( SLV_CHARACTER_OVERRUN );
+                        }
+                        #else
+                        {
+                            // TODO
+                        }
+                        #endif
                         vClearRequestFrame();
                         break;
                     }
@@ -362,7 +370,15 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 #endif
                     default :
                     {
-                        xSetException( ILLEGAL_FUNCTION );
+                        #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                        {
+                            xSetException( SLV_ILLEGAL_FUNCTION );
+                        }
+                        #else
+                        {
+                            xSetException( ILLEGAL_FUNCTION );
+                        }
+                        #endif
                     }
                 }
 
@@ -424,8 +440,16 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             default :
             {
-                xSetException( NOK_PROCESS_STATE );
-                vSetState( SLAVE_IDLE );
+                #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                {
+                    xSetException( SLV_ILLEGAL_STATE );
+                }
+                #else
+                {
+                    xSetException( SLAVE_DEVICE_FAILURE );
+                }
+                #endif
+                vSetState( FORMATTING_ERROR_REPLY );
             }
         }
 
@@ -462,7 +486,15 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
     default. If successful the exception is reset to 'OK' or will be overwritten
     if another error occurs. Otherwise it persists which means that we could not
     find a matching register map entry. */
-    xSetException( ILLEGAL_DATA_ADDRESS );
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_DATA_ADDRESS );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_ADDRESS );
+    }
+    #endif
 
     /* Scan the register map and check if the request address value lies in the
     range of one of the mapped register entries. */
@@ -488,14 +520,32 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                     /* While register access rights are not a standard feature
                     of Modbus we will set a non standard exception and abort
                     the for loop. */
-                    xSetException( NOK_REGISTER_ACCESS );
+                    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                    {
+                        xSetException( SLV_ILLEGAL_ACCESS );
+                    }
+                    #else
+                    {
+                        xSetException( SLAVE_DEVICE_FAILURE );
+                    }
+                    #endif
+
                     break;
                 }
             }
 
             /* We could not find the function code in the access rights map so
             we set the exception and abort the for loop. */
-            xSetException( ILLEGAL_FUNCTION );
+            #if( configEXTENDED_EXCEPTION_CODES == 1 )
+            {
+                xSetException( SLV_ILLEGAL_FUNCTION );
+            }
+            #else
+            {
+                xSetException( ILLEGAL_FUNCTION );
+            }
+            #endif
+
             break;
         }
     }
@@ -535,7 +585,15 @@ void SerialModbusSlave::vHandler03_04( void )
         }
     }
 
-    xSetException( ILLEGAL_DATA_VALUE );
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_DATA_VALUE );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_VALUE );
+    }
+    #endif
 }
 #endif
 /*-----------------------------------------------------------*/
@@ -563,7 +621,15 @@ void SerialModbusSlave::vHandler05( void )
         return;
     }
 
-    xSetException( ILLEGAL_DATA_VALUE );
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_DATA_VALUE );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_VALUE );
+    }
+    #endif
 }
 #endif
 /*-----------------------------------------------------------*/
@@ -919,6 +985,14 @@ void SerialModbusSlave::vHandler16( void )
         }
     }
 
-    xSetException( ILLEGAL_DATA_VALUE );
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_DATA_VALUE );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_VALUE );
+    }
+    #endif
 }
 #endif

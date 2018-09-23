@@ -102,18 +102,28 @@ typedef enum MBException_e
     GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
 
     /* Non-standard exception codes */
-    NOK_BUFFER_OVERFLOW = 0x10,
-    NOK_NO_REPLY        = 0x12,
-    NOK_BYTE_COUNT      = 0x13,
-    NOK_COIL_VALUE      = 0x14,
-    NOK_OUTPUT_VALUE    = 0x15,
-    NOK_OUTPUT_ADDRESS  = 0x16,
-    NOK_QUANTITY        = 0x19,
-    NOK_NULL_POINTER    = 0x1A,
-    NOK_CHECKSUM        = 0x1B,
-    NOK_REQUEST_ENTRY   = 0x1C,
-    NOK_PROCESS_STATE   = 0x1D,
-    NOK_REGISTER_ACCESS = 0x1E,
+    ILLEGAL_REQUEST                         = 0x11,
+    CHARACTER_OVERRUN                       = 0x12,
+    NO_REPLY                                = 0x13,
+    ILLEGAL_CHECKSUM                        = 0x14,
+    ILLEGAL_STATE                           = 0x15,
+    ILLEGAL_BYTE_COUNT                      = 0x16,
+    ILLEGAL_COIL_VALUE                      = 0x17,
+    ILLEGAL_OUTPUT_ADDRESS                  = 0x18,
+    ILLEGAL_OUTPUT_VALUE                    = 0x19,
+    ILLEGAL_QUANTITY                        = 0x1A,
+
+#if( configEXTENDED_EXCEPTION_CODES == 1 )
+
+    /* Extended exception codes */
+    SLV_ILLEGAL_FUNCTION                    = 0x21,
+    SLV_ILLEGAL_DATA_ADDRESS                = 0x22,
+    SLV_ILLEGAL_DATA_VALUE                  = 0x23,
+    SLV_CHARACTER_OVERRUN                   = 0x24,
+    SLV_ILLEGAL_STATE                       = 0x25,
+    SLV_ILLEGAL_ACCESS                      = 0x26,
+
+#endif
 
     NOK = 0xFF
 }
