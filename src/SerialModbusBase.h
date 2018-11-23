@@ -144,6 +144,7 @@ public:
 #if( configPROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
 #endif
+    void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
 
 protected:
 
@@ -171,6 +172,8 @@ protected:
     uint16_t usReplyWord( size_t xNbr, size_t xOffset = 3 );
     uint32_t ulReplyDword( size_t xNbr, size_t xOffset = 3 );
     uint64_t uxReplyQword( size_t xNbr, size_t xOffset = 3 );
+    void vDelayUs( uint32_t ulDelayUs );
+    void (*vCustomDelayUs)( uint32_t ulDelayUs );
 #if( configMODE == configMODE_RTU )
     uint16_t usCRC16( uint8_t * pucData, size_t xDataLength );
     uint32_t ulInterFrameDelayUs;

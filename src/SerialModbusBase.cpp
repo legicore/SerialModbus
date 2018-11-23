@@ -58,6 +58,8 @@ SerialModbusBase::SerialModbusBase()
         cAsciiInputDelimiter = configASCII_INPUT_DELIMITER;
     }
     #endif
+
+    vCustomDelayUs = NULL;
 }
 /*-----------------------------------------------------------*/
 
@@ -403,6 +405,10 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
     }
 
+    /* Wait the amount of microseconds for the Inter Frame Delay to let the
+    receiving device detect the end of the frame. */
+    vDelayUs( ulInterFrameDelayUs );
+
     if( vSerialCtrlRx != NULL )
     {
         (*vSerialCtrlRx)();
@@ -425,3 +431,22 @@ void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
     }
 }
 #endif
+/*-----------------------------------------------------------*/
+
+void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
+{
+    if( vCustomDelayUs == NULL )
+    {
+        delayMicroseconds( ulDelayUs );
+    }
+    else
+    {
+        (*vCustomDelayUs)( ulDelayUs );
+    }
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
+{
+    vCustomDelayUs = customDelay;
+}
