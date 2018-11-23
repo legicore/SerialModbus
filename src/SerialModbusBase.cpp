@@ -405,9 +405,13 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
     }
 
-    /* Wait the amount of microseconds for the Inter Frame Delay to let the
-    receiving device detect the end of the frame. */
-    vDelayUs( ulInterFrameDelayUs );
+    #if( configMODE == configMODE_RTU )
+    {
+        /* Wait the amount of microseconds for the Inter Frame Delay to let the
+        receiving device detect the end of the frame. */
+        vDelayUs( ulInterFrameDelayUs );
+    }
+    #endif
 
     if( vSerialCtrlRx != NULL )
     {
