@@ -104,6 +104,9 @@ private:
 #if( configFC06 == 1 )
     void vHandler06( void );
 #endif
+#if( configFC08 == 1 )
+    void vHandler08( void );
+#endif
 #if( configFC16 == 1 )
     void vHandler16( void );
 #endif

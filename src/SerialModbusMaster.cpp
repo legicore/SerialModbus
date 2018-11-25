@@ -47,12 +47,15 @@ SerialModbusMaster::SerialModbusMaster()
 
 void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
 {
+    ulSerialBaud = baud;
     pxSerial = serial;
-    pxSerial->begin( baud, config );
+    ucSerialConfig = config;
+
+    pxSerial->begin( ulSerialBaud, ucSerialConfig );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( baud );
+        vCalculateTimeouts( ulSerialBaud );
     }
     #endif
 }
@@ -60,12 +63,14 @@ void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t 
 
 void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
 {
+    ulSerialBaud = baud;
     pxSerialSoftware = serial;
-    pxSerialSoftware->begin( baud );
+
+    pxSerialSoftware->begin( ulSerialBaud );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( baud );
+        vCalculateTimeouts( ulSerialBaud );
     }
     #endif
 }
@@ -174,11 +179,87 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
         case WRITE_SINGLE_COIL:
         case WRITE_SINGLE_REGISTER:
         {
-            pucRequestFrame[ 4 ] = highByte( request->object[ 0 ] );
-            pucRequestFrame[ 5 ] =  lowByte( request->object[ 0 ] );
-            xRequestLength = 6;
+            if( request->object != NULL )
+            {
+                pucRequestFrame[ 4 ] = highByte( request->object[ 0 ] );
+                pucRequestFrame[ 5 ] =  lowByte( request->object[ 0 ] );
+                xRequestLength = 6;
+            }
+            else
+            {
+                return xSetException( ILLEGAL_REQUEST );
+            }
 
             break;
+        }
+#endif
+#if( configFC08 == 1 )
+        case DIAGNOSTIC:
+        {
+            switch( request->address )
+            {
+#if( configSFC00 == 1 )
+                case RETURN_QUERY_DATA:
+                {
+                    xRequestLength = 4;
+
+                    if( request->object != NULL )
+                    {
+                        for( size_t i = xRequestLength; i < request->objectSize; i++ )
+                        {
+                            pucRequestFrame[ i ] = ( ( uint8_t * ) request->object )[ i ];
+                            xRequestLength++;
+                        }
+                    }
+                    else
+                    {
+                        return xSetException( ILLEGAL_REQUEST );
+                    }
+
+                    break;
+                }
+#endif
+#if( configSFC01 == 1 )
+                case RESTART_COMMUNICATIONS_OPTION:
+                {
+                    // TODO
+                    break;
+                }
+#endif
+#if( configSFC03 == 1 )
+                case CHANGE_ASCII_INPUT_DELIMITER:
+                {
+                    // TODO
+                    break;
+                }
+#endif
+#if( ( configSFC02 == 1 ) || ( configSFC04 == 1 ) || ( configSFC10 == 1 ) || ( configSFC11 == 1 ) || \
+     ( configSFC12 == 1 ) || ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
+     ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) || ( configSFC20 == 1 ) )
+                case RETURN_DIAGNOSTIC_REGISTER:
+                case FORCE_LISTEN_ONLY_MODE:
+                case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+                case RETURN_BUS_MESSAGE_COUNT:
+                case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+                case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+                case RETURN_SLAVE_MESSAGE_COUNT:
+                case RETURN_SLAVE_NO_RESPONSE_COUNT:
+                case RETURN_SLAVE_NAK_COUNT:
+                case RETURN_SLAVE_BUSY_COUNT:
+                case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+                case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+                {
+                    ucREQUEST_DATA_HI = 0x00;
+                    ucREQUEST_DATA_LO = 0x00;
+
+                    break;
+                }
+#endif
+                default:
+                {
+                    return xSetException( ILLEGAL_FUNCTION );
+                }
+            }
         }
 #endif
 #if( configFC16 == 1 )
@@ -412,6 +493,13 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                         break;
                     }
 #endif
+#if( configFC08 == 1 )
+                    case DIAGNOSTIC :
+                    {
+                        vHandler08();
+                        break;
+                    }
+#endif
 #if( configFC16 == 1 )
                     case WRITE_MULTIPLE_REGISTERS :
                     {
@@ -620,6 +708,127 @@ void SerialModbusMaster::vHandler06( void )
     {
         xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
+    }
+}
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configFC08 == 1 )
+void SerialModbusMaster::vHandler08( void )
+{
+    switch( usREPLY_SUB_FUNCTION_CODE )
+    {
+#if( configSFC00 == 1 )
+        case RETURN_QUERY_DATA:
+        {
+            for( size_t i = 4; i < xReplyLength - 2; i++ )
+            {
+                if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                {
+                    xSetException( ILLEGAL_QUERY_DATA );
+                    vSetState( PROCESSING_ERROR );
+                    return;
+                }
+            }
+
+            break;
+        }
+#endif
+#if( configSFC01 == 1 )
+        case RESTART_COMMUNICATIONS_OPTION:
+        {
+            break;
+        }
+#endif
+#if( configSFC02 == 1 )
+        case RETURN_DIAGNOSTIC_REGISTER:
+        {
+            break;
+        }
+#endif
+#if( configSFC03 == 1 )
+        case CHANGE_ASCII_INPUT_DELIMITER:
+        {
+            break;
+        }
+#endif
+#if( configSFC04 == 1 )
+        case FORCE_LISTEN_ONLY_MODE:
+        {
+            break;
+        }
+#endif
+#if( configSFC10 == 1 )
+        case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+        {
+            break;
+        }
+#endif
+#if( configSFC11 == 1 )
+        case RETURN_BUS_MESSAGE_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC12 == 1 )
+        case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC13 == 1 )
+        case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC14 == 1 )
+        case RETURN_SLAVE_MESSAGE_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC15 == 1 )
+        case RETURN_SLAVE_NO_RESPONSE_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC16 == 1 )
+        case RETURN_SLAVE_NAK_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC17 == 1 )
+        case RETURN_SLAVE_BUSY_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC18 == 1 )
+        case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+        {
+            break;
+        }
+#endif
+#if( configSFC20 == 1 )
+        case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+        {
+            break;
+        }
+#endif
+        default:
+        {
+            xSetException( ILLEGAL_FUNCTION );
+            vSetState( PROCESSING_ERROR );
+            return;
+        }
+    }
+
+    if( pxRequest->action != NULL )
+    {
+        (*pxRequest->action)();
     }
 }
 #endif

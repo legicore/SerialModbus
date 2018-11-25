@@ -41,6 +41,9 @@
 #define configPROCESS_LOOP_HOOK         1
 #define configEXTENDED_EXCEPTION_CODES  1
 
+#define configEXCEPTION_CODE_BIT        0x80
+#define configSUB_FUNCTION_CODE_BIT     0x40
+
 /*-----------------------------------------------------------*/
 
 #define configTURNAROUND_DELAY_US   200000
@@ -75,6 +78,23 @@
 #define configFC11      N   /* GET_COM_EVENT_COUNTER */
 #define configFC12      N   /* GET_COM_EVENT_LOG */
 #define configFC17      N   /* REPORT_SLAVE_ID */
+
+/* Diagnostic Sub-Function Codes */
+#define configSFC00     0   /* RETURN_QUERY_DATA */
+#define configSFC01     0   /* RESTART_COMMUNICATIONS_OPTION */
+#define configSFC02     0   /* RETURN_DIAGNOSTIC_REGISTER */
+#define configSFC03     0   /* CHANGE_ASCII_INPUT_DELIMITER */
+#define configSFC04     0   /* FORCE_LISTEN_ONLY_MODE */
+#define configSFC10     0   /* CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER */
+#define configSFC11     0   /* RETURN_BUS_MESSAGE_COUNT */
+#define configSFC12     0   /* RETURN_BUS_COMMUNICATION_ERROR_COUNT */
+#define configSFC13     0   /* RETURN_BUS_EXCEPTION_ERROR_COUNT */
+#define configSFC14     0   /* RETURN_SLAVE_MESSAGE_COUNT */
+#define configSFC15     0   /* RETURN_SLAVE_NO_RESPONSE_COUNT */
+#define configSFC16     0   /* RETURN_SLAVE_NAK_COUNT */
+#define configSFC17     0   /* RETURN_SLAVE_BUSY_COUNT */
+#define configSFC18     0   /* RETURN_BUS_CHARACTER_OVERRUN_COUNT */
+#define configSFC20     0   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
 
 #undef N /* Not implemented */
 

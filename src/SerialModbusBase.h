@@ -66,21 +66,21 @@ MBFunctionCode_t;
 /** TODO */
 typedef enum MBSubFunctionCode_e
 {
-    RETURN_QUERY_DATA                       = 0x00,
-    RESTART_COMMUNICATIONS_OPTION           = 0x01,
-    RETURN_DIAGNOSTIC_REGISTER              = 0x02,
-    CHANGE_ASCII_INPUT_DELIMITER            = 0x03,
-    FORCE_LISTEN_ONLY_MODE                  = 0x04,
-    CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER  = 0x0A,
-    RETURN_BUS_MESSAGE_COUNT                = 0x0B,
-    RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 0x0C,
-    RETURN_BUS_EXCEPTION_ERROR_COUNT        = 0x0D,
-    RETURN_SLAVE_MESSAGE_COUNT              = 0x0E,
-    RETURN_SLAVE_NO_RESPONSE_COUNT          = 0x0F,
-    RETURN_SLAVE_NAK_COUNT                  = 0x10,
-    RETURN_SLAVE_BUSY_COUNT                 = 0x11,
-    RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 0x12,
-    CLEAR_OVERRUN_COUNTER_AND_FLAG          = 0x14
+    RETURN_QUERY_DATA                       = 0,
+    RESTART_COMMUNICATIONS_OPTION           = 1,
+    RETURN_DIAGNOSTIC_REGISTER              = 2,
+    CHANGE_ASCII_INPUT_DELIMITER            = 3,
+    FORCE_LISTEN_ONLY_MODE                  = 4,
+    CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER  = 10,
+    RETURN_BUS_MESSAGE_COUNT                = 11,
+    RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 12,
+    RETURN_BUS_EXCEPTION_ERROR_COUNT        = 13,
+    RETURN_SLAVE_MESSAGE_COUNT              = 14,
+    RETURN_SLAVE_NO_RESPONSE_COUNT          = 15,
+    RETURN_SLAVE_NAK_COUNT                  = 16,
+    RETURN_SLAVE_BUSY_COUNT                 = 17,
+    RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 18,
+    CLEAR_OVERRUN_COUNTER_AND_FLAG          = 20
 }
 MBSubFunctionCode_t;
 
@@ -91,7 +91,7 @@ typedef enum MBException_e
 {
     OK = 0x00,
 
-    /* Stansard exception codes. */
+    /* Standard exception codes. */
     ILLEGAL_FUNCTION                        = 0x01,
     ILLEGAL_DATA_ADDRESS                    = 0x02,
     ILLEGAL_DATA_VALUE                      = 0x03,
@@ -113,6 +113,7 @@ typedef enum MBException_e
     ILLEGAL_OUTPUT_ADDRESS                  = 0x18,
     ILLEGAL_OUTPUT_VALUE                    = 0x19,
     ILLEGAL_QUANTITY                        = 0x1A,
+    ILLEGAL_QUERY_DATA                      = 0x1B,
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 
@@ -164,6 +165,8 @@ protected:
     void (*vSerialCtrlRx)( void );
     HardwareSerial * pxSerial;
     SoftwareSerial * pxSerialSoftware;
+    uint16_t ulSerialBaud;
+    uint8_t ucSerialConfig;
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );
     uint32_t ulRequestDword( size_t xNbr, size_t xOffset = 4 );
@@ -235,8 +238,8 @@ protected:
 #define ucREQUEST_SUB_FUNCTION_CODE_LO  pucRequestFrame[ 3 ]
 #define usREQUEST_SUB_FUNCTION_CODE     ( ( ( uint16_t ) ucREQUEST_SUB_FUNCTION_CODE_HI << 8 ) | ucREQUEST_SUB_FUNCTION_CODE_LO )
 
-#define ucREQUEST_DATA_HI               ucReplyFrame[ 4 ]
-#define ucREQUEST_DATA_LO               ucReplyFrame[ 5 ]
+#define ucREQUEST_DATA_HI               pucRequestFrame[ 4 ]
+#define ucREQUEST_DATA_LO               pucRequestFrame[ 5 ]
 #define usREQUEST_DATA                  ( ( ( uint16_t ) ucREQUEST_DATA_HI << 8 ) | ucREQUEST_DATA_LO )
 
 #define ucREQUEST_INPUT_DELIMITER_HI    pucRequestFrame[ 4 ]

@@ -33,6 +33,8 @@ SerialModbusBase::SerialModbusBase()
 
     pxSerial = NULL;
     pxSerialSoftware = NULL;
+    ulSerialBaud = 0;
+    ucSerialConfig = 0x00;
 
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
@@ -461,7 +463,7 @@ void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
 
         /* If a non-standard serial configuration is used the number of bits
         could possibly change and needs to be adapted for the formula. */
-        #if( configUART_SETTINGS != SERIAL_8E1 )
+        #if( ucSerialConfig != configUART_SETTINGS )
         {
             switch( configUART_SETTINGS )
             {

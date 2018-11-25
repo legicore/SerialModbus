@@ -81,6 +81,13 @@ public:
     void begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
     MBStatus_t processModbus( void );
     void setRegisterMap( const MBRegister_t * registerMap );
+#if( configFC08 == 1 )
+    uint16_t diagRegGet( void );
+    bool diagRegGet( size_t bit );
+    bool diagRegSet( size_t bit );
+    bool diagRegClear( size_t bit );
+    void diagRegClear( void );
+#endif
 
 private:
 
@@ -103,36 +110,32 @@ private:
     void vHandler16( void );
 #endif
 #if( configFC08 == 1 )
-    void handler08( void );
-    uint16_t cpt1_busMsgCnt;
-    uint16_t cpt2_busComErrCnt;
-    uint16_t cpt3_slvExcErrCnt;
-    uint16_t cpt4_slvMsgCnt;
-    uint16_t cpt5_slvNoRspCnt;
-    uint16_t cpt6_slvNAKCnt;
-    uint16_t cpt7_slvBsyCnt;
-    uint16_t cpt8_busChrOvrCount;
-    uint16_t diagnosticRegister;
-    uint16_t diagRegGet( void );
-    bool diagRegGet( size_t bit );
-    bool diagRegSet( size_t bit );
-    bool diagRegClear( size_t bit );
-    void diagRegClear( void );
+    void vHandler08( void );
+    void vClearDiagnosticCounters( void );
+    uint16_t usBusMessageCount;
+    uint16_t usBusCommunicationErrorCount;
+    uint16_t usExceptionErrorCount;
+    uint16_t usSlaveMessageCount;
+    uint16_t usSlaveNoResponseCount;
+    uint16_t usSlaveNAKCount;
+    uint16_t usSlaveBusyCount;
+    uint16_t usBusCharacterOverrunCount;
+    uint16_t usDiagnosticRegister;
 #endif
     bool bListenOnlyMode;
 };
 /*-----------------------------------------------------------*/
 
 #if( configFC08 == 1 )
-    #define incCPT( x ) if( x <= 0xFFFF ) { x++; }
-    #define incCPT1()   incCPT( cpt1_busMsgCnt )
-    #define incCPT2()   incCPT( cpt2_busComErrCnt )
-    #define incCPT3()   incCPT( cpt3_slvExcErrCnt )
-    #define incCPT4()   incCPT( cpt4_slvMsgCnt )
-    #define incCPT5()   incCPT( cpt5_slvNoRspCnt )
-    #define incCPT6()   incCPT( cpt6_slvNAKCnt )
-    #define incCPT7()   incCPT( cpt7_slvBsyCnt )
-    #define incCPT8()   incCPT( cpt8_busChrOvrCount )
+    #define incCPT( x ) if( x < 0xFFFF ) { x++; }
+    #define incCPT1()   incCPT( usBusMessageCount )
+    #define incCPT2()   incCPT( usBusCommunicationErrorCount )
+    #define incCPT3()   incCPT( usExceptionErrorCount )
+    #define incCPT4()   incCPT( usSlaveMessageCount )
+    #define incCPT5()   incCPT( usSlaveNoResponseCount )
+    #define incCPT6()   incCPT( usSlaveNAKCount )
+    #define incCPT7()   incCPT( usSlaveBusyCount )
+    #define incCPT8()   incCPT( usBusCharacterOverrunCount )
 #else
     #define incCPT1()
     #define incCPT2()
