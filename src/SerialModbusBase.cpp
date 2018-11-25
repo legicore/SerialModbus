@@ -424,15 +424,118 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 #if( configMODE == configMODE_RTU )
 void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
 {
+    /* 11 is the appropriate value for the default UART configuration. */
+    uint32_t ulNbrOfBits = 11;
+
     if( ulBaud > 19200 )
     {
+        /* For transfer rates higer than 19200 Baud Modbus recommend fixed
+        values for the inter character timeout and the inter frame delay. */
         ulInterCharacterTimeoutUs = 750;
         ulInterFrameDelayUs       = 1750;
     }
     else
     {
-        ulInterCharacterTimeoutUs = 16500000 / ulBaud;
-        ulInterFrameDelayUs       = 38500000 / ulBaud;
+        /* For transfer rates lower than 19200 Baud the timing is more critical
+        and must be calculated. */
+
+        /* Calculation example for the inter character timeout with 19200 Baud
+        (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
+
+            19200 Baud / 11 Bits = 1745.45'
+
+        That means 1745.45' characters could be transmitted in 1 Second.
+
+            1000 ms / 1745.45 = 0.5729167' ms
+
+        So one character needs 0.5729167' ms to be transmitted.
+        The inter character timeout is defined as 1.5x the time needed to
+        transfer one character (Inter frame delay is 3.5x).
+
+            0.5729167' ms * 1.5 = 0.859375 ms
+
+        And because our timers are working with microseconds we have a final
+        value of 859.375 us.
+
+            0.859375 ms * 1000 = 859.375 us */
+
+        /* If a non-standard serial configuration is used the number of bits
+        could possibly change and needs to be adapted for the formula. */
+        #if( configUART_SETTINGS != SERIAL_8E1 )
+        {
+            switch( configUART_SETTINGS )
+            {
+                case SERIAL_5N1 :
+                case SERIAL_5E1 :
+                case SERIAL_5O1 :
+                {
+                    ulNbrOfBits = 8;
+                    break;
+                }
+                case SERIAL_6N1 :
+                case SERIAL_5N2 :
+                case SERIAL_6E1 :
+                case SERIAL_5E2 :
+                case SERIAL_6O1 :
+                case SERIAL_5O2 :
+                {
+                    ulNbrOfBits = 9;
+                    break;
+                }
+                case SERIAL_7N1 :
+                case SERIAL_6N2 :
+                case SERIAL_7E1 :
+                case SERIAL_6E2 :
+                case SERIAL_7O1 :
+                case SERIAL_6O2 :
+                {
+                    ulNbrOfBits = 10;
+                    break;
+                }
+                case SERIAL_8N1 :
+                case SERIAL_7N2 :
+                case SERIAL_8E1 :
+                case SERIAL_7E2 :
+                case SERIAL_8O1 :
+                case SERIAL_7O2 :
+                {
+                    ulNbrOfBits = 11;
+                    break;
+                }
+                case SERIAL_8N2 :
+                case SERIAL_8E2 :
+                case SERIAL_8O2 :
+                {
+                    ulNbrOfBits = 12;
+                    break;
+                }
+                default :
+                {
+                    /* If an unknown value is set for the serial configuration
+                    the system behavior could be unpredictable! */
+                }
+            }
+        }
+        #endif
+
+        /* General formula:
+
+                      1000
+            timeout = ---- * nbrOfBits * characterTimes * 1000
+                      baud
+
+        Final formulas:
+
+                                    nbrOfBits * 1000000 * 1.5
+            interCharacterTimeout = -------------------------
+                                              baud
+
+                              nbrOfBits * 1000000 * 3.5
+            interFrameDelay = -------------------------
+                                        baud */
+
+		ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
+		ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
     }
 }
 #endif
