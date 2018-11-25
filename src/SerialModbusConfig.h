@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include <Arduino.h>
+
 /*-----------------------------------------------------------*/
 
 #define configMODE_RTU                  1

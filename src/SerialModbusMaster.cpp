@@ -17,11 +17,12 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-#include <Arduino.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusBase.h"
 #include "SerialModbusMaster.h"
+
+#include <Arduino.h>
 
 /*-----------------------------------------------------------*/
 
