@@ -19,6 +19,10 @@
 
 /*-----------------------------------------------------------*/
 
+#include <stdint.h>
+
+/*-----------------------------------------------------------*/
+
 #define configMODE_RTU                  1
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
@@ -29,6 +33,8 @@
 #define configID_SLAVE_MAX              ( ( uint8_t ) 247 )
 
 #define configASCII_INPUT_DELIMITER     ( '\n' )
+
+#define configUART_SETTINGS             SERIAL_8E1
 
 #define configPROCESS_LOOP_HOOK         1
 #define configEXTENDED_EXCEPTION_CODES  1
