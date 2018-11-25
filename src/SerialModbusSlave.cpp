@@ -506,7 +506,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].objectSize ) ) )
         {
             /* Scan the access rights map for the request function code. */
-            for( size_t i = 0; pxAccessRights[ i ].uxAccess != 0b00; i++ )
+            for( size_t i = 0; pxAccessRights[ i ].uxAccess != NA; i++ )
             {
                 if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].uxFunctionCode )
                 {

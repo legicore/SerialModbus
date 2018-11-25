@@ -534,8 +534,8 @@ void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
             interFrameDelay = -------------------------
                                         baud */
 
-		ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
-		ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
+        ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
+        ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
     }
 }
 #endif
