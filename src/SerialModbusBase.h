@@ -90,7 +90,7 @@ typedef enum MBException_e
 {
     OK = 0x00,
 
-    /* Stansard exception codes */
+    /* Stansard exception codes. */
     ILLEGAL_FUNCTION                        = 0x01,
     ILLEGAL_DATA_ADDRESS                    = 0x02,
     ILLEGAL_DATA_VALUE                      = 0x03,
@@ -101,7 +101,7 @@ typedef enum MBException_e
     GATEWAY_PATH_UNAVAILABLE                = 0x0A,
     GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
 
-    /* Non-standard exception codes */
+    /* Non-standard exception codes. */
     ILLEGAL_REQUEST                         = 0x11,
     CHARACTER_OVERRUN                       = 0x12,
     NO_REPLY                                = 0x13,
@@ -115,13 +115,12 @@ typedef enum MBException_e
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 
-    /* Extended exception codes */
+    /* Extended exception codes for slave replies. */
     SLV_ILLEGAL_FUNCTION                    = 0x21,
     SLV_ILLEGAL_DATA_ADDRESS                = 0x22,
     SLV_ILLEGAL_DATA_VALUE                  = 0x23,
-    SLV_CHARACTER_OVERRUN                   = 0x24,
-    SLV_ILLEGAL_STATE                       = 0x25,
-    SLV_ILLEGAL_ACCESS                      = 0x26,
+    SLV_ILLEGAL_STATE                       = 0x24,
+    SLV_ILLEGAL_ACCESS                      = 0x25,
 
 #endif
 

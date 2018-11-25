@@ -227,16 +227,14 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         error counter. */
                         incCPT8();
                         incCPT2();
-                        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                        {
-                            xSetException( SLV_CHARACTER_OVERRUN );
-                        }
-                        #else
-                        {
-                            // TODO
-                        }
-                        #endif
+                        xSetException( CHARACTER_OVERRUN );
+
+                        /* We go directly back to the idle state because we
+                        don't want to send any kind of reply. It would cause bus
+                        collisions if every slave sends an error reply. */
                         vClearRequestFrame();
+                        vSetState( SLAVE_IDLE );
+
                         break;
                     }
                 }
@@ -255,16 +253,16 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             }
                             else
                             {
+
                                 /* Checksum error -> Increment the bus
-                                communication error counter and clear the
-                                request frame. */
+                                communication error counter. */
                                 incCPT2();
-                                vClearRequestFrame();
 
                                 /* We go directly back to the idle state
                                 because we don't want to send any kind of reply.
-                                It would threaten a bus collision if every slave
-                                would send an error reply. */
+                                It would cause bus collisions if every slave
+                                sends an error reply. */
+                                vClearRequestFrame();
                                 vSetState( SLAVE_IDLE );
                             }
                         }
@@ -300,9 +298,12 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                     incCPT2();
                                 }
 
-                                /* If the received request is not dedicated to
-                                us or we encounter a checksum error */
+                                /* We go directly back to the idle state because
+                                we don't want to send any kind of reply. It
+                                would cause bus collisions if every slave
+                                sends an error reply. */
                                 vClearRequestFrame();
+                                vSetState( SLAVE_IDLE );
                             }
                         }
                     }
