@@ -452,6 +452,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     xSetException( SLAVE_DEVICE_FAILURE );
                 }
                 #endif
+
                 vSetState( FORMATTING_ERROR_REPLY );
             }
         }
@@ -599,7 +600,7 @@ void SerialModbusSlave::vHandler03_04( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_DATA_VALUE );
+        xSetException( SLV_ILLEGAL_QUANTITY );
     }
     #else
     {
@@ -635,7 +636,7 @@ void SerialModbusSlave::vHandler05( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_DATA_VALUE );
+        xSetException( SLV_ILLEGAL_COIL_VALUE );
     }
     #else
     {
@@ -721,16 +722,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -749,16 +741,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -781,7 +764,7 @@ void SerialModbusSlave::vHandler08( void )
             {
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
+                    xSetException( SLV_ILLEGAL_ASCII_DELIMITER );
                 }
                 #else
                 {
@@ -804,16 +787,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -832,16 +806,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -860,16 +825,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -888,16 +844,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -916,16 +863,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -944,16 +882,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -972,16 +901,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -1000,16 +920,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -1028,16 +939,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -1056,16 +958,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -1085,16 +978,7 @@ void SerialModbusSlave::vHandler08( void )
             }
             else
             {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_DATA_VALUE );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-                #endif
-
+                xSetException( ILLEGAL_DATA_VALUE );
                 return;
             }
 
@@ -1239,7 +1123,7 @@ void SerialModbusSlave::vHandler16( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_DATA_VALUE );
+        xSetException( SLV_ILLEGAL_QUANTITY );
     }
     #else
     {

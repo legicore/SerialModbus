@@ -120,11 +120,13 @@ typedef enum MBException_e
 
     /* Extended exception codes for slave replies. */
     SLV_ILLEGAL_FUNCTION                    = 0x21,
-    SLV_ILLEGAL_DATA_ADDRESS                = 0x22,
-    SLV_ILLEGAL_DATA_VALUE                  = 0x23,
-    SLV_ILLEGAL_STATE                       = 0x24,
-    SLV_ILLEGAL_ACCESS                      = 0x25,
-    SLV_ILLEGAL_SUB_FUNCTION                = 0x26,
+    SLV_ILLEGAL_STATE                       = 0x22,
+    SLV_ILLEGAL_DATA_ADDRESS                = 0x23,
+    SLV_ILLEGAL_ACCESS                      = 0x24,
+    SLV_ILLEGAL_QUANTITY                    = 0x25,
+    SLV_ILLEGAL_COIL_VALUE                  = 0x26,
+    SLV_ILLEGAL_ASCII_DELIMITER             = 0x27,
+    SLV_ILLEGAL_SUB_FUNCTION                = 0x28,
 
 #endif
 
