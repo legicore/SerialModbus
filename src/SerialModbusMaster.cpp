@@ -257,7 +257,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 #endif
                 default:
                 {
-                    return xSetException( ILLEGAL_FUNCTION );
+                    return xSetException( ILLEGAL_SUB_FUNCTION );
                 }
             }
         }
@@ -820,7 +820,7 @@ void SerialModbusMaster::vHandler08( void )
 #endif
         default:
         {
-            xSetException( ILLEGAL_FUNCTION );
+            xSetException( ILLEGAL_SUB_FUNCTION );
             vSetState( PROCESSING_ERROR );
             return;
         }

@@ -114,6 +114,7 @@ typedef enum MBException_e
     ILLEGAL_OUTPUT_VALUE                    = 0x19,
     ILLEGAL_QUANTITY                        = 0x1A,
     ILLEGAL_QUERY_DATA                      = 0x1B,
+    ILLEGAL_SUB_FUNCTION                    = 0x1C,
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 
@@ -123,6 +124,7 @@ typedef enum MBException_e
     SLV_ILLEGAL_DATA_VALUE                  = 0x23,
     SLV_ILLEGAL_STATE                       = 0x24,
     SLV_ILLEGAL_ACCESS                      = 0x25,
+    SLV_ILLEGAL_SUB_FUNCTION                = 0x26,
 
 #endif
 

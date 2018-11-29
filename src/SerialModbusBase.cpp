@@ -463,7 +463,7 @@ void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
 
         /* If a non-standard serial configuration is used the number of bits
         could possibly change and needs to be adapted for the formula. */
-        #if( ucSerialConfig != configUART_SETTINGS )
+        #if( configUART_SETTINGS != SERIAL_8E1 )
         {
             switch( configUART_SETTINGS )
             {
