@@ -403,6 +403,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                 }
                 else
                 {
+                    /* This seams to be a broadcast, so we increment the no
+                    response count and don't send any reply. */
                     incCPT5();
                 }
 
@@ -483,9 +485,11 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
         return NOK;
     }
 
-    /* TODO */
     #if( configFC08 == 1 )
     {
+        /* If the diagnostic functions are enabled we don't need to do the
+        normal request check. All diagnoctic functions are a part of the Modbus
+        protocol (and don't need any definition as a register etc.). */
         if( ucREQUEST_FUNCTION_CODE == ( uint8_t ) DIAGNOSTIC )
         {
             return OK;
@@ -673,11 +677,14 @@ void SerialModbusSlave::vHandler06( void )
 #if( configFC08 == 1 )
 void SerialModbusSlave::vHandler08( void )
 {
+    /* Set the common reply data for all diagnostic sub functions. */
     ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
     ucREPLY_SUB_FUNCTION_CODE_HI = ucREQUEST_SUB_FUNCTION_CODE_HI;
     ucREPLY_SUB_FUNCTION_CODE_LO = ucREQUEST_SUB_FUNCTION_CODE_LO;
 
-    /* TODO */
+    /* Some of the diagnoostic sub functions just return the received request
+    data (which is in most cases 0x0000). So we apply this data directly at the
+    beginning of the handler and will change it only in the specific cases. */
     ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
     ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
 
@@ -988,6 +995,7 @@ void SerialModbusSlave::vHandler08( void )
         default:
         {
             incCPT3();
+
             #if( configEXTENDED_EXCEPTION_CODES == 1 )
             {
                 xSetException( SLV_ILLEGAL_SUB_FUNCTION );
