@@ -233,21 +233,46 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
                     break;
                 }
 #endif
-#if( ( configSFC02 == 1 ) || ( configSFC04 == 1 ) || ( configSFC10 == 1 ) || ( configSFC11 == 1 ) || \
-     ( configSFC12 == 1 ) || ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
-     ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) || ( configSFC20 == 1 ) )
+#if( configSFC02 == 1 )
                 case RETURN_DIAGNOSTIC_REGISTER:
+#endif
+#if( configSFC04 == 1 )
                 case FORCE_LISTEN_ONLY_MODE:
+#endif
+#if( configSFC10 == 1 )
                 case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+#endif
+#if( configSFC11 == 1 )
                 case RETURN_BUS_MESSAGE_COUNT:
+#endif
+#if( configSFC12 == 1 )
                 case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+#endif
+#if( configSFC13 == 1 )
                 case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+#endif
+#if( configSFC14 == 1 )
                 case RETURN_SLAVE_MESSAGE_COUNT:
+#endif
+#if( configSFC15 == 1 )
                 case RETURN_SLAVE_NO_RESPONSE_COUNT:
+#endif
+#if( configSFC16 == 1 )
                 case RETURN_SLAVE_NAK_COUNT:
+#endif
+#if( configSFC17 == 1 )
                 case RETURN_SLAVE_BUSY_COUNT:
+#endif
+#if( configSFC18 == 1 )
                 case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+#endif
+#if( configSFC20 == 1 )
                 case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+#endif
+#if( ( configSFC02 == 1 ) || ( configSFC04 == 1 ) || ( configSFC10 == 1 ) || \
+     ( configSFC11 == 1 ) || ( configSFC12 == 1 ) || ( configSFC13 == 1 ) || \
+     ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || ( configSFC16 == 1 ) || \
+     ( configSFC17 == 1 ) || ( configSFC18 == 1 ) || ( configSFC20 == 1 ) )
                 {
                     ucREQUEST_DATA_HI = 0x00;
                     ucREQUEST_DATA_LO = 0x00;
@@ -716,119 +741,110 @@ void SerialModbusMaster::vHandler06( void )
 #if( configFC08 == 1 )
 void SerialModbusMaster::vHandler08( void )
 {
-    switch( usREPLY_SUB_FUNCTION_CODE )
+    if( usREPLY_SUB_FUNCTION_CODE == usREQUEST_SUB_FUNCTION_CODE )
     {
-#if( configSFC00 == 1 )
-        case RETURN_QUERY_DATA:
+        switch( usREPLY_SUB_FUNCTION_CODE )
         {
-            for( size_t i = 4; i < xReplyLength - 2; i++ )
+#if( configSFC00 == 1 )
+            case RETURN_QUERY_DATA:
             {
-                if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                for( size_t i = 4; i < xReplyLength - 2; i++ )
                 {
-                    xSetException( ILLEGAL_QUERY_DATA );
+                    if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                    {
+                        xSetException( ILLEGAL_QUERY_DATA );
+                        vSetState( PROCESSING_ERROR );
+                        return;
+                    }
+                }
+
+                break;
+            }
+#endif
+#if( configSFC01 == 1 )
+            case RESTART_COMMUNICATIONS_OPTION:
+#endif
+#if( configSFC03 == 1 )
+            case CHANGE_ASCII_INPUT_DELIMITER:
+#endif
+#if( configSFC04 == 1 )
+            case FORCE_LISTEN_ONLY_MODE:
+#endif
+#if( configSFC10 == 1 )
+            case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+#endif
+#if( configSFC20 == 1 )
+            case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+#endif
+#if( ( configSFC01 == 1 ) || ( configSFC03 == 1 ) || ( configSFC04 == 1 ) || \
+     ( configSFC10 == 1 ) || ( configSFC20 == 1 ) )
+            {
+                if( usREPLY_DATA != usREQUEST_DATA )
+                {
+                    xSetException( ILLEGAL_OUTPUT_VALUE );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
-            }
 
-            break;
-        }
-#endif
-#if( configSFC01 == 1 )
-        case RESTART_COMMUNICATIONS_OPTION:
-        {
-            break;
-        }
+                break;
+            }
 #endif
 #if( configSFC02 == 1 )
-        case RETURN_DIAGNOSTIC_REGISTER:
-        {
-            break;
-        }
-#endif
-#if( configSFC03 == 1 )
-        case CHANGE_ASCII_INPUT_DELIMITER:
-        {
-            break;
-        }
-#endif
-#if( configSFC04 == 1 )
-        case FORCE_LISTEN_ONLY_MODE:
-        {
-            break;
-        }
-#endif
-#if( configSFC10 == 1 )
-        case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
-        {
-            break;
-        }
+            case RETURN_DIAGNOSTIC_REGISTER:
 #endif
 #if( configSFC11 == 1 )
-        case RETURN_BUS_MESSAGE_COUNT:
-        {
-            break;
-        }
+            case RETURN_BUS_MESSAGE_COUNT:
 #endif
 #if( configSFC12 == 1 )
-        case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
-        {
-            break;
-        }
+            case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
 #endif
 #if( configSFC13 == 1 )
-        case RETURN_BUS_EXCEPTION_ERROR_COUNT:
-        {
-            break;
-        }
+            case RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
 #if( configSFC14 == 1 )
-        case RETURN_SLAVE_MESSAGE_COUNT:
-        {
-            break;
-        }
+            case RETURN_SLAVE_MESSAGE_COUNT:
 #endif
 #if( configSFC15 == 1 )
-        case RETURN_SLAVE_NO_RESPONSE_COUNT:
-        {
-            break;
-        }
+            case RETURN_SLAVE_NO_RESPONSE_COUNT:
 #endif
 #if( configSFC16 == 1 )
-        case RETURN_SLAVE_NAK_COUNT:
-        {
-            break;
-        }
+            case RETURN_SLAVE_NAK_COUNT:
 #endif
 #if( configSFC17 == 1 )
-        case RETURN_SLAVE_BUSY_COUNT:
-        {
-            break;
-        }
+            case RETURN_SLAVE_BUSY_COUNT:
 #endif
 #if( configSFC18 == 1 )
-        case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
-        {
-            break;
-        }
+            case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
 #endif
-#if( configSFC20 == 1 )
-        case CLEAR_OVERRUN_COUNTER_AND_FLAG:
-        {
-            break;
-        }
+#if( ( configSFC02 == 1 ) || ( configSFC11 == 1 ) || ( configSFC12 == 1 ) || \
+     ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
+     ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) )
+            {
+                if( pxRequest->object != NULL )
+                {
+                    *( ( uint16_t * ) pxRequest->object ) = usREPLY_DATA;
+                }
+
+                break;
+            }
 #endif
-        default:
+            default:
+            {
+                xSetException( ILLEGAL_SUB_FUNCTION );
+                vSetState( PROCESSING_ERROR );
+                return;
+            }
+        }
+
+        if( pxRequest->action != NULL )
         {
-            xSetException( ILLEGAL_SUB_FUNCTION );
-            vSetState( PROCESSING_ERROR );
-            return;
+            (*pxRequest->action)();
         }
     }
-
-    if( pxRequest->action != NULL )
+    else
     {
-        (*pxRequest->action)();
+        xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        vSetState( PROCESSING_ERROR );
     }
 }
 #endif
