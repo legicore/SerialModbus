@@ -181,8 +181,8 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
         {
             if( request->object != NULL )
             {
-                pucRequestFrame[ 4 ] = highByte( request->object[ 0 ] );
-                pucRequestFrame[ 5 ] =  lowByte( request->object[ 0 ] );
+                pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
                 xRequestLength = 6;
             }
             else
@@ -277,8 +277,8 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
             {
                 for( size_t i = 0; i < request->objectSize; i++ )
                 {
-                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( request->object[ i ] );
-                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( request->object[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( ( ( uint16_t * ) request->object )[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( ( ( uint16_t * ) request->object )[ i ] );
                     xRequestLength += 2;
                 }
             }
@@ -631,7 +631,7 @@ void SerialModbusMaster::vHandler03_04( void )
             
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pxRequest->object[ i + xOffset ] = usReplyWord( i );
+                ( ( uint16_t * ) pxRequest->object )[ i + xOffset ] = usReplyWord( i );
             }
         }
 

@@ -47,7 +47,7 @@ typedef struct MBRequest_s
     uint8_t id;
     uint8_t functionCode;
     uint16_t address;
-    uint16_t * object;
+    void * object;
     size_t objectSize;
     void (*action)( void );
 }
