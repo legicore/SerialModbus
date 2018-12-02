@@ -47,15 +47,12 @@ SerialModbusMaster::SerialModbusMaster()
 
 void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
 {
-    ulSerialBaud = baud;
     pxSerial = serial;
-    ucSerialConfig = config;
-
-    pxSerial->begin( ulSerialBaud, ucSerialConfig );
+    pxSerial->begin( baud, config );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( ulSerialBaud );
+        vCalculateTimeouts( baud );
     }
     #endif
 }
@@ -63,14 +60,12 @@ void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t 
 
 void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
 {
-    ulSerialBaud = baud;
     pxSerialSoftware = serial;
-
-    pxSerialSoftware->begin( ulSerialBaud );
+    pxSerialSoftware->begin( baud );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( ulSerialBaud );
+        vCalculateTimeouts( baud );
     }
     #endif
 }

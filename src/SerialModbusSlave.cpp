@@ -125,15 +125,12 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * 
 {
     ucSlaveId = slaveId;
 
-    ulSerialBaud = baud;
     pxSerial = serial;
-    ucSerialConfig = config;
-
-    pxSerial->begin( ulSerialBaud, ucSerialConfig );
+    pxSerial->begin( baud, config );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( ulSerialBaud );
+        vCalculateTimeouts( baud );
     }
     #endif
 }
@@ -143,14 +140,12 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * 
 {
     ucSlaveId = slaveId;
 
-    ulSerialBaud = baud;
     pxSerialSoftware = serial;
-
-    pxSerialSoftware->begin( ulSerialBaud );
+    pxSerialSoftware->begin( baud );
 
     #if( configMODE == configMODE_RTU )
     {
-        vCalculateTimeouts( ulSerialBaud );
+        vCalculateTimeouts( baud );
     }
     #endif
 }
@@ -711,16 +706,7 @@ void SerialModbusSlave::vHandler08( void )
             {
                 bListenOnlyMode = false;
 
-                if( pxSerial != NULL )
-                {
-                    pxSerial->end();
-                    pxSerial->begin( ulSerialBaud, ucSerialConfig );
-                }
-                else if( pxSerialSoftware != NULL )
-                {
-                    pxSerial->end();
-                    pxSerial->begin( ulSerialBaud );
-                }
+                // TODO: Restart the serial connection needed!?
 
                 if( usREQUEST_DATA == 0xFF00 )
                 {

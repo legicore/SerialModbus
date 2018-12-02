@@ -169,8 +169,6 @@ protected:
     void (*vSerialCtrlRx)( void );
     HardwareSerial * pxSerial;
     SoftwareSerial * pxSerialSoftware;
-    uint16_t ulSerialBaud;
-    uint8_t ucSerialConfig;
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );
     uint32_t ulRequestDword( size_t xNbr, size_t xOffset = 4 );

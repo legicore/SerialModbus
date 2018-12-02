@@ -31,10 +31,8 @@ SerialModbusBase::SerialModbusBase()
     xRequestLength = 0;
     xReplyLength   = 0;
 
-    pxSerial = NULL;
+    pxSerial         = NULL;
     pxSerialSoftware = NULL;
-    ulSerialBaud = 0;
-    ucSerialConfig = 0x00;
 
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
