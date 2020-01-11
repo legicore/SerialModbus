@@ -44,10 +44,10 @@ MBSlaveState_t;
 /** TODO */
 typedef enum MBAccess_e
 {
-    NA = 0b00,
-    RD = 0b01,
-    WR = 0b10,
-    RW = 0b11
+    NA = 0b00,  /** No Access. */
+    RD = 0b01,  /** Read only. */
+    WR = 0b10,  /** Write only. */
+    RW = 0b11   /** Read and write. */
 }
 MBAccess_t;
 

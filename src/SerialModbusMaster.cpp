@@ -140,7 +140,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
         return xSetException( ILLEGAL_REQUEST );
     }
 
-    xSetException( OK );
+    ( void ) xSetException( OK );
 
     if( ( request->id            > configID_SLAVE_MAX ) ||
         ( request->functionCode == 0x00               ) ||
@@ -423,14 +423,14 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
                 else
                 {
-                    xSetException( CHARACTER_OVERRUN );
+                    ( void ) xSetException( CHARACTER_OVERRUN );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    xSetException( NO_REPLY );
+                    ( void ) xSetException( NO_REPLY );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }

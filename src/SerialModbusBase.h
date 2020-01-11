@@ -127,6 +127,7 @@ typedef enum MBException_e
     SLV_ILLEGAL_COIL_VALUE                  = 0x26,
     SLV_ILLEGAL_ASCII_DELIMITER             = 0x27,
     SLV_ILLEGAL_SUB_FUNCTION                = 0x28,
+    SLV_ILLEGAL_DATA_VALUE                  = 0x29,
 
 #endif
 

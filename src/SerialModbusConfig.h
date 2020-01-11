@@ -78,20 +78,20 @@
 
 /* Diagnostic Sub-Function Codes */
 #define configSFC00     1   /* RETURN_QUERY_DATA */
-#define configSFC01     N   /* RESTART_COMMUNICATIONS_OPTION */
-#define configSFC02     N   /* RETURN_DIAGNOSTIC_REGISTER */
-#define configSFC03     N   /* CHANGE_ASCII_INPUT_DELIMITER */
-#define configSFC04     N   /* FORCE_LISTEN_ONLY_MODE */
-#define configSFC10     N   /* CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER */
-#define configSFC11     N   /* RETURN_BUS_MESSAGE_COUNT */
-#define configSFC12     N   /* RETURN_BUS_COMMUNICATION_ERROR_COUNT */
-#define configSFC13     N   /* RETURN_BUS_EXCEPTION_ERROR_COUNT */
-#define configSFC14     N   /* RETURN_SLAVE_MESSAGE_COUNT */
-#define configSFC15     N   /* RETURN_SLAVE_NO_RESPONSE_COUNT */
-#define configSFC16     N   /* RETURN_SLAVE_NAK_COUNT */
-#define configSFC17     N   /* RETURN_SLAVE_BUSY_COUNT */
-#define configSFC18     N   /* RETURN_BUS_CHARACTER_OVERRUN_COUNT */
-#define configSFC20     N   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
+#define configSFC01     1   /* RESTART_COMMUNICATIONS_OPTION */
+#define configSFC02     1   /* RETURN_DIAGNOSTIC_REGISTER */
+#define configSFC03     1   /* CHANGE_ASCII_INPUT_DELIMITER */
+#define configSFC04     1   /* FORCE_LISTEN_ONLY_MODE */
+#define configSFC10     1   /* CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER */
+#define configSFC11     1   /* RETURN_BUS_MESSAGE_COUNT */
+#define configSFC12     1   /* RETURN_BUS_COMMUNICATION_ERROR_COUNT */
+#define configSFC13     1   /* RETURN_BUS_EXCEPTION_ERROR_COUNT */
+#define configSFC14     1   /* RETURN_SLAVE_MESSAGE_COUNT */
+#define configSFC15     1   /* RETURN_SLAVE_NO_RESPONSE_COUNT */
+#define configSFC16     1   /* RETURN_SLAVE_NAK_COUNT */
+#define configSFC17     1   /* RETURN_SLAVE_BUSY_COUNT */
+#define configSFC18     1   /* RETURN_BUS_CHARACTER_OVERRUN_COUNT */
+#define configSFC20     1   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
 
 #undef N /* Not implemented */
 
