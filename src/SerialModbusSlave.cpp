@@ -33,70 +33,65 @@ typedef struct MBAccessRights_s
 }
 MBAccessRights_t;
 
-static const MBAccessRights_t pxAccessRights[] =
-{
+static const MBAccessRights_t pxAccessRights[] = {
     /* Bit Data Access */
-#if configFC01
+#if( configFC01 == 1 )
     { RD, READ_COILS },
 #endif
-#if configFC02
+#if( configFC02 == 1 )
     { RD, READ_DISCRETE_INPUTS },
 #endif
-#if configFC05
+#if( configFC05 == 1 )
     { WR, WRITE_SINGLE_COIL },
 #endif
-#if configFC15
+#if( configFC15 == 1 )
     { WR, WRITE_MULTIPLE_COILS },
 #endif
-
     /* Word Data Access */
-#if configFC03
+#if( configFC03 == 1 )
     { RD, READ_HOLDING_REGISTERS },
 #endif
-#if configFC04
+#if( configFC04 == 1 )
     { RD, READ_INPUT_REGISTERS },
 #endif
-#if configFC06
+#if( configFC06 == 1 )
     { WR, WRITE_SINGLE_REGISTER },
 #endif
-#if configFC16
+#if( configFC16 == 1 )
     { WR, WRITE_MULTIPLE_REGISTERS },
 #endif
-#if configFC22
+#if( configFC22 == 1 )
     { WR, MASK_WRITE_REGISTER },
 #endif
-#if configFC23
+#if( configFC23 == 1 )
     { RW, READ_WRITE_MULTIPLE_REGISTERS },
 #endif
-#if configFC24
+#if( configFC24 == 1 )
     { RD, READ_FIFO_QUEUE },
 #endif
-
     /* File Record Data Access */
-#if configFC20
+#if( configFC20 == 1 )
     { RD, READ_FILE_RECORD },
 #endif
-#if configFC21
+#if( configFC21 == 1 )
     { WR, WRITE_FILE_RECORD },
 #endif
-
     /* Diagnostics */
-#if configFC07
+#if( configFC07 == 1 )
     { RD, READ_EXCEPTION_STATUS },
 #endif
-#if configFC08
+#if( configFC08 == 1 )
     { RW, DIAGNOSTIC },
 #endif
-#if configFC11
+#if( configFC11 == 1 )
     { RD, GET_COM_EVENT_COUNTER },
 #endif
-#if configFC12
+#if( configFC12 == 1 )
     { RD, GET_COM_EVENT_LOG },
 #endif
-#if configFC17
+#if( configFC17 == 1 )
     { RD, REPORT_SLAVE_ID },
 #endif
-
     /* Marks the end of the list. */
     { 0b00, 0b000000 }
 };
@@ -121,20 +116,24 @@ SerialModbusSlave::SerialModbusSlave()
     ucSlaveId = configID_SLAVE_MAX;
 }
 /*-----------------------------------------------------------*/
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || ( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__ ) || defined( __AVR_ATmega8__ ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
 
-void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
-{
-    ucSlaveId = slaveId;
-
-    pxSerial = serial;
-    pxSerial->begin( baud, config );
-
-    #if( configMODE == configMODE_RTU )
+    void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
     {
-        vCalculateTimeouts( baud );
+        ucSlaveId = slaveId;
+
+        pxSerial = serial;
+        pxSerial->begin( baud, config );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            vCalculateTimeouts( baud );
+        }
+        #endif
     }
-    #endif
-}
+
+#endif
 /*-----------------------------------------------------------*/
 
 void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
@@ -150,6 +149,25 @@ void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * 
     }
     #endif
 }
+/*-----------------------------------------------------------*/
+
+#if defined( __AVR_ATmega4809__ )
+
+    void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config )
+    {
+        ucSlaveId = slaveId;
+
+        pxSerial = serial;
+        pxSerial->begin( baud, config );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            vCalculateTimeouts( baud );
+        }
+        #endif
+    }
+
+#endif
 /*-----------------------------------------------------------*/
 
 void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )
@@ -331,7 +349,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             {
                 switch( ucREQUEST_FUNCTION_CODE )
                 {
-#if configFC03 || configFC04
+#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
                     case READ_HOLDING_REGISTERS :
                     case READ_INPUT_REGISTERS :
                     {
@@ -339,28 +357,28 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         break;
                     }
 #endif
-#if configFC05
+#if( configFC05 == 1 )
                     case WRITE_SINGLE_COIL :
                     {
                         vHandler05();
                         break;
                     }
 #endif
-#if configFC06
+#if( configFC06 == 1 )
                     case WRITE_SINGLE_REGISTER :
                     {
                         vHandler06();
                         break;
                     }
 #endif
-#if configFC08
+#if( configFC08 == 1 )
                     case DIAGNOSTIC :
                     {
                         vHandler08();
                         break;
                     }
 #endif
-#if configFC16
+#if( configFC16 == 1 )
                     case WRITE_MULTIPLE_REGISTERS :
                     {
                         vHandler16();
@@ -567,7 +585,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 }
 /*-----------------------------------------------------------*/
 
-#if configFC03 || configFC04
+#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
 
     void SerialModbusSlave::vHandler03_04( void )
     {
@@ -613,7 +631,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC05
+#if( configFC05 == 1 )
 
     void SerialModbusSlave::vHandler05( void )
     {
@@ -651,7 +669,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC06
+#if( configFC06 == 1 )
 
     void SerialModbusSlave::vHandler06( void )
     {
@@ -676,7 +694,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     void SerialModbusSlave::vHandler08( void )
     {
@@ -694,7 +712,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
         switch( ucREQUEST_FUNCTION_CODE )
         {
-#if configSFC00
+#if( configSFC00 == 1 )
             case RETURN_QUERY_DATA:
             {
                 xReplyLength = 4;
@@ -708,7 +726,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC01
+#if( configSFC01 == 1 )
             case RESTART_COMMUNICATIONS_OPTION:
             {
                 if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == 0xFF00 ) )
@@ -731,7 +749,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC02
+#if( configSFC02 == 1 )
             case RETURN_DIAGNOSTIC_REGISTER:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -750,7 +768,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC03
+#if( configSFC03 == 1 )
             case CHANGE_ASCII_INPUT_DELIMITER:
             {
                 if( ( isAscii( ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
@@ -780,7 +798,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC04
+#if( configSFC04 == 1 )
             case FORCE_LISTEN_ONLY_MODE:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -796,7 +814,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC10
+#if( configSFC10 == 1 )
             case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -815,7 +833,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC11
+#if( configSFC11 == 1 )
             case RETURN_BUS_MESSAGE_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -834,7 +852,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC12
+#if( configSFC12 == 1 )
             case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -853,7 +871,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC13
+#if( configSFC13 == 1 )
             case RETURN_BUS_EXCEPTION_ERROR_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -872,7 +890,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC14
+#if( configSFC14 == 1 )
             case RETURN_SLAVE_MESSAGE_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -891,7 +909,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC15
+#if( configSFC15 == 1 )
             case RETURN_SLAVE_NO_RESPONSE_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -910,7 +928,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC16
+#if( configSFC16 == 1 )
             case RETURN_SLAVE_NAK_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -929,7 +947,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC17
+#if( configSFC17 == 1 )
             case RETURN_SLAVE_BUSY_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -948,7 +966,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC18
+#if( configSFC18 == 1 )
             case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -967,7 +985,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 break;
             }
 #endif
-#if configSFC20
+#if( configSFC20 == 1 )
             case CLEAR_OVERRUN_COUNTER_AND_FLAG:
             {
                 if( usREQUEST_DATA == 0x0000 )
@@ -1014,7 +1032,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     void SerialModbusSlave::vClearDiagnosticCounters( void )
     {
@@ -1031,7 +1049,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     uint16_t SerialModbusSlave::diagRegGet( void )
     {
@@ -1041,7 +1059,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     bool SerialModbusSlave::diagRegGet( size_t bit )
     {
@@ -1059,7 +1077,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     bool SerialModbusSlave::diagRegSet( size_t bit )
     {
@@ -1075,7 +1093,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     bool SerialModbusSlave::diagRegClear( size_t bit )
     {
@@ -1091,7 +1109,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC08
+#if( configFC08 == 1 )
 
     void SerialModbusSlave::diagRegClear( void )
     {
@@ -1101,7 +1119,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
 /*-----------------------------------------------------------*/
 
-#if configFC16
+#if( configFC16 == 1 )
 
     void SerialModbusSlave::vHandler16( void )
     {

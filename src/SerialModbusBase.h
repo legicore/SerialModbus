@@ -151,6 +151,12 @@ public:
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
 #endif
     void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
+#if( configMODE == configMODE_RTU )
+    uint32_t getInterCharacterTimeout( void );
+    uint32_t getInterFrameDelay( void );
+    int8_t setInterCharacterTimeout( uint32_t timeUs );
+    int8_t setInterFrameDelay( uint32_t timeUs );
+#endif
 
 protected:
 
@@ -168,7 +174,11 @@ protected:
     void vSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
     void (*vSerialCtrlTx)( void );
     void (*vSerialCtrlRx)( void );
+#if defined( __AVR_ATmega4809__ )
+    UartClass * pxSerial;
+#else
     HardwareSerial * pxSerial;
+#endif
     SoftwareSerial * pxSerialSoftware;
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );

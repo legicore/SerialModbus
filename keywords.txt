@@ -33,6 +33,10 @@ setInterCharacterTimeout	KEYWORD2
 setResponseTimeout	KEYWORD2
 setTurnaroundDelay	KEYWORD2
 setProcessLoopHook	KEYWORD2
+getInterFrameDelay	KEYWORD2
+getInterCharacterTimeout	KEYWORD2
+setInterFrameDelay	KEYWORD2
+setInterCharacterTimeout	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

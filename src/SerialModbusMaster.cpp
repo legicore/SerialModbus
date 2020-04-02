@@ -44,18 +44,22 @@ SerialModbusMaster::SerialModbusMaster()
     xRequestMapIndex = 0;
 }
 /*-----------------------------------------------------------*/
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || ( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__ ) || defined( __AVR_ATmega8__ ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
 
-void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
-{
-    pxSerial = serial;
-    pxSerial->begin( baud, config );
-
-    #if( configMODE == configMODE_RTU )
+    void SerialModbusMaster::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
     {
-        vCalculateTimeouts( baud );
+        pxSerial = serial;
+        pxSerial->begin( baud, config );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            vCalculateTimeouts( baud );
+        }
+        #endif
     }
-    #endif
-}
+
+#endif
 /*-----------------------------------------------------------*/
 
 void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
@@ -69,6 +73,23 @@ void SerialModbusMaster::begin( uint32_t baud, SoftwareSerial * serial )
     }
     #endif
 }
+/*-----------------------------------------------------------*/
+
+#if defined( __AVR_ATmega4809__ )
+
+    void SerialModbusMaster::begin( uint32_t baud, UartClass * serial, uint32_t config )
+    {
+        pxSerial = serial;
+        pxSerial->begin( baud, config );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            vCalculateTimeouts( baud );
+        }
+        #endif
+    }
+
+#endif
 /*-----------------------------------------------------------*/
 
 void SerialModbusMaster::vSetState( MBMasterState_t xStatePar )
@@ -638,223 +659,205 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 /*-----------------------------------------------------------*/
 
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-void SerialModbusMaster::vHandler03_04( void )
-{
-    size_t xOffset = 0;
 
-    /* Check the response byte count */
-    if( ucREPLY_BYTE_COUNT == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
+    void SerialModbusMaster::vHandler03_04( void )
     {
-        if( pxRequest->object != NULL )
+        size_t xOffset = 0;
+
+        /* Check the response byte count */
+        if( ucREPLY_BYTE_COUNT == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
         {
-            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
-            
-            for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
+            if( pxRequest->object != NULL )
             {
-                ( ( uint16_t * ) pxRequest->object )[ i + xOffset ] = usReplyWord( i );
+                xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
+                
+                for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
+                {
+                    ( ( uint16_t * ) pxRequest->object )[ i + xOffset ] = usReplyWord( i );
+                }
+            }
+
+            xReplyDataSize = ( size_t ) usREQUEST_QUANTITY;
+
+            if( pxRequest->action != NULL )
+            {
+                (*pxRequest->action)();
             }
         }
-
-        xReplyDataSize = ( size_t ) usREQUEST_QUANTITY;
-
-        if( pxRequest->action != NULL )
+        else
         {
-            (*pxRequest->action)();
+            xSetException( ILLEGAL_BYTE_COUNT );
+            vSetState( PROCESSING_ERROR );
         }
     }
-    else
-    {
-        xSetException( ILLEGAL_BYTE_COUNT );
-        vSetState( PROCESSING_ERROR );
-    }
-}
+
 #endif
 /*-----------------------------------------------------------*/
 
 #if( configFC05 == 1 )
-void SerialModbusMaster::vHandler05( void )
-{
-    /* Check the response output address */
-    if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
-    {
-        /* Check the response output value */
-        if( usREPLY_COIL_VALUE == usREQUEST_COIL_VALUE )
-        {
-            xReplyDataSize = 1;
 
-            if( pxRequest->action != NULL )
+    void SerialModbusMaster::vHandler05( void )
+    {
+        /* Check the response output address */
+        if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
+        {
+            /* Check the response output value */
+            if( usREPLY_COIL_VALUE == usREQUEST_COIL_VALUE )
             {
-                (*pxRequest->action)();
+                xReplyDataSize = 1;
+
+                if( pxRequest->action != NULL )
+                {
+                    (*pxRequest->action)();
+                }
+            }
+            else
+            {
+                xSetException( ILLEGAL_COIL_VALUE );
+                vSetState( PROCESSING_ERROR );
             }
         }
         else
         {
-            xSetException( ILLEGAL_COIL_VALUE );
+            xSetException( ILLEGAL_OUTPUT_ADDRESS );
             vSetState( PROCESSING_ERROR );
         }
     }
-    else
-    {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
-        vSetState( PROCESSING_ERROR );
-    }
-}
+
 #endif
 /*-----------------------------------------------------------*/
 
 #if( configFC06 == 1 )
-void SerialModbusMaster::vHandler06( void )
-{
-    /* Check the response output address */
-    if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
-    {
-        /* Check the response output value */
-        if( usREPLY_OUTPUT_VALUE == usREQUEST_OUTPUT_VALUE )
-        {
-            xReplyDataSize = 1;
 
-            if( pxRequest->action != NULL )
+    void SerialModbusMaster::vHandler06( void )
+    {
+        /* Check the response output address */
+        if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
+        {
+            /* Check the response output value */
+            if( usREPLY_OUTPUT_VALUE == usREQUEST_OUTPUT_VALUE )
             {
-                (*pxRequest->action)();
+                xReplyDataSize = 1;
+
+                if( pxRequest->action != NULL )
+                {
+                    (*pxRequest->action)();
+                }
+            }
+            else
+            {
+                xSetException( ILLEGAL_OUTPUT_VALUE );
+                vSetState( PROCESSING_ERROR );
             }
         }
         else
         {
-            xSetException( ILLEGAL_OUTPUT_VALUE );
+            xSetException( ILLEGAL_OUTPUT_ADDRESS );
             vSetState( PROCESSING_ERROR );
         }
     }
-    else
-    {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
-        vSetState( PROCESSING_ERROR );
-    }
-}
+
 #endif
 /*-----------------------------------------------------------*/
 
 #if( configFC08 == 1 )
-void SerialModbusMaster::vHandler08( void )
-{
-    if( usREPLY_SUB_FUNCTION_CODE == usREQUEST_SUB_FUNCTION_CODE )
-    {
-        switch( usREPLY_SUB_FUNCTION_CODE )
-        {
-#if( configSFC00 == 1 )
-            case RETURN_QUERY_DATA:
-            {
-                for( size_t i = 4; i < xReplyLength - 2; i++ )
-                {
-                    if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
-                    {
-                        xSetException( ILLEGAL_QUERY_DATA );
-                        vSetState( PROCESSING_ERROR );
-                        return;
-                    }
-                }
 
-                break;
-            }
+    void SerialModbusMaster::vHandler08( void )
+    {
+        if( usREPLY_SUB_FUNCTION_CODE == usREQUEST_SUB_FUNCTION_CODE )
+        {
+            switch( usREPLY_SUB_FUNCTION_CODE )
+            {
+#if( configSFC00 == 1 )
+                case RETURN_QUERY_DATA:
+                {
+                    for( size_t i = 4; i < xReplyLength - 2; i++ )
+                    {
+                        if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                        {
+                            xSetException( ILLEGAL_QUERY_DATA );
+                            vSetState( PROCESSING_ERROR );
+                            return;
+                        }
+                    }
+
+                    break;
+                }
 #endif
 #if( configSFC01 == 1 )
-            case RESTART_COMMUNICATIONS_OPTION:
+                case RESTART_COMMUNICATIONS_OPTION:
 #endif
 #if( configSFC03 == 1 )
-            case CHANGE_ASCII_INPUT_DELIMITER:
+                case CHANGE_ASCII_INPUT_DELIMITER:
 #endif
 #if( configSFC04 == 1 )
-            case FORCE_LISTEN_ONLY_MODE:
+                case FORCE_LISTEN_ONLY_MODE:
 #endif
 #if( configSFC10 == 1 )
-            case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+                case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
 #endif
 #if( configSFC20 == 1 )
-            case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+                case CLEAR_OVERRUN_COUNTER_AND_FLAG:
 #endif
 #if( ( configSFC01 == 1 ) || ( configSFC03 == 1 ) || ( configSFC04 == 1 ) || \
      ( configSFC10 == 1 ) || ( configSFC20 == 1 ) )
-            {
-                if( usREPLY_DATA != usREQUEST_DATA )
                 {
-                    xSetException( ILLEGAL_OUTPUT_VALUE );
-                    vSetState( PROCESSING_ERROR );
-                    return;
-                }
+                    if( usREPLY_DATA != usREQUEST_DATA )
+                    {
+                        xSetException( ILLEGAL_OUTPUT_VALUE );
+                        vSetState( PROCESSING_ERROR );
+                        return;
+                    }
 
-                break;
-            }
+                    break;
+                }
 #endif
 #if( configSFC02 == 1 )
-            case RETURN_DIAGNOSTIC_REGISTER:
+                case RETURN_DIAGNOSTIC_REGISTER:
 #endif
 #if( configSFC11 == 1 )
-            case RETURN_BUS_MESSAGE_COUNT:
+                case RETURN_BUS_MESSAGE_COUNT:
 #endif
 #if( configSFC12 == 1 )
-            case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+                case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
 #endif
 #if( configSFC13 == 1 )
-            case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+                case RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
 #if( configSFC14 == 1 )
-            case RETURN_SLAVE_MESSAGE_COUNT:
+                case RETURN_SLAVE_MESSAGE_COUNT:
 #endif
 #if( configSFC15 == 1 )
-            case RETURN_SLAVE_NO_RESPONSE_COUNT:
+                case RETURN_SLAVE_NO_RESPONSE_COUNT:
 #endif
 #if( configSFC16 == 1 )
-            case RETURN_SLAVE_NAK_COUNT:
+                case RETURN_SLAVE_NAK_COUNT:
 #endif
 #if( configSFC17 == 1 )
-            case RETURN_SLAVE_BUSY_COUNT:
+                case RETURN_SLAVE_BUSY_COUNT:
 #endif
 #if( configSFC18 == 1 )
-            case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+                case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
 #endif
 #if( ( configSFC02 == 1 ) || ( configSFC11 == 1 ) || ( configSFC12 == 1 ) || \
      ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
      ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) )
-            {
-                if( pxRequest->object != NULL )
                 {
-                    *( ( uint16_t * ) pxRequest->object ) = usREPLY_DATA;
+                    if( pxRequest->object != NULL )
+                    {
+                        *( ( uint16_t * ) pxRequest->object ) = usREPLY_DATA;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 #endif
-            default:
-            {
-                xSetException( ILLEGAL_SUB_FUNCTION );
-                vSetState( PROCESSING_ERROR );
-                return;
+                default:
+                {
+                    xSetException( ILLEGAL_SUB_FUNCTION );
+                    vSetState( PROCESSING_ERROR );
+                    return;
+                }
             }
-        }
-
-        if( pxRequest->action != NULL )
-        {
-            (*pxRequest->action)();
-        }
-    }
-    else
-    {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
-        vSetState( PROCESSING_ERROR );
-    }
-}
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC16 == 1 )
-void SerialModbusMaster::vHandler16( void )
-{
-    /* Check the response output address */
-    if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
-    {
-        /* Check the response output value */
-        if( usREPLY_QUANTITY == usREQUEST_QUANTITY )
-        {
-            xReplyDataSize = 0;
 
             if( pxRequest->action != NULL )
             {
@@ -863,14 +866,42 @@ void SerialModbusMaster::vHandler16( void )
         }
         else
         {
-            xSetException( ILLEGAL_QUANTITY );
+            xSetException( ILLEGAL_OUTPUT_ADDRESS );
             vSetState( PROCESSING_ERROR );
         }
     }
-    else
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configFC16 == 1 )
+
+    void SerialModbusMaster::vHandler16( void )
     {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
-        vSetState( PROCESSING_ERROR );
+        /* Check the response output address */
+        if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
+        {
+            /* Check the response output value */
+            if( usREPLY_QUANTITY == usREQUEST_QUANTITY )
+            {
+                xReplyDataSize = 0;
+
+                if( pxRequest->action != NULL )
+                {
+                    (*pxRequest->action)();
+                }
+            }
+            else
+            {
+                xSetException( ILLEGAL_QUANTITY );
+                vSetState( PROCESSING_ERROR );
+            }
+        }
+        else
+        {
+            xSetException( ILLEGAL_OUTPUT_ADDRESS );
+            vSetState( PROCESSING_ERROR );
+        }
     }
-}
+
 #endif
