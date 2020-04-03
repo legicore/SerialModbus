@@ -41,7 +41,6 @@ SerialModbusMaster::SerialModbusMaster()
     ulTimerTurnaroundDelayUs = 0;
 
     pxRequestMap = NULL;
-    xRequestMapIndex = 0;
 }
 /*-----------------------------------------------------------*/
 
@@ -63,15 +62,15 @@ void SerialModbusMaster::vStartResponseTimeout( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusMaster::bTimeoutTurnaroundDelay( void )
+bool SerialModbusMaster::bTimeoutTurnaroundDelay( void ) const
 {
-    return ( micros() - ulTimerTurnaroundDelayUs ) > ulTurnaroundDelayUs;
+    return ( micros() - ulTimerTurnaroundDelayUs ) >= ulTurnaroundDelayUs;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusMaster::bTimeoutResponseTimeout( void )
+bool SerialModbusMaster::bTimeoutResponseTimeout( void ) const
 {
-    return ( micros() - ulTimerResponseTimeoutUs ) > ulResponseTimeoutUs;
+    return ( micros() - ulTimerResponseTimeoutUs ) >= ulResponseTimeoutUs;
 }
 /*-----------------------------------------------------------*/
 
@@ -89,6 +88,8 @@ void SerialModbusMaster::setTurnaroundDelay( uint32_t timeMs )
 
 MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 {
+    static size_t xRequestMapIndex = 0;
+
     if( pxRequestMap != NULL )
     {
         if( pxRequestMap[ xRequestMapIndex ].functionCode == 0x00 )
@@ -561,7 +562,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 }
 /*-----------------------------------------------------------*/
 
-size_t SerialModbusMaster::getReplyDataSize( void )
+size_t SerialModbusMaster::getReplyDataSize( void ) const
 {
     return xReplyDataSize;
 }

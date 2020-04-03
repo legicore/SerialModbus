@@ -164,8 +164,8 @@ public:
 #endif
     void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
 #if( configMODE == configMODE_RTU )
-    uint32_t getInterCharacterTimeout( void );
-    uint32_t getInterFrameDelay( void );
+    uint32_t getInterCharacterTimeout( void ) const;
+    uint32_t getInterFrameDelay( void ) const;
     int8_t setInterCharacterTimeout( uint32_t timeUs );
     int8_t setInterFrameDelay( uint32_t timeUs );
 #endif
@@ -211,8 +211,8 @@ protected:
     uint32_t ulTimerInterCharacterTimeoutUs;
     void vStartInterFrameDelay( void );
     void vStartInterCharacterTimeout( void );
-    bool bTimeoutInterFrameDelay( void );
-    bool bTimeoutInterCharacterTimeout( void );
+    bool bTimeoutInterFrameDelay( void ) const;
+    bool bTimeoutInterCharacterTimeout( void ) const;
     bool bCalculateTimeouts( uint32_t ulBaud );
 #endif
 #if( configMODE == configMODE_ASCII )

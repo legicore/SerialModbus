@@ -446,9 +446,9 @@ MBException_t SerialModbusBase::xSetException( MBException_t xExceptionPar )
 
 #if( configMODE == configMODE_RTU )
 
-    bool SerialModbusBase::bTimeoutInterFrameDelay( void )
+    bool SerialModbusBase::bTimeoutInterFrameDelay( void ) const
     {
-        return ( micros() - ulTimerInterFrameDelayUs ) > ulInterFrameDelayUs;
+        return ( micros() - ulTimerInterFrameDelayUs ) >= ulInterFrameDelayUs;
     }
 
 #endif
@@ -456,9 +456,9 @@ MBException_t SerialModbusBase::xSetException( MBException_t xExceptionPar )
 
 #if( configMODE == configMODE_RTU )
 
-    bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
+    bool SerialModbusBase::bTimeoutInterCharacterTimeout( void ) const
     {
-        return ( micros() - ulTimerInterCharacterTimeoutUs ) > ulInterCharacterTimeoutUs;
+        return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
     }
 
 #endif
@@ -690,7 +690,7 @@ void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 
 #if( configMODE == configMODE_RTU )
 
-	uint32_t SerialModbusBase::getInterCharacterTimeout( void )
+	uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
 	{
 		return ulInterCharacterTimeoutUs;
 	}
@@ -700,7 +700,7 @@ void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 
 #if( configMODE == configMODE_RTU )
 
-	uint32_t SerialModbusBase::getInterFrameDelay( void )
+	uint32_t SerialModbusBase::getInterFrameDelay( void ) const
 	{
 		return ulInterFrameDelayUs;
 	}

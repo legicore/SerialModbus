@@ -66,7 +66,7 @@ public:
     SerialModbusMaster();
     MBStatus_t setRequest( const MBRequest_t * request );
     MBStatus_t processModbus( void );
-    size_t getReplyDataSize( void );
+    size_t getReplyDataSize( void ) const;
     size_t getReplyData( uint16_t * buffer, size_t bufferSize );
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
@@ -79,14 +79,13 @@ private:
     MBStatus_t xProcessRequestMap( void );
     const MBRequest_t * pxRequest;
     const MBRequest_t * pxRequestMap;
-    size_t xRequestMapIndex;
     size_t xReplyDataSize;
     uint32_t ulTimerTurnaroundDelayUs;
     uint32_t ulTimerResponseTimeoutUs;
     uint32_t ulTurnaroundDelayUs;
     uint32_t ulResponseTimeoutUs;
-    bool bTimeoutTurnaroundDelay( void );
-    bool bTimeoutResponseTimeout( void );
+    bool bTimeoutTurnaroundDelay( void ) const;
+    bool bTimeoutResponseTimeout( void ) const;
     void vStartTurnaroundDelay( void );
     void vStartResponseTimeout( void );
 #if( configFC03 == 1 || configFC04 == 1 )

@@ -34,6 +34,7 @@ typedef struct MBAccessRights_s
 MBAccessRights_t;
 
 static const MBAccessRights_t pxAccessRights[] = {
+
     /* Bit Data Access */
 #if( configFC01 == 1 )
     { RD, READ_COILS },
@@ -47,6 +48,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 #if( configFC15 == 1 )
     { WR, WRITE_MULTIPLE_COILS },
 #endif
+
     /* Word Data Access */
 #if( configFC03 == 1 )
     { RD, READ_HOLDING_REGISTERS },
@@ -69,6 +71,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 #if( configFC24 == 1 )
     { RD, READ_FIFO_QUEUE },
 #endif
+
     /* File Record Data Access */
 #if( configFC20 == 1 )
     { RD, READ_FILE_RECORD },
@@ -76,6 +79,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 #if( configFC21 == 1 )
     { WR, WRITE_FILE_RECORD },
 #endif
+
     /* Diagnostics */
 #if( configFC07 == 1 )
     { RD, READ_EXCEPTION_STATUS },
@@ -92,6 +96,7 @@ static const MBAccessRights_t pxAccessRights[] = {
 #if( configFC17 == 1 )
     { RD, REPORT_SLAVE_ID },
 #endif
+
     /* Marks the end of the list. */
     { 0b00, 0b000000 }
 };
