@@ -34,6 +34,9 @@ SerialModbusBase::SerialModbusBase()
     pxSerial         = NULL;
     pxSerialSoftware = NULL;
 
+    /* This is the default value of Arduinos HardwareSerial implementation. */
+    ulSerialConfig = SERIAL_8E1;
+
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
 
@@ -61,6 +64,107 @@ SerialModbusBase::SerialModbusBase()
     #endif
 
     vCustomDelayUs = NULL;
+}
+/*-----------------------------------------------------------*/
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+
+    bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial )
+    {
+        if( baud == 0 || serial == NULL )
+        {
+            return false;
+        }
+
+        pxSerial = serial;
+        pxSerial->begin( baud, ulSerialConfig );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            if( bCalculateTimeouts( baud ) != true )
+            {
+                return false;
+            }
+        }
+        #endif
+
+        return true;
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+
+    bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
+    {
+        ulSerialConfig = config;
+        return begin( baud, serial );
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if defined( __AVR_ATmega4809__ )
+
+    bool SerialModbusBase::begin( uint32_t baud, UartClass * serial )
+    {
+        if( baud == 0 || serial == NULL )
+        {
+            return false;
+        }
+
+        pxSerial = serial;
+        pxSerial->begin( baud, ulSerialConfig );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            if( bCalculateTimeouts( baud ) != true )
+            {
+                return false;
+            }
+        }
+        #endif
+
+        return true;
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if defined( __AVR_ATmega4809__ )
+
+    bool SerialModbusBase::begin( uint32_t baud, UartClass * serial, uint32_t config )
+    {
+        ulSerialConfig = config;
+        return begin( baud, serial );
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
+{
+    if( baud == 0 || serial == NULL )
+    {
+        return false;
+    }
+
+    pxSerialSoftware = serial;
+    pxSerialSoftware->begin( baud );
+
+    #if( configMODE == configMODE_RTU )
+    {
+        if( bCalculateTimeouts( baud ) != true )
+        {
+            return false;
+        }
+    }
+    #endif
+
+    return true;
 }
 /*-----------------------------------------------------------*/
 
@@ -447,10 +551,11 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 
 #if( configMODE == configMODE_RTU )
 
-    void SerialModbusBase::vCalculateTimeouts( uint32_t ulBaud )
+    bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
     {
-        /* 11 is the appropriate value for the default UART configuration. */
-        uint32_t ulNbrOfBits = 11;
+        /* The given value here will beoverwritten anyway, but 11 would be the
+        right value for the Arduino dafault configuration (SERIAL_8E1). */
+        uint8_t ucNbrOfBits = 11;
 
         if( ulBaud > 19200 )
         {
@@ -484,64 +589,57 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 
                 0.859375 ms * 1000 = 859.375 us */
 
-            /* If a non-standard serial configuration is used the number of bits
-            could possibly change and needs to be adapted for the formula. */
-            #if( configUART_SETTINGS != SERIAL_8E1 )
+            switch( ulSerialConfig )
             {
-                switch( configUART_SETTINGS )
+                case SERIAL_5N1 :
+                case SERIAL_5E1 :
+                case SERIAL_5O1 :
                 {
-                    case SERIAL_5N1 :
-                    case SERIAL_5E1 :
-                    case SERIAL_5O1 :
-                    {
-                        ulNbrOfBits = 8;
-                        break;
-                    }
-                    case SERIAL_6N1 :
-                    case SERIAL_5N2 :
-                    case SERIAL_6E1 :
-                    case SERIAL_5E2 :
-                    case SERIAL_6O1 :
-                    case SERIAL_5O2 :
-                    {
-                        ulNbrOfBits = 9;
-                        break;
-                    }
-                    case SERIAL_7N1 :
-                    case SERIAL_6N2 :
-                    case SERIAL_7E1 :
-                    case SERIAL_6E2 :
-                    case SERIAL_7O1 :
-                    case SERIAL_6O2 :
-                    {
-                        ulNbrOfBits = 10;
-                        break;
-                    }
-                    case SERIAL_8N1 :
-                    case SERIAL_7N2 :
-                    case SERIAL_8E1 :
-                    case SERIAL_7E2 :
-                    case SERIAL_8O1 :
-                    case SERIAL_7O2 :
-                    {
-                        ulNbrOfBits = 11;
-                        break;
-                    }
-                    case SERIAL_8N2 :
-                    case SERIAL_8E2 :
-                    case SERIAL_8O2 :
-                    {
-                        ulNbrOfBits = 12;
-                        break;
-                    }
-                    default :
-                    {
-                        /* If an unknown value is set the system behavior could
-                        be unpredictable! */
-                    }
+                    ucNbrOfBits = 8;
+                    break;
+                }
+                case SERIAL_6N1 :
+                case SERIAL_5N2 :
+                case SERIAL_6E1 :
+                case SERIAL_5E2 :
+                case SERIAL_6O1 :
+                case SERIAL_5O2 :
+                {
+                    ucNbrOfBits = 9;
+                    break;
+                }
+                case SERIAL_7N1 :
+                case SERIAL_6N2 :
+                case SERIAL_7E1 :
+                case SERIAL_6E2 :
+                case SERIAL_7O1 :
+                case SERIAL_6O2 :
+                {
+                    ucNbrOfBits = 10;
+                    break;
+                }
+                case SERIAL_8N1 :
+                case SERIAL_7N2 :
+                case SERIAL_8E1 :
+                case SERIAL_7E2 :
+                case SERIAL_8O1 :
+                case SERIAL_7O2 :
+                {
+                    ucNbrOfBits = 11;
+                    break;
+                }
+                case SERIAL_8N2 :
+                case SERIAL_8E2 :
+                case SERIAL_8O2 :
+                {
+                    ucNbrOfBits = 12;
+                    break;
+                }
+                default :
+                {
+                    return false;
                 }
             }
-            #endif
 
             /* General formula:
 
@@ -559,9 +657,11 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
                 interFrameDelay = -------------------------
                                             baud */
 
-            ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
-            ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
+            ulInterCharacterTimeoutUs = ( ucNbrOfBits * 1500000 ) / ulBaud;
+            ulInterFrameDelayUs       = ( ucNbrOfBits * 3500000 ) / ulBaud;
         }
+
+        return true;
     }
 
 #endif

@@ -116,58 +116,76 @@ SerialModbusSlave::SerialModbusSlave()
     ucSlaveId = configID_SLAVE_MAX;
 }
 /*-----------------------------------------------------------*/
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || ( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__ ) || defined( __AVR_ATmega8__ ) || \
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
     defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
 
-    void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
+    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial )
     {
+        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+        {
+            return false;
+        }
+
         ucSlaveId = slaveId;
 
-        pxSerial = serial;
-        pxSerial->begin( baud, config );
-
-        #if( configMODE == configMODE_RTU )
-        {
-            vCalculateTimeouts( baud );
-        }
-        #endif
+        return SerialModbusBase::begin( baud, serial );
     }
 
 #endif
 /*-----------------------------------------------------------*/
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
 
-void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
-{
-    ucSlaveId = slaveId;
-
-    pxSerialSoftware = serial;
-    pxSerialSoftware->begin( baud );
-
-    #if( configMODE == configMODE_RTU )
+    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
     {
-        vCalculateTimeouts( baud );
+        ulSerialConfig = config;
+        return begin( slaveId, baud, serial );
     }
-    #endif
-}
+
+#endif
 /*-----------------------------------------------------------*/
 
 #if defined( __AVR_ATmega4809__ )
 
-    void SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config )
+    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial )
     {
+        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+        {
+            return false;
+        }
+
         ucSlaveId = slaveId;
 
-        pxSerial = serial;
-        pxSerial->begin( baud, config );
-
-        #if( configMODE == configMODE_RTU )
-        {
-            vCalculateTimeouts( baud );
-        }
-        #endif
+        return SerialModbusBase::begin( baud, serial );
     }
 
 #endif
+/*-----------------------------------------------------------*/
+
+#if defined( __AVR_ATmega4809__ )
+
+    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config )
+    {
+        ulSerialConfig = config;
+        return begin( slaveId, baud, serial );
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
+{
+    if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+    {
+        return false;
+    }
+
+    ucSlaveId = slaveId;
+
+    return SerialModbusBase::begin( baud, serial );
+}
 /*-----------------------------------------------------------*/
 
 void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )

@@ -146,6 +146,18 @@ class SerialModbusBase
 public:
 
     SerialModbusBase();
+#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    bool begin( uint32_t baud, HardwareSerial * serial );
+    bool begin( uint32_t baud, HardwareSerial * serial, uint8_t config );
+#elif defined( __AVR_ATmega4809__ )
+    bool begin( uint32_t baud, UartClass * serial );
+    bool begin( uint32_t baud, UartClass * serial, uint32_t config );
+#else
+    #error the currently selected board is unsuported
+#endif
+    bool begin( uint32_t baud, SoftwareSerial * serial );
     void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
 #if( configPROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
@@ -180,6 +192,7 @@ protected:
     HardwareSerial * pxSerial;
 #endif
     SoftwareSerial * pxSerialSoftware;
+    uint32_t ulSerialConfig;
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );
     uint32_t ulRequestDword( size_t xNbr, size_t xOffset = 4 );
@@ -200,7 +213,7 @@ protected:
     void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void );
     bool bTimeoutInterCharacterTimeout( void );
-    void vCalculateTimeouts( uint32_t ulBaud );
+    bool bCalculateTimeouts( uint32_t ulBaud );
 #endif
 #if( configMODE == configMODE_ASCII )
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );

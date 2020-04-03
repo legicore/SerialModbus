@@ -36,8 +36,6 @@
 
 #define configASCII_INPUT_DELIMITER     ( '\n' )
 
-#define configUART_SETTINGS             SERIAL_8E1
-
 #define configPROCESS_LOOP_HOOK         1
 #define configEXTENDED_EXCEPTION_CODES  0
 

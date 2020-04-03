@@ -38,7 +38,7 @@ void setup( void )
     digitalWrite( LED_BUILTIN, LOW );
 
     Master.setRequestMap( requestMap );
-    Master.begin( 19200 );
+    Master.begin( 19200, &Serial );
 }
 /*-----------------------------------------------------------*/
 

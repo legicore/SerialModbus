@@ -74,15 +74,15 @@ public:
 
     SerialModbusSlave();
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    )
-    void begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial = &Serial, uint8_t config = configUART_SETTINGS );
-#elif defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
-    void begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial = &Serial1, uint8_t config = configUART_SETTINGS );
+    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial );
+    bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config );
+#elif defined( __AVR_ATmega4809__ )
+    bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial );
+    bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config );
 #endif
-#if defined( __AVR_ATmega4809__ )
-    void begin( uint8_t slaveId, uint32_t baud, UartClass * serial = &Serial1, uint32_t config = configUART_SETTINGS );
-#endif
-    void begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
+    bool begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
     MBStatus_t processModbus( void );
     void setRegisterMap( const MBRegister_t * registerMap );
 #if( configFC08 == 1 )
