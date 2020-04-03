@@ -256,7 +256,7 @@ The second entry address lies in the address range of the first entry and must a
 
 > MIT License
 >
-> Copyright (c) 2018 Martin Legleiter
+> Copyright (c) 2020 Martin Legleiter
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal

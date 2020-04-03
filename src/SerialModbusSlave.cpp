@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2018 Martin Legleiter
+ * @copyright   (c) 2020 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -116,6 +116,7 @@ SerialModbusSlave::SerialModbusSlave()
     ucSlaveId = configID_SLAVE_MAX;
 }
 /*-----------------------------------------------------------*/
+
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
     defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
@@ -134,6 +135,7 @@ SerialModbusSlave::SerialModbusSlave()
 
 #endif
 /*-----------------------------------------------------------*/
+
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
     defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
