@@ -30,6 +30,8 @@ The library has been developed (and will be further improved/expanded) in strict
 * Arduino Mega 2650
 * Arduino Leonardo
 * Arduino Pro Mini (ATmega328P, 5V, 16MHz)
+* Arduino Nano Every
+* Arduino Uno Wifi Rev2
 
 # Getting Started
 

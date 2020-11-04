@@ -210,7 +210,7 @@ void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 MBStatus_t SerialModbusSlave::processModbus( void )
 {
     xSetException( OK );
-    
+
     do
     {
         /* Get the current state and select the associated action */
@@ -289,12 +289,15 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                             {
+                                /* Received a new valid request -> Increment the
+                                bus message counter. */
+                                incCPT1();
+
                                 while( bTimeoutInterFrameDelay() != true );
                                 vSetState( CHECKING_REQUEST );
                             }
                             else
                             {
-
                                 /* Checksum error -> Increment the bus
                                 communication error counter. */
                                 incCPT2();
