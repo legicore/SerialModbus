@@ -331,6 +331,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 if( ( ucREQUEST_ID == ucSlaveId          ) ||
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
+                                    /* Received a new valid request ->
+                                    Increment the bus message counter. */
+                                    incCPT1();
+
                                     if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                     {
                                         vSetState( CHECKING_REQUEST );
