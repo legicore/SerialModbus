@@ -449,8 +449,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                 }
                 else
                 {
-                    /* This seams to be a broadcast, so we increment the no
-                    response count and don't send any reply. */
+                    /* This is a broadcast, so we clear the reply frame to send
+                    no reply and increment the no response counter. */
+                    vClearReplyFrame();
                     incCPT5();
                 }
 
