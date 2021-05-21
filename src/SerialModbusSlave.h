@@ -107,19 +107,19 @@ private:
     size_t xRegisterMapIndex;
     MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
 #if( configFC03 == 1 || configFC04 == 1 )
-    void vHandler03_04( void );
+    void vHandlerFC03_04( void );
 #endif
 #if( configFC05 == 1 )
-    void vHandler05( void );
+    void vHandlerFC05( void );
 #endif
 #if( configFC06 == 1 )
-    void vHandler06( void );
+    void vHandlerFC06( void );
 #endif
 #if( configFC16 == 1 )
-    void vHandler16( void );
+    void vHandlerFC16( void );
 #endif
 #if( configFC08 == 1 )
-    void vHandler08( void );
+    void vHandlerFC08( void );
     void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
@@ -136,24 +136,24 @@ private:
 /*-----------------------------------------------------------*/
 
 #if( configFC08 == 1 )
-    #define incCPT( x ) if( x < 0xFFFF ) { x++; }
-    #define incCPT1()   incCPT( usBusMessageCount )
-    #define incCPT2()   incCPT( usBusCommunicationErrorCount )
-    #define incCPT3()   incCPT( usExceptionErrorCount )
-    #define incCPT4()   incCPT( usSlaveMessageCount )
-    #define incCPT5()   incCPT( usSlaveNoResponseCount )
-    #define incCPT6()   incCPT( usSlaveNAKCount )
-    #define incCPT7()   incCPT( usSlaveBusyCount )
-    #define incCPT8()   incCPT( usBusCharacterOverrunCount )
+    #define vIncCPT( counter ) if( counter < 0xFFFF ) counter++
+    #define vIncCPT1()  vIncCPT( usBusMessageCount )
+    #define vIncCPT2()  vIncCPT( usBusCommunicationErrorCount )
+    #define vIncCPT3()  vIncCPT( usExceptionErrorCount )
+    #define vIncCPT4()  vIncCPT( usSlaveMessageCount )
+    #define vIncCPT5()  vIncCPT( usSlaveNoResponseCount )
+    #define vIncCPT6()  vIncCPT( usSlaveNAKCount )
+    #define vIncCPT7()  vIncCPT( usSlaveBusyCount )
+    #define vIncCPT8()  vIncCPT( usBusCharacterOverrunCount )
 #else
-    #define incCPT1()
-    #define incCPT2()
-    #define incCPT3()
-    #define incCPT4()
-    #define incCPT5()
-    #define incCPT6()
-    #define incCPT7()
-    #define incCPT8()
+    #define vIncCPT1()
+    #define vIncCPT2()
+    #define vIncCPT3()
+    #define vIncCPT4()
+    #define vIncCPT5()
+    #define vIncCPT6()
+    #define vIncCPT7()
+    #define vIncCPT8()
 #endif
 
 /*-----------------------------------------------------------*/

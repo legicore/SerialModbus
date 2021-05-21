@@ -272,8 +272,8 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         /* Receive buffer overflow -> Increment the bus
                         charakter overrun counter and the bus communication
                         error counter. */
-                        incCPT8();
-                        incCPT2();
+                        vIncCPT8();
+                        vIncCPT2();
                         xSetException( CHARACTER_OVERRUN );
 
                         /* We go directly back to the idle state because we
@@ -297,7 +297,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             {
                                 /* Received a new valid request -> Increment the
                                 bus message counter. */
-                                incCPT1();
+                                vIncCPT1();
 
                                 while( bTimeoutInterFrameDelay() != true );
                                 vSetState( CHECKING_REQUEST );
@@ -306,7 +306,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             {
                                 /* Checksum error -> Increment the bus
                                 communication error counter. */
-                                incCPT2();
+                                vIncCPT2();
 
                                 /* We go directly back to the idle state
                                 because we don't want to send any kind of reply.
@@ -339,7 +339,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 {
                                     /* Received a new valid request ->
                                     Increment the bus message counter. */
-                                    incCPT1();
+                                    vIncCPT1();
 
                                     if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                     {
@@ -349,7 +349,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                     /* Checksum error -> Increment the bus
                                     communication error counter. */
-                                    incCPT2();
+                                    vIncCPT2();
                                 }
 
                                 /* We go directly back to the idle state because
@@ -369,7 +369,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case CHECKING_REQUEST :
             {
-                incCPT4();
+                vIncCPT4();
 
                 if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == OK )
                 {
@@ -391,35 +391,35 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     case READ_HOLDING_REGISTERS :
                     case READ_INPUT_REGISTERS :
                     {
-                        vHandler03_04();
+                        vHandlerFC03_04();
                         break;
                     }
 #endif
 #if( configFC05 == 1 )
                     case WRITE_SINGLE_COIL :
                     {
-                        vHandler05();
+                        vHandlerFC05();
                         break;
                     }
 #endif
 #if( configFC06 == 1 )
                     case WRITE_SINGLE_REGISTER :
                     {
-                        vHandler06();
+                        vHandlerFC06();
                         break;
                     }
 #endif
 #if( configFC08 == 1 )
                     case DIAGNOSTIC :
                     {
-                        vHandler08();
+                        vHandlerFC08();
                         break;
                     }
 #endif
 #if( configFC16 == 1 )
                     case WRITE_MULTIPLE_REGISTERS :
                     {
-                        vHandler16();
+                        vHandlerFC16();
                         break;
                     }
 #endif
@@ -458,7 +458,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     /* This is a broadcast, so we clear the reply frame to send
                     no reply and increment the no response counter. */
                     vClearReplyFrame();
-                    incCPT5();
+                    vIncCPT5();
                 }
 
                 vClearRequestFrame();
@@ -480,7 +480,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case FORMATTING_ERROR_REPLY :
             {
-                incCPT3();
+                vIncCPT3();
 
                 ucREPLY_ID = ucSlaveId;
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
@@ -626,7 +626,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
 
-    void SerialModbusSlave::vHandler03_04( void )
+    void SerialModbusSlave::vHandlerFC03_04( void )
     {
         size_t xOffset = 0;
 
@@ -672,7 +672,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
 #if( configFC05 == 1 )
 
-    void SerialModbusSlave::vHandler05( void )
+    void SerialModbusSlave::vHandlerFC05( void )
     {
         if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
         {
@@ -710,7 +710,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
 #if( configFC06 == 1 )
 
-    void SerialModbusSlave::vHandler06( void )
+    void SerialModbusSlave::vHandlerFC06( void )
     {
         size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
@@ -735,7 +735,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
 #if( configFC08 == 1 )
 
-    void SerialModbusSlave::vHandler08( void )
+    void SerialModbusSlave::vHandlerFC08( void )
     {
         /* Set the common reply data for all diagnostic sub functions. */
         ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -1046,7 +1046,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
             default:
             {
-                incCPT3();
+                vIncCPT3();
 
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
@@ -1160,7 +1160,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
 #if( configFC16 == 1 )
 
-    void SerialModbusSlave::vHandler16( void )
+    void SerialModbusSlave::vHandlerFC16( void )
     {
         size_t xOffset = 0;
 
@@ -1172,7 +1172,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             {
                 if( ucREQUEST_BYTE_COUNT_2 == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
                 {
-                    for( size_t i = 0; i < usREQUEST_QUANTITY; i++ )
+                    for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                     {
                         pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
                     }

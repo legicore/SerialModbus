@@ -472,35 +472,35 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     case READ_HOLDING_REGISTERS :
                     case READ_INPUT_REGISTERS :
                     {
-                        vHandler03_04();
+                        vHandlerFC03_04();
                         break;
                     }
 #endif
 #if( configFC05 == 1 )
                     case WRITE_SINGLE_COIL :
                     {
-                        vHandler05();
+                        vHandlerFC05();
                         break;
                     }
 #endif
 #if( configFC06 == 1 )
                     case WRITE_SINGLE_REGISTER :
                     {
-                        vHandler06();
+                        vHandlerFC06();
                         break;
                     }
 #endif
 #if( configFC08 == 1 )
                     case DIAGNOSTIC :
                     {
-                        vHandler08();
+                        vHandlerFC08();
                         break;
                     }
 #endif
 #if( configFC16 == 1 )
                     case WRITE_MULTIPLE_REGISTERS :
                     {
-                        vHandler16();
+                        vHandlerFC16();
                         break;
                     }
 #endif
@@ -616,7 +616,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
 
-    void SerialModbusMaster::vHandler03_04( void )
+    void SerialModbusMaster::vHandlerFC03_04( void )
     {
         size_t xOffset = 0;
 
@@ -652,7 +652,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 
 #if( configFC05 == 1 )
 
-    void SerialModbusMaster::vHandler05( void )
+    void SerialModbusMaster::vHandlerFC05( void )
     {
         /* Check the response output address */
         if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
@@ -685,7 +685,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 
 #if( configFC06 == 1 )
 
-    void SerialModbusMaster::vHandler06( void )
+    void SerialModbusMaster::vHandlerFC06( void )
     {
         /* Check the response output address */
         if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
@@ -718,7 +718,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 
 #if( configFC08 == 1 )
 
-    void SerialModbusMaster::vHandler08( void )
+    void SerialModbusMaster::vHandlerFC08( void )
     {
         if( usREPLY_SUB_FUNCTION_CODE == usREQUEST_SUB_FUNCTION_CODE )
         {
@@ -832,7 +832,7 @@ size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
 
 #if( configFC16 == 1 )
 
-    void SerialModbusMaster::vHandler16( void )
+    void SerialModbusMaster::vHandlerFC16( void )
     {
         /* Check the response output address */
         if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
