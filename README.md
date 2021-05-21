@@ -32,6 +32,7 @@ The library has been developed (and will be further improved/expanded) in strict
 * Arduino Pro Mini (ATmega328P, 5V, 16MHz)
 * Arduino Nano Every
 * Arduino Uno Wifi Rev2
+* Arduino Nano RP2040 Connec
 
 # Getting Started
 
@@ -258,7 +259,7 @@ The second entry address lies in the address range of the first entry and must a
 
 > MIT License
 >
-> Copyright (c) 2020 Martin Legleiter
+> Copyright (c) 2021 Martin Legleiter
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal

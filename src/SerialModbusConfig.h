@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2020 Martin Legleiter
+ * @copyright   (c) 2021 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -69,7 +69,7 @@
 
 /* Diagnostics */
 #define configFC07      N   /* READ_EXCEPTION_STATUS */
-#define configFC08      0   /* DIAGNOSTIC */
+#define configFC08      1   /* DIAGNOSTIC */
 #define configFC11      N   /* GET_COM_EVENT_COUNTER */
 #define configFC12      N   /* GET_COM_EVENT_LOG */
 #define configFC17      N   /* REPORT_SLAVE_ID */

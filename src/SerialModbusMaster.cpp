@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2020 Martin Legleiter
+ * @copyright   (c) 2021 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -255,6 +255,8 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
                     return xSetException( ILLEGAL_SUB_FUNCTION );
                 }
             }
+
+            break;
         }
 #endif
 #if( configFC16 == 1 )

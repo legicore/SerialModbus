@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2020 Martin Legleiter
+ * @copyright   (c) 2021 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -22,7 +22,9 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#include <SoftwareSerial.h>
+#if !defined( ARDUINO_ARCH_RP2040 )
+    #include <SoftwareSerial.h>
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -32,7 +34,9 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength   = 0;
 
     pxSerial         = NULL;
+#if !defined( ARDUINO_ARCH_RP2040 )
     pxSerialSoftware = NULL;
+#endif
 
     /* This is the default value of Arduinos HardwareSerial implementation. */
     ulSerialConfig = SERIAL_8E1;
@@ -69,7 +73,8 @@ SerialModbusBase::SerialModbusBase()
 
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
+    defined( ARDUINO_ARCH_RP2040 )
 
     bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial )
     {
@@ -147,27 +152,31 @@ SerialModbusBase::SerialModbusBase()
 #endif
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
-{
-    if( baud == 0 || serial == NULL )
-    {
-        return false;
-    }
+#if !defined( ARDUINO_ARCH_RP2040 )
 
-    pxSerialSoftware = serial;
-    pxSerialSoftware->begin( baud );
-
-    #if( configMODE == configMODE_RTU )
+    bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
     {
-        if( bCalculateTimeouts( baud ) != true )
+        if( baud == 0 || serial == NULL )
         {
             return false;
         }
-    }
-    #endif
 
-    return true;
-}
+        pxSerialSoftware = serial;
+        pxSerialSoftware->begin( baud );
+
+        #if( configMODE == configMODE_RTU )
+        {
+            if( bCalculateTimeouts( baud ) != true )
+            {
+                return false;
+            }
+        }
+        #endif
+
+        return true;
+    }
+
+#endif
 /*-----------------------------------------------------------*/
 
 MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
@@ -505,6 +514,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
             return true;
         }
     }
+#if !defined( ARDUINO_ARCH_RP2040 )
     else if( pxSerialSoftware != NULL )
     {
         if( pxSerialSoftware->available() > 0 )
@@ -514,6 +524,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
             return true;
         }
     }
+#endif
 
     return false ;
 }
@@ -531,10 +542,12 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         pxSerial->write( pucSendBuffer, pxBufferLength );
         pxSerial->flush();
     }
+#if !defined( ARDUINO_ARCH_RP2040 )
     else if( pxSerialSoftware != NULL )
     {
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
     }
+#endif
 
     #if( configMODE == configMODE_RTU )
     {

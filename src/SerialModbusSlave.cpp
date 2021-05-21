@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2020 Martin Legleiter
+ * @copyright   (c) 2021 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -124,7 +124,8 @@ SerialModbusSlave::SerialModbusSlave()
 
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
+    defined( ARDUINO_ARCH_RP2040 )
 
     bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial )
     {
@@ -143,7 +144,8 @@ SerialModbusSlave::SerialModbusSlave()
 
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
+    defined( ARDUINO_ARCH_RP2040 )
 
     bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
     {
@@ -182,17 +184,21 @@ SerialModbusSlave::SerialModbusSlave()
 #endif
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
-{
-    if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+#if !defined( ARDUINO_ARCH_RP2040 )
+
+    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
     {
-        return false;
+        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+        {
+            return false;
+        }
+
+        ucSlaveId = slaveId;
+
+        return SerialModbusBase::begin( baud, serial );
     }
 
-    ucSlaveId = slaveId;
-
-    return SerialModbusBase::begin( baud, serial );
-}
+#endif
 /*-----------------------------------------------------------*/
 
 void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )

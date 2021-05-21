@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2020 Martin Legleiter
+ * @copyright   (c) 2021 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -26,7 +26,9 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#include <SoftwareSerial.h>
+#if !defined( ARDUINO_ARCH_RP2040 )
+    #include <SoftwareSerial.h>
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -75,14 +77,17 @@ public:
     SerialModbusSlave();
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
+    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
+    defined( ARDUINO_ARCH_RP2040 )
     bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial );
     bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config );
 #elif defined( __AVR_ATmega4809__ )
     bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial );
     bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config );
 #endif
+#if !defined( ARDUINO_ARCH_RP2040 )
     bool begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
+#endif
     MBStatus_t processModbus( void );
     void setRegisterMap( const MBRegister_t * registerMap );
 #if( configFC08 == 1 )
