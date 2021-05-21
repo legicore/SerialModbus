@@ -20,14 +20,15 @@
 
 SerialModbusMaster Master;
     
-uint16_t object[ 1 ] = { COIL_OFF };
+uint16_t object1[ 1 ] = { 0 };
+uint16_t object2[ 1 ] = { 0 };
 
-void toggleCoil( void );
-void toggleLed( void );
+void action1( void );
+void action2( void );
 
 const MBRequest_t requestMap[] = {
-    { 1, WRITE_SINGLE_COIL, 0x1000, object, 1, toggleCoil },
-    { 1, WRITE_SINGLE_COIL, 0x2000, object, 1, toggleCoil },
+    { 1, WRITE_SINGLE_REGISTER, 0x1000, object1, 1, action1 },
+    { 1, READ_INPUT_REGISTERS,  0x2000, object2, 1, action2 },
     REQUEST_MAP_END
 };
 /*-----------------------------------------------------------*/
@@ -38,42 +39,28 @@ void setup( void )
     digitalWrite( LED_BUILTIN, LOW );
 
     Master.setRequestMap( requestMap );
-    Master.begin( 19200, &Serial );
+    Master.begin( 9600, &Serial );
 }
 /*-----------------------------------------------------------*/
 
 void loop( void )
 {
-    if( Master.processModbus() != OK )
-    {
-        toggleLed();
-    }
-
+    Master.processModbus();
     delay( 100 );
 }
 /*-----------------------------------------------------------*/
 
-void toggleCoil( void )
+void action1( void )
 {
-    if( object[ 0 ] == COIL_OFF )
-    {
-        object[ 0 ] = COIL_ON;
-    }
-    else
-    {
-        object[ 0 ] = COIL_OFF;
-    }
+    digitalWrite( LED_BUILTIN, HIGH );
 }
 /*-----------------------------------------------------------*/
 
-void toggleLed( void )
+void action2( void )
 {
-    if( digitalRead( LED_BUILTIN ) == LOW )
-    {
-        digitalWrite( LED_BUILTIN, HIGH );
-    }
-    else
+    if( object2[ 0 ] == object1[ 0 ] + 1 )
     {
         digitalWrite( LED_BUILTIN, LOW );
+        object1[ 0 ] = object2[ 0 ];
     }
 }

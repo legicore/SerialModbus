@@ -18,23 +18,22 @@
 
 /*-----------------------------------------------------------*/
 
-#define MAX485_CTRL_PIN 2
-
-/*-----------------------------------------------------------*/
-
 SerialModbusSlave Slave;
-    
-uint16_t object[ 1 ] = { COIL_OFF };
 
-void ledOn( void );
-void ledOff( void );
+uint16_t object1[ 1 ] = { 0 };
+uint16_t object2[ 1 ] = { 0 };
+
+void action1( void );
+void action2( void );
 
 const MBRegister_t registerMap[] = {
-    { WR, 0x1000, object, 1, ledOn },
-    { WR, 0x2000, object, 1, ledOff },
+    { WR, 0x1000, object1, 1, action1 },
+    { RD, 0x2000, object2, 1, action2 },
     REGISTER_MAP_END
 };
 /*-----------------------------------------------------------*/
+
+#define MAX485_CTRL_PIN 2
 
 void max485Tx( void );
 void max485Rx( void );
@@ -48,15 +47,28 @@ void setup( void )
 
     pinMode( MAX485_CTRL_PIN, OUTPUT );
 
-    Slave.setSerialCtrl( &max485Tx, &max485Rx );
+    Slave.setSerialCtrl( max485Tx, max485Rx );
     Slave.setRegisterMap( registerMap );
-    Slave.begin( 1, 19200, &Serial );
+    Slave.begin( 1, 9600, &Serial );
 }
 /*-----------------------------------------------------------*/
 
 void loop( void )
 {
     Slave.processModbus();
+}
+/*-----------------------------------------------------------*/
+
+void action1( void )
+{
+    digitalWrite( LED_BUILTIN, HIGH );
+    object2[ 0 ] = object1[ 0 ] + 1;
+}
+/*-----------------------------------------------------------*/
+
+void action2( void )
+{
+    digitalWrite( LED_BUILTIN, LOW );
 }
 /*-----------------------------------------------------------*/
 
@@ -69,16 +81,4 @@ void max485Tx( void )
 void max485Rx( void )
 {
     digitalWrite( MAX485_CTRL_PIN, LOW );
-}
-/*-----------------------------------------------------------*/
-
-void ledOn( void )
-{
-    digitalWrite( LED_BUILTIN, HIGH );
-}
-/*-----------------------------------------------------------*/
-
-void ledOff( void )
-{
-    digitalWrite( LED_BUILTIN, LOW );
 }
