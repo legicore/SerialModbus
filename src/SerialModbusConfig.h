@@ -98,8 +98,12 @@
 
 /*-----------------------------------------------------------*/
 
-#if( configSLAVE_MULTI_ID == 1 ) && ( configFC08 == 1 )
-    #warning Diagnostics (configFC08) does not work with multi ID (configSLAVE_MULTI_ID)!
+#if( ( configSLAVE_MULTI_ID == 1 ) && ( configFC08 == 1 ) )
+    #warning Diagnostics (function code 8) does not work correctly when multi ID support is used!
+#endif
+
+#if( ( configFC08 == 1 ) && ( configSFC04 == 1 ) && ( configSFC00 == 0 ) )
+    #warning Sub-function code 0 is needed to deavtivate Listen Only Mode (sub-function code 4)!
 #endif
 
 /*-----------------------------------------------------------*/

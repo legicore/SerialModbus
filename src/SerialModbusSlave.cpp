@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusBase.h"
@@ -462,61 +463,70 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case PROCESSING_REQUIRED_ACTION :
             {
-                switch( ucREQUEST_FUNCTION_CODE )
+#if( configFC08 == 1 )
+                /* If the Listen Only Mode is active we only monitor all bus
+                messages, but we perform no data processing. Only a request with
+                function code 8 (DIAGNOSTIC) and sub function code 1
+                (RESTART_COMMUNICATIONS_OPTION) will be processed, because it is
+                needed to deavtivate the only listen mode. */
+                if( ( bListenOnlyMode == false ) ||
+                    ( ( ucREQUEST_FUNCTION_CODE == DIAGNOSTIC ) &&
+                      ( usREQUEST_SUB_FUNCTION_CODE == RESTART_COMMUNICATIONS_OPTION ) ) )
                 {
-#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-                    case READ_HOLDING_REGISTERS :
-                    case READ_INPUT_REGISTERS :
+#endif
+                    switch( ucREQUEST_FUNCTION_CODE )
                     {
-                        vHandlerFC03_04();
-                        break;
-                    }
+#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
+                        case READ_HOLDING_REGISTERS :
+                        case READ_INPUT_REGISTERS :
+                        {
+                            vHandlerFC03_04();
+                            break;
+                        }
 #endif
 #if( configFC05 == 1 )
-                    case WRITE_SINGLE_COIL :
-                    {
-                        vHandlerFC05();
-                        break;
-                    }
+                        case WRITE_SINGLE_COIL :
+                        {
+                            vHandlerFC05();
+                            break;
+                        }
 #endif
 #if( configFC06 == 1 )
-                    case WRITE_SINGLE_REGISTER :
-                    {
-                        vHandlerFC06();
-                        break;
-                    }
+                        case WRITE_SINGLE_REGISTER :
+                        {
+                            vHandlerFC06();
+                            break;
+                        }
 #endif
 #if( configFC08 == 1 )
-                    case DIAGNOSTIC :
-                    {
-                        vHandlerFC08();
-                        break;
-                    }
+                        case DIAGNOSTIC :
+                        {
+                            vHandlerFC08();
+                            break;
+                        }
 #endif
 #if( configFC16 == 1 )
-                    case WRITE_MULTIPLE_REGISTERS :
-                    {
-                        vHandlerFC16();
-                        break;
-                    }
+                        case WRITE_MULTIPLE_REGISTERS :
+                        {
+                            vHandlerFC16();
+                            break;
+                        }
 #endif
-                    default :
-                    {
-                        #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                        default :
                         {
-                            xSetException( SLV_ILLEGAL_FUNCTION );
+                            #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                            {
+                                xSetException( SLV_ILLEGAL_FUNCTION );
+                            }
+                            #else
+                            {
+                                xSetException( ILLEGAL_FUNCTION );
+                            }
+                            #endif
                         }
-                        #else
-                        {
-                            xSetException( ILLEGAL_FUNCTION );
-                        }
-                        #endif
                     }
-                }
 
-                if( ucREQUEST_ID != configID_BROADCAST )
-                {
-                    if( bListenOnlyMode == false )
+                    if( ucREQUEST_ID != configID_BROADCAST )
                     {
                         if( xException == OK )
                         {
@@ -529,14 +539,16 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                         break;
                     }
+                    else
+                    {
+                        /* This is a broadcast, so we clear the reply frame to
+                        send no reply and increment the no response counter. */
+                        vClearReplyFrame();
+                        vIncCPT5();
+                    }
+#if( configFC08 == 1 )
                 }
-                else
-                {
-                    /* This is a broadcast, so we clear the reply frame to send
-                    no reply and increment the no response counter. */
-                    vClearReplyFrame();
-                    vIncCPT5();
-                }
+#endif
 
                 vClearRequestFrame();
                 vSetState( SLAVE_IDLE );
@@ -829,11 +841,12 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
         /* Some of the diagnoostic sub functions just return the received
         request data (which is in most cases 0x0000). So we apply this data
         directly at the beginning of the handler and will change it only in the
-        specific cases. */
+        specific cases - the same goes for the reply length. */
         ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
         ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
+        xReplyLength = 6;
 
-        switch( ucREQUEST_FUNCTION_CODE )
+        switch( usREQUEST_SUB_FUNCTION_CODE )
         {
 #if( configSFC00 == 1 )
             case RETURN_QUERY_DATA:
@@ -854,14 +867,18 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             {
                 if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == 0xFF00 ) )
                 {
-                    bListenOnlyMode = false;
+                    /* INFO: The Modbus spec says here to also clear an error
+                    flag, but this flag is nowhere specified. */
 
-                    // TODO: Restart the serial connection needed!?
+                    bListenOnlyMode = false;
 
                     if( usREQUEST_DATA == 0xFF00 )
                     {
-                        // TODO: Refers to the atm. not implemented "Comm Events".
+                        vClearDiagnosticCounters();
                     }
+
+                    /* INFO: The Modbus spec says here to perform a complete
+                    restart of the device, but we skip that. */
                 }
                 else
                 {
@@ -879,8 +896,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usDiagnosticRegister );
                     ucREPLY_DATA_LO =  lowByte( usDiagnosticRegister );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -898,10 +913,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                     ( ucREQUEST_INPUT_DELIMITER_LO            == 0x00 ) )
                 {
                     cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
-                    ucREPLY_INPUT_DELIMITER_HI = ( uint8_t ) cAsciiInputDelimiter;
-                    ucREPLY_INPUT_DELIMITER_LO = ucREQUEST_INPUT_DELIMITER_LO;
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -963,8 +974,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usBusMessageCount );
                     ucREPLY_DATA_LO =  lowByte( usBusMessageCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -982,8 +991,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usBusCommunicationErrorCount );
                     ucREPLY_DATA_LO =  lowByte( usBusCommunicationErrorCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1001,8 +1008,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usExceptionErrorCount );
                     ucREPLY_DATA_LO =  lowByte( usExceptionErrorCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1020,8 +1025,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usSlaveMessageCount );
                     ucREPLY_DATA_LO =  lowByte( usSlaveMessageCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1039,8 +1042,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usSlaveNoResponseCount );
                     ucREPLY_DATA_LO =  lowByte( usSlaveNoResponseCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1058,8 +1059,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usSlaveNAKCount );
                     ucREPLY_DATA_LO =  lowByte( usSlaveNAKCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1077,8 +1076,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usSlaveBusyCount );
                     ucREPLY_DATA_LO =  lowByte( usSlaveBusyCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1096,8 +1093,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     ucREPLY_DATA_HI = highByte( usBusCharacterOverrunCount );
                     ucREPLY_DATA_LO =  lowByte( usBusCharacterOverrunCount );
-
-                    xReplyLength = 7;
                 }
                 else
                 {
@@ -1115,9 +1110,8 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     usBusCharacterOverrunCount = 0;
 
-                    // TODO: What is the overrun error counter flag?
-
-                    xReplyLength = 7;
+                    /* INFO: The Modbus spec says here to also clear an error
+                    flag, but this flag is nowhere specified. */
                 }
                 else
                 {
@@ -1146,10 +1140,14 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             }
         }
 
-        if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+        #if( configEXTENDED_EXCEPTION_CODES == 1 )
         {
-            (*pxRegisterMap[ xRegisterMapIndex ].action)();
+            if( xException == ILLEGAL_DATA_VALUE )
+            {
+                xSetException( SLV_ILLEGAL_DATA_VALUE );
+            }
         }
+        #endif
     }
 
 #endif

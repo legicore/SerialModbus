@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusBase.h"
@@ -115,11 +116,10 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
         return xSetException( ILLEGAL_REQUEST );
     }
 
-    ( void ) xSetException( OK );
+    xSetException( OK );
 
-    if( ( request->id            > configID_SLAVE_MAX ) ||
+    if( ( request->id           >  configID_SLAVE_MAX ) ||
         ( request->functionCode == 0x00               ) ||
-        ( request->address      == 0x0000             ) ||
         ( request->objectSize   == 0                  ) )
     {
         return xSetException( ILLEGAL_REQUEST );
@@ -166,6 +166,8 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 #if( configFC08 == 1 )
         case DIAGNOSTIC:
         {
+            xRequestLength = 6;
+
             switch( request->address )
             {
 #if( configSFC00 == 1 )
@@ -199,7 +201,16 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 #if( configSFC03 == 1 )
                 case CHANGE_ASCII_INPUT_DELIMITER:
                 {
-                    // TODO
+                    if( isAscii( ( int ) request->object ) == true )
+                    {
+                        pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                        pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                    }
+                    else
+                    {
+                        return xSetException( ILLEGAL_REQUEST );
+                    }
+
                     break;
                 }
 #endif
@@ -244,8 +255,9 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
      ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || ( configSFC16 == 1 ) || \
      ( configSFC17 == 1 ) || ( configSFC18 == 1 ) || ( configSFC20 == 1 ) )
                 {
-                    ucREQUEST_DATA_HI = 0x00;
-                    ucREQUEST_DATA_LO = 0x00;
+                    pucRequestFrame[ 4 ] = 0x00;
+                    pucRequestFrame[ 5 ] = 0x00;
+                    xRequestLength = 6;
 
                     break;
                 }
@@ -309,6 +321,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 {
     if( xProcessRequestMap() != OK )
     {
+        xSetException( ILLEGAL_REQUEST );
         vSetState( PROCESSING_ERROR );
     }
 
@@ -400,14 +413,14 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
                 else
                 {
-                    ( void ) xSetException( CHARACTER_OVERRUN );
+                    xSetException( CHARACTER_OVERRUN );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    ( void ) xSetException( NO_REPLY );
+                    xSetException( NO_REPLY );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
