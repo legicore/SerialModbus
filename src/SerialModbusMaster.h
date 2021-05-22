@@ -63,13 +63,11 @@ class SerialModbusMaster : public SerialModbusBase
 public:
 
     SerialModbusMaster();
+    void setRequestMap( const MBRequest_t * requestMap );
     MBStatus_t setRequest( const MBRequest_t * request );
     MBStatus_t processModbus( void );
-    size_t getReplyDataSize( void ) const;
-    size_t getReplyData( uint16_t * buffer, size_t bufferSize );
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
-    void setRequestMap( const MBRequest_t * requestMap );
 
 private:
 

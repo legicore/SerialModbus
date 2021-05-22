@@ -577,56 +577,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 }
 /*-----------------------------------------------------------*/
 
-size_t SerialModbusMaster::getReplyDataSize( void ) const
-{
-    return xReplyDataSize;
-}
-/*-----------------------------------------------------------*/
-
-size_t SerialModbusMaster::getReplyData( uint16_t * buffer, size_t bufferSize )
-{
-    if( ( buffer == NULL ) || ( bufferSize <= 0 ) || ( bufferSize > xReplyDataSize ) )
-    {
-        return 0;
-    }
-
-    switch( ucREPLY_FUNCTION_CODE )
-    {
-#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-        case READ_HOLDING_REGISTERS:
-        case READ_INPUT_REGISTERS:
-        {
-            for( size_t i = 0; i < bufferSize; i++ )
-            {
-                buffer[ i ] = usReplyWord( i );
-            }
-            return bufferSize;
-        }
-#endif
-#if( configFC05 == 1 )
-        case WRITE_SINGLE_COIL:
-        {
-            buffer[ 0 ] = usREQUEST_COIL_VALUE;
-            return bufferSize;
-        }
-#endif
-#if( configFC06 == 1 )
-        case WRITE_SINGLE_REGISTER:
-        {
-            buffer[ 0 ] = usREPLY_REGISTER_VALUE;
-            return bufferSize;
-        }
-#endif
-        default:
-        {
-            return 0;
-        }
-    }
-
-    return 0;
-}
-/*-----------------------------------------------------------*/
-
 #if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
 
     void SerialModbusMaster::vHandlerFC03_04( void )
