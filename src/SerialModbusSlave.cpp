@@ -118,7 +118,18 @@ SerialModbusSlave::SerialModbusSlave()
     pxRegisterMap = NULL;
     xRegisterMapIndex = 0;
 
-    ucSlaveId = configID_SLAVE_MAX;
+    ucSlaveId = 0xFF;
+
+    #if( configSLAVE_MULTI_ID == 1 )
+    {
+        xIdCount = 0;
+
+        for( size_t i = 0; i < configMAX_ID_COUNT; i++ )
+        {
+            ucIdMap[ i ] = 0x00;
+        }
+    }
+    #endif
 }
 /*-----------------------------------------------------------*/
 
@@ -210,7 +221,59 @@ void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )
 void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 {
     pxRegisterMap = registerMap;
+
+    #if( configSLAVE_MULTI_ID == 1 )
+    {
+        vSetIdMap();
+    }
+    #endif
 }
+/*-----------------------------------------------------------*/
+
+#if( configSLAVE_MULTI_ID == 1 )
+    
+    void SerialModbusSlave::vSetIdMap( void )
+    {
+        bool bIdFound = false;
+
+        for( size_t i = 0; pxRegisterMap[ i ].id != 0x00; i++ )
+        {
+            for( size_t j = 0; j < xIdCount; j++ )
+            {
+                if( ucIdMap[ j ] == pxRegisterMap[ i ].id )
+                {
+                    bIdFound = true;
+                }
+            }
+
+            if( bIdFound == false )
+            {
+                ucIdMap[ xIdCount++ ] = pxRegisterMap[ i ].id;
+            }
+
+            bIdFound = false;
+        }
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configSLAVE_MULTI_ID == 1 )
+    
+    bool SerialModbusSlave::bCheckId( uint8_t ucId )
+    {
+        for( size_t i = 0; i < xIdCount; i++ )
+        {
+            if( ucIdMap[ i ] == ucId )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+#endif
 /*-----------------------------------------------------------*/
 
 MBStatus_t SerialModbusSlave::processModbus( void )
@@ -244,7 +307,11 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             #if( configMODE == configMODE_RTU )
                             {
+#if( configSLAVE_MULTI_ID == 1 )
+                                if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
+#else
                                 if( ( ucREQUEST_ID == ucSlaveId          ) ||
+#endif
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
                                     vStartInterFrameDelay();
@@ -300,6 +367,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 vIncCPT1();
 
                                 while( bTimeoutInterFrameDelay() != true );
+#if( configSLAVE_MULTI_ID == 1 )
+                                ucSlaveId = ucREQUEST_ID;
+#endif
                                 vSetState( CHECKING_REQUEST );
                             }
                             else
@@ -334,7 +404,11 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                 /* Check if the received request is dedicated to
                                 us or if it is a broadcast. */
+#if( configSLAVE_MULTI_ID == 1 )
+                                if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
+#else
                                 if( ( ucREQUEST_ID == ucSlaveId          ) ||
+#endif
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
                                     /* Received a new valid request ->
@@ -343,6 +417,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                     if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                     {
+#if( configSLAVE_MULTI_ID == 1 )
+                                        ucSlaveId = ucREQUEST_ID;
+#endif
                                         vSetState( CHECKING_REQUEST );
                                         break;
                                     }
@@ -571,53 +648,60 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
     range of one of the mapped register entries. */
     for( ; pxRegisterMap[ xRegisterMapIndex ].address != 0x0000; xRegisterMapIndex++ )
     {
-        if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
-            ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].objectSize ) ) )
+#if( configSLAVE_MULTI_ID == 1 )
+        if( pxRegisterMap[ xRegisterMapIndex ].id == ucSlaveId )
         {
-            /* Scan the access rights map for the request function code. */
-            for( size_t i = 0; pxAccessRights[ i ].uxAccess != NA; i++ )
+#endif
+            if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
+                ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].objectSize ) ) )
             {
-                if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].uxFunctionCode )
+                /* Scan the access rights map for the request function code. */
+                for( size_t i = 0; pxAccessRights[ i ].uxAccess != NA; i++ )
                 {
-                    /* Check if the type of the request function code has the
-                    right to access the destination register. */
-                    if( ( pxRegisterMap[ xRegisterMapIndex ].access & ( MBAccess_t ) pxAccessRights[ i ].uxAccess ) != 0 )
+                    if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].uxFunctionCode )
                     {
-                        /* Reset the exception which was set from the start. */
-                        return xSetException( OK );
-                    }
+                        /* Check if the type of the request function code has
+                        the right to access the destination register. */
+                        if( ( pxRegisterMap[ xRegisterMapIndex ].access & ( MBAccess_t ) pxAccessRights[ i ].uxAccess ) != 0 )
+                        {
+                            /* Reset the exception which was set from start. */
+                            return xSetException( OK );
+                        }
 
-                    /* While register access rights are not a standard feature
-                    of Modbus we will set a non standard exception and abort
-                    the for loop. */
-                    #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                    {
-                        xSetException( SLV_ILLEGAL_ACCESS );
-                    }
-                    #else
-                    {
-                        xSetException( SLAVE_DEVICE_FAILURE );
-                    }
-                    #endif
+                        /* While register access rights are not a standard
+                        feature of Modbus we will set a non standard exception
+                        and abort the for loop. */
+                        #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                        {
+                            xSetException( SLV_ILLEGAL_ACCESS );
+                        }
+                        #else
+                        {
+                            xSetException( SLAVE_DEVICE_FAILURE );
+                        }
+                        #endif
 
-                    break;
+                        break;
+                    }
                 }
-            }
 
-            /* We could not find the function code in the access rights map so
-            we set the exception and abort the for loop. */
-            #if( configEXTENDED_EXCEPTION_CODES == 1 )
-            {
-                xSetException( SLV_ILLEGAL_FUNCTION );
-            }
-            #else
-            {
-                xSetException( ILLEGAL_FUNCTION );
-            }
-            #endif
+                /* We could not find the function code in the access rights map
+                so we set the exception and abort the for loop. */
+                #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                {
+                    xSetException( SLV_ILLEGAL_FUNCTION );
+                }
+                #else
+                {
+                    xSetException( ILLEGAL_FUNCTION );
+                }
+                #endif
 
-            break;
+                break;
+            }
+#if( configSLAVE_MULTI_ID == 1 )
         }
+#endif
     }
 
     return NOK;

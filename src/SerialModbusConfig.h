@@ -39,6 +39,9 @@
 #define configPROCESS_LOOP_HOOK         1
 #define configEXTENDED_EXCEPTION_CODES  0
 
+#define configSLAVE_MULTI_ID            0
+#define configMAX_ID_COUNT              8
+
 /*-----------------------------------------------------------*/
 
 #define configTURNAROUND_DELAY_US   200000
@@ -92,6 +95,12 @@
 #define configSFC20     1   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
 
 #undef N /* Not implemented */
+
+/*-----------------------------------------------------------*/
+
+#if( configSLAVE_MULTI_ID == 1 ) && ( configFC08 == 1 )
+    #warning Diagnostics (configFC08) does not work with multi ID (configSLAVE_MULTI_ID)!
+#endif
 
 /*-----------------------------------------------------------*/
 

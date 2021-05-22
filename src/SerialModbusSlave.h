@@ -56,6 +56,9 @@ MBAccess_t;
 /** TODO */
 typedef struct MBRegister_s
 {
+#if( configSLAVE_MULTI_ID == 1 )
+    uint8_t id;
+#endif
     MBAccess_t access;
     uint16_t address;
     uint16_t * object;
@@ -65,7 +68,11 @@ typedef struct MBRegister_s
 MBRegister_t;
 
 /** TODO */
-#define REGISTER_MAP_END { NA, 0x0000, NULL, 0, NULL }
+#if( configSLAVE_MULTI_ID == 1 )
+    #define REGISTER_MAP_END { 0x00, NA, 0x0000, NULL, 0, NULL }
+#else
+    #define REGISTER_MAP_END { NA, 0x0000, NULL, 0, NULL }
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -132,6 +139,12 @@ private:
     uint16_t usDiagnosticRegister;
 #endif
     bool bListenOnlyMode;
+#if( configSLAVE_MULTI_ID == 1 )
+    uint8_t ucIdMap[ configMAX_ID_COUNT ];
+    size_t xIdCount;
+    void vSetIdMap( void );
+    bool bCheckId( uint8_t ucId );
+#endif
 };
 /*-----------------------------------------------------------*/
 
