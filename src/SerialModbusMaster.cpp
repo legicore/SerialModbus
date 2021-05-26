@@ -31,17 +31,16 @@ SerialModbusMaster::SerialModbusMaster()
 {
     xState = MASTER_IDLE;
 
-    xReplyDataSize = 0;
-
+    pxRequestMap = NULL;
+    xRequestMapIndex = 0;
     pxRequest = NULL;
+    bSkipRequestMap = false;
 
     ulTurnaroundDelayUs = configTURNAROUND_DELAY_US;
     ulResponseTimeoutUs = configRESPONSE_TIMEOUT_US;
 
     ulTimerResponseTimeoutUs = 0;
     ulTimerTurnaroundDelayUs = 0;
-
-    pxRequestMap = NULL;
 }
 /*-----------------------------------------------------------*/
 
@@ -87,10 +86,15 @@ void SerialModbusMaster::setTurnaroundDelay( uint32_t timeMs )
 }
 /*-----------------------------------------------------------*/
 
+void SerialModbusMaster::setRequestMap( const MBRequest_t * requestMap )
+{
+    pxRequestMap = requestMap;
+    xRequestMapIndex = 0;
+}
+/*-----------------------------------------------------------*/
+
 MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 {
-    static size_t xRequestMapIndex = 0;
-
     if( pxRequestMap != NULL )
     {
         if( pxRequestMap[ xRequestMapIndex ].functionCode == 0x00 )
@@ -98,7 +102,7 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
             xRequestMapIndex = 0;
         }
 
-        return setRequest( &pxRequestMap[ xRequestMapIndex++ ] );
+        return setRequest( &pxRequestMap[ xRequestMapIndex++ ], true );
     }
     else
     {
@@ -109,11 +113,16 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
+MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool requestMap )
 {
     if( request == NULL )
     {
         return xSetException( ILLEGAL_REQUEST );
+    }
+
+    if( requestMap == false )
+    {
+        bSkipRequestMap = true;
     }
 
     xSetException( OK );
@@ -257,7 +266,6 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
                 {
                     pucRequestFrame[ 4 ] = 0x00;
                     pucRequestFrame[ 5 ] = 0x00;
-                    xRequestLength = 6;
 
                     break;
                 }
@@ -311,18 +319,19 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::setRequestMap( const MBRequest_t * requestMap )
-{
-    pxRequestMap = requestMap;
-}
-/*-----------------------------------------------------------*/
-
 MBStatus_t SerialModbusMaster::processModbus( void )
 {
-    if( xProcessRequestMap() != OK )
+    if( bSkipRequestMap == false )
     {
-        xSetException( ILLEGAL_REQUEST );
-        vSetState( PROCESSING_ERROR );
+        if( xProcessRequestMap() != OK )
+        {
+            xSetException( ILLEGAL_REQUEST );
+            vSetState( PROCESSING_ERROR );
+        }
+    }
+    else
+    {
+        bSkipRequestMap = false;
     }
 
     do
@@ -545,7 +554,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             {
                 vClearRequestFrame();
                 vClearReplyFrame();
-                xReplyDataSize = 0;
 
                 vSetState( MASTER_IDLE );
 
@@ -596,8 +604,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
             }
 
-            xReplyDataSize = ( size_t ) usREQUEST_QUANTITY;
-
             if( pxRequest->action != NULL )
             {
                 (*pxRequest->action)();
@@ -623,8 +629,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             /* Check the response output value */
             if( usREPLY_COIL_VALUE == usREQUEST_COIL_VALUE )
             {
-                xReplyDataSize = 1;
-
                 if( pxRequest->action != NULL )
                 {
                     (*pxRequest->action)();
@@ -656,8 +660,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             /* Check the response output value */
             if( usREPLY_OUTPUT_VALUE == usREQUEST_OUTPUT_VALUE )
             {
-                xReplyDataSize = 1;
-
                 if( pxRequest->action != NULL )
                 {
                     (*pxRequest->action)();
@@ -803,8 +805,6 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             /* Check the response output value */
             if( usREPLY_QUANTITY == usREQUEST_QUANTITY )
             {
-                xReplyDataSize = 0;
-
                 if( pxRequest->action != NULL )
                 {
                     (*pxRequest->action)();

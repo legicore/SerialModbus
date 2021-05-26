@@ -64,7 +64,7 @@ public:
 
     SerialModbusMaster();
     void setRequestMap( const MBRequest_t * requestMap );
-    MBStatus_t setRequest( const MBRequest_t * request );
+    MBStatus_t setRequest( const MBRequest_t * request, bool requestMap = false );
     MBStatus_t processModbus( void );
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
@@ -76,7 +76,8 @@ private:
     MBStatus_t xProcessRequestMap( void );
     const MBRequest_t * pxRequest;
     const MBRequest_t * pxRequestMap;
-    size_t xReplyDataSize;
+    size_t xRequestMapIndex;
+    bool bSkipRequestMap;
     uint32_t ulTimerTurnaroundDelayUs;
     uint32_t ulTimerResponseTimeoutUs;
     uint32_t ulTurnaroundDelayUs;
