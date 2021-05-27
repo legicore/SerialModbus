@@ -26,7 +26,7 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     #include <SoftwareSerial.h>
 #endif
 
@@ -85,14 +85,14 @@ public:
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
     defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 )
+    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
     bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial );
     bool begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config );
 #elif defined( __AVR_ATmega4809__ )
     bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial );
     bool begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config );
 #endif
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     bool begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
 #endif
     MBStatus_t processModbus( void );

@@ -22,7 +22,7 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     #include <SoftwareSerial.h>
 #endif
 
@@ -34,7 +34,7 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength   = 0;
 
     pxSerial         = NULL;
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     pxSerialSoftware = NULL;
 #endif
 
@@ -74,7 +74,7 @@ SerialModbusBase::SerialModbusBase()
 #if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
     defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
     defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 )
+    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
 
     bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial )
     {
@@ -152,7 +152,7 @@ SerialModbusBase::SerialModbusBase()
 #endif
 /*-----------------------------------------------------------*/
 
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
 
     bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
     {
@@ -514,7 +514,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
             return true;
         }
     }
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     else if( pxSerialSoftware != NULL )
     {
         if( pxSerialSoftware->available() > 0 )
@@ -542,7 +542,7 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         pxSerial->write( pucSendBuffer, pxBufferLength );
         pxSerial->flush();
     }
-#if !defined( ARDUINO_ARCH_RP2040 )
+#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
     else if( pxSerialSoftware != NULL )
     {
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
