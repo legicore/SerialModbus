@@ -20,6 +20,7 @@
 /*-----------------------------------------------------------*/
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include <Arduino.h>
 
@@ -29,23 +30,26 @@
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
-#define configMAX_FRAME_SIZE            ( 64 )
+#define configMAX_FRAME_SIZE            64
+
+/*-----------------------------------------------------------*/
 
 #define configID_BROADCAST              ( ( uint8_t ) 0 )
 #define configID_SLAVE_MAX              ( ( uint8_t ) 247 )
 
-#define configASCII_INPUT_DELIMITER     ( '\n' )
+#define configASCII_INPUT_DELIMITER     ( ( char ) '\n' )
+
+#define configTURNAROUND_DELAY_US       ( ( uint32_t ) 200000 )
+#define configRESPONSE_TIMEOUT_US       ( ( uint32_t ) 1000000 )
+
+/*-----------------------------------------------------------*/
 
 #define configPROCESS_LOOP_HOOK         1
+
 #define configEXTENDED_EXCEPTION_CODES  0
 
 #define configSLAVE_MULTI_ID            0
 #define configMAX_ID_COUNT              8
-
-/*-----------------------------------------------------------*/
-
-#define configTURNAROUND_DELAY_US   200000
-#define configRESPONSE_TIMEOUT_US   1000000
 
 /*-----------------------------------------------------------*/
 
