@@ -19,10 +19,11 @@
 #include <stdbool.h>
 
 #include "SerialModbusConfig.h"
+#include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
     #include <SoftwareSerial.h>
 #endif
 
@@ -34,12 +35,10 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength   = 0;
 
     pxSerial         = NULL;
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
     pxSerialSoftware = NULL;
 #endif
-
-    /* This is the default value of Arduinos HardwareSerial implementation. */
-    ulSerialConfig = SERIAL_8E1;
+    ulSerialConfig = 0;
 
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
@@ -71,88 +70,31 @@ SerialModbusBase::SerialModbusBase()
 }
 /*-----------------------------------------------------------*/
 
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
-
-    bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial )
+bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config )
+{
+    if( baud == 0 || serial == NULL || config == 0 )
     {
-        if( baud == 0 || serial == NULL )
+        return false;
+    }
+
+    pxSerial = serial;
+    ulSerialConfig = config;
+    pxSerial->begin( baud, config );
+
+    #if( configMODE == configMODE_RTU )
+    {
+        if( bCalculateTimeouts( baud ) != true )
         {
             return false;
         }
-
-        pxSerial = serial;
-        pxSerial->begin( baud, ulSerialConfig );
-
-        #if( configMODE == configMODE_RTU )
-        {
-            if( bCalculateTimeouts( baud ) != true )
-            {
-                return false;
-            }
-        }
-        #endif
-
-        return true;
     }
+    #endif
 
-#endif
+    return true;
+}
 /*-----------------------------------------------------------*/
 
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ )
-
-    bool SerialModbusBase::begin( uint32_t baud, HardwareSerial * serial, uint8_t config )
-    {
-        ulSerialConfig = config;
-        return begin( baud, serial );
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if defined( __AVR_ATmega4809__ )
-
-    bool SerialModbusBase::begin( uint32_t baud, UartClass * serial )
-    {
-        if( baud == 0 || serial == NULL )
-        {
-            return false;
-        }
-
-        pxSerial = serial;
-        pxSerial->begin( baud, ulSerialConfig );
-
-        #if( configMODE == configMODE_RTU )
-        {
-            if( bCalculateTimeouts( baud ) != true )
-            {
-                return false;
-            }
-        }
-        #endif
-
-        return true;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if defined( __AVR_ATmega4809__ )
-
-    bool SerialModbusBase::begin( uint32_t baud, UartClass * serial, uint32_t config )
-    {
-        ulSerialConfig = config;
-        return begin( baud, serial );
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
 
     bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
     {
@@ -514,7 +456,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
             return true;
         }
     }
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
     else if( pxSerialSoftware != NULL )
     {
         if( pxSerialSoftware->available() > 0 )
@@ -542,7 +484,7 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
         pxSerial->write( pucSendBuffer, pxBufferLength );
         pxSerial->flush();
     }
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
     else if( pxSerialSoftware != NULL )
     {
         pxSerialSoftware->write( pucSendBuffer, pxBufferLength );

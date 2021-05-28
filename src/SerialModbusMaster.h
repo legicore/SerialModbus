@@ -23,6 +23,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "SerialModbusConfig.h"
+#include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>

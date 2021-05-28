@@ -24,9 +24,10 @@
 #include <stdbool.h>
 
 #include "SerialModbusConfig.h"
+#include "SerialModbusCompat.h"
 
 #include <Arduino.h>
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
     #include <SoftwareSerial.h>
 #endif
 
@@ -148,19 +149,8 @@ class SerialModbusBase
 public:
 
     SerialModbusBase();
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
-    bool begin( uint32_t baud, HardwareSerial * serial );
-    bool begin( uint32_t baud, HardwareSerial * serial, uint8_t config );
-#elif defined( __AVR_ATmega4809__ )
-    bool begin( uint32_t baud, UartClass * serial );
-    bool begin( uint32_t baud, UartClass * serial, uint32_t config );
-#else
-    #error the currently selected board is unsuported
-#endif
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+    bool begin( uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_8N1 );
+#if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint32_t baud, SoftwareSerial * serial );
 #endif
     void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
@@ -191,12 +181,8 @@ protected:
     void vSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
     void (*vSerialCtrlTx)( void );
     void (*vSerialCtrlRx)( void );
-#if defined( __AVR_ATmega4809__ )
-    UartClass * pxSerial;
-#else
-    HardwareSerial * pxSerial;
-#endif
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+    Serial_t * pxSerial;
+#if defined( COMPAT_SOFTWARE_SERIAL )
     SoftwareSerial * pxSerialSoftware;
 #endif
     uint32_t ulSerialConfig;

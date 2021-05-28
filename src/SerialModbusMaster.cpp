@@ -20,6 +20,7 @@
 #include <ctype.h>
 
 #include "SerialModbusConfig.h"
+#include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
 #include "SerialModbusMaster.h"
 

@@ -20,10 +20,14 @@
 #include <ctype.h>
 
 #include "SerialModbusConfig.h"
+#include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
 #include "SerialModbusSlave.h"
 
 #include <Arduino.h>
+#if defined( COMPAT_SOFTWARE_SERIAL )
+    #include <SoftwareSerial.h>
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -134,69 +138,20 @@ SerialModbusSlave::SerialModbusSlave()
 }
 /*-----------------------------------------------------------*/
 
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
-
-    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial )
+bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, Serial_t * serial, uint32_t config )
+{
+    if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
     {
-        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
-        {
-            return false;
-        }
-
-        ucSlaveId = slaveId;
-
-        return SerialModbusBase::begin( baud, serial );
+        return false;
     }
 
-#endif
+    ucSlaveId = slaveId;
+
+    return SerialModbusBase::begin( baud, serial, config );
+}
 /*-----------------------------------------------------------*/
 
-#if defined( __AVR_ATmega640__  ) || defined( __AVR_ATmega1280__ ) || defined( __AVR_ATmega1281__ ) || defined( __AVR_ATmega2560__ ) || defined( __AVR_ATmega2561__ ) || \
-    defined( __AVR_ATmega328P__ ) || defined( __AVR_ATmega168__  ) || defined( __AVR_ATmega8__    ) || \
-    defined( __AVR_ATmega32U4__ ) || defined( __AVR_ATmega16U4__ ) || \
-    defined( ARDUINO_ARCH_RP2040 ) || defined( ARDUINO_ARCH_SAMD )
-
-    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, HardwareSerial * serial, uint8_t config )
-    {
-        ulSerialConfig = config;
-        return begin( slaveId, baud, serial );
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if defined( __AVR_ATmega4809__ )
-
-    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial )
-    {
-        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
-        {
-            return false;
-        }
-
-        ucSlaveId = slaveId;
-
-        return SerialModbusBase::begin( baud, serial );
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if defined( __AVR_ATmega4809__ )
-
-    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, UartClass * serial, uint32_t config )
-    {
-        ulSerialConfig = config;
-        return begin( slaveId, baud, serial );
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if !defined( ARDUINO_ARCH_RP2040 ) && !defined( ARDUINO_ARCH_SAMD )
+#if defined( COMPAT_SOFTWARE_SERIAL )
 
     bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
     {
