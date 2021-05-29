@@ -84,7 +84,7 @@ class SerialModbusSlave : public SerialModbusBase
 public:
 
     SerialModbusSlave();
-    bool begin( uint8_t slaveId, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_8N1 );
+    bool begin( uint8_t slaveId, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_CONFIG_DEFAULT );
 #if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
 #endif

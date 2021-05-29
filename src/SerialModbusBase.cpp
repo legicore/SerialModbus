@@ -32,13 +32,16 @@
 SerialModbusBase::SerialModbusBase()
 {
     xRequestLength = 0;
-    xReplyLength   = 0;
+    xReplyLength = 0;
 
-    pxSerial         = NULL;
-#if defined( COMPAT_SOFTWARE_SERIAL )
-    pxSerialSoftware = NULL;
-#endif
+    pxSerial = NULL;
     ulSerialConfig = 0;
+    #if defined( COMPAT_SOFTWARE_SERIAL )
+    {
+        pxSerialSoftware = NULL;
+        ulSerialConfig = SERIAL_CONFIG_DEFAULT;
+    }
+    #endif
 
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
@@ -47,9 +50,9 @@ SerialModbusBase::SerialModbusBase()
 
     #if( configMODE == configMODE_RTU )
     {
-        ulInterFrameDelayUs            = 0;
-        ulTimerInterFrameDelayUs       = 0;
-        ulInterCharacterTimeoutUs      = 0;
+        ulInterFrameDelayUs = 0;
+        ulTimerInterFrameDelayUs = 0;
+        ulInterCharacterTimeoutUs = 0;
         ulTimerInterCharacterTimeoutUs = 0;
     }
     #endif
@@ -510,16 +513,14 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 
     bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
     {
-        /* The given value here will beoverwritten anyway, but 11 would be the
-        right value for the Arduino dafault configuration (SERIAL_8E1). */
-        uint8_t ucNbrOfBits = 11;
+        uint8_t ucNbrOfBits = 0;
 
         if( ulBaud > 19200 )
         {
             /* For transfer rates higer than 19200 Baud Modbus recommend fixed
             values for the inter character timeout and the inter frame delay. */
             ulInterCharacterTimeoutUs = 750;
-            ulInterFrameDelayUs       = 1750;
+            ulInterFrameDelayUs = 1750;
         }
         else
         {

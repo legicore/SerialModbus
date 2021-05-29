@@ -23,6 +23,10 @@
 
 /*-----------------------------------------------------------*/
 
+/* This value for the Arduino default serial configuration is taken from the
+source code (8 data bits, no parity, 1 stop bit). */
+#define SERIAL_CONFIG_DEFAULT SERIAL_8N1
+
 /* Check the architecture, based on the architecture of the tested boards. */
 #if defined( ARDUINO_ARCH_AVR ) || \
     defined( ARDUINO_ARCH_MEGAAVR ) || \
