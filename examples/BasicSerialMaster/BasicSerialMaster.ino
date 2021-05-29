@@ -39,7 +39,7 @@ void setup( void )
     digitalWrite( LED_BUILTIN, LOW );
 
     Master.setRequestMap( requestMap );
-    Master.begin( 9600, &Serial );
+    Master.begin( 9600 );
 }
 /*-----------------------------------------------------------*/
 

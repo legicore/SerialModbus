@@ -39,7 +39,7 @@ void setup( void )
     digitalWrite( LED_BUILTIN, LOW );
 
     Slave.setRegisterMap( registerMap );
-    Slave.begin( 1, 9600, &Serial );
+    Slave.begin( 1, 9600 );
 }
 /*-----------------------------------------------------------*/
 

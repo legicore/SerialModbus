@@ -49,7 +49,7 @@ void setup( void )
 
     Slave.setSerialCtrl( max485Tx, max485Rx );
     Slave.setRegisterMap( registerMap );
-    Slave.begin( 1, 9600, &Serial );
+    Slave.begin( 1, 9600 );
 }
 /*-----------------------------------------------------------*/
 

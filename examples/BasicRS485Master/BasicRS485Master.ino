@@ -49,7 +49,7 @@ void setup( void )
 
     Master.setSerialCtrl( max485Tx, max485Rx );
     Master.setRequestMap( requestMap );
-    Master.begin( 9600, &Serial );
+    Master.begin( 9600 );
 }
 /*-----------------------------------------------------------*/
 
