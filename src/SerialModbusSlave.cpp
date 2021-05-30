@@ -323,9 +323,13 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                 vIncCPT1();
 
                                 while( bTimeoutInterFrameDelay() != true );
-#if( configSLAVE_MULTI_ID == 1 )
-                                ucSlaveId = ucREQUEST_ID;
-#endif
+
+                                #if( configSLAVE_MULTI_ID == 1 )
+                                {
+                                    ucSlaveId = ucREQUEST_ID;
+                                }
+                                #endif
+
                                 vSetState( CHECKING_REQUEST );
                             }
                             else
@@ -373,10 +377,14 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                     if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                     {
-#if( configSLAVE_MULTI_ID == 1 )
-                                        ucSlaveId = ucREQUEST_ID;
-#endif
+                                        #if( configSLAVE_MULTI_ID == 1 )
+                                        {
+                                            ucSlaveId = ucREQUEST_ID;
+                                        }
+                                        #endif
+
                                         vSetState( CHECKING_REQUEST );
+
                                         break;
                                     }
 
@@ -864,16 +872,19 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #if( configSFC03 == 1 )
             case CHANGE_ASCII_INPUT_DELIMITER:
             {
-                if( ( isAscii( ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
-                    ( ucREQUEST_INPUT_DELIMITER_LO            == 0x00 ) )
+                if( ( isAscii( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
+                    ( ucREQUEST_INPUT_DELIMITER_LO                     == 0x00 ) )
                 {
                     cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
+
+                    ucREPLY_INPUT_DELIMITER_HI = ( uint8_t ) cAsciiInputDelimiter;
+                    ucREPLY_INPUT_DELIMITER_LO = 0x00;
                 }
                 else
                 {
                     #if( configEXTENDED_EXCEPTION_CODES == 1 )
                     {
-                        xSetException( SLV_ILLEGAL_ASCII_DELIMITER );
+                        xSetException( SLV_ILLEGAL_INPUT_DELIMITER );
                     }
                     #else
                     {

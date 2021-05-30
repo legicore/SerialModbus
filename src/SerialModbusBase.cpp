@@ -63,11 +63,7 @@ SerialModbusBase::SerialModbusBase()
     }
     #endif
 
-    #if( configMODE == configMODE_ASCII )
-    {
-        cAsciiInputDelimiter = configASCII_INPUT_DELIMITER;
-    }
-    #endif
+    cAsciiInputDelimiter = configASCII_INPUT_DELIMITER;
 
     vCustomDelayUs = NULL;
 }

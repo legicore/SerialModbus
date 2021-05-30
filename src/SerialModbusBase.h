@@ -128,7 +128,7 @@ typedef enum MBException_e
     SLV_ILLEGAL_ACCESS                      = 0x24,
     SLV_ILLEGAL_QUANTITY                    = 0x25,
     SLV_ILLEGAL_COIL_VALUE                  = 0x26,
-    SLV_ILLEGAL_ASCII_DELIMITER             = 0x27,
+    SLV_ILLEGAL_INPUT_DELIMITER             = 0x27,
     SLV_ILLEGAL_SUB_FUNCTION                = 0x28,
     SLV_ILLEGAL_DATA_VALUE                  = 0x29,
 
@@ -219,9 +219,7 @@ protected:
 #if( configPROCESS_LOOP_HOOK == 1 )
     void (*vProcessLoopHook)( void );
 #endif
-#if( ( configMODE == configMODE_ASCII ) || ( configFC08 == 1 ) )
     char cAsciiInputDelimiter;
-#endif
 };
 /*-----------------------------------------------------------*/
 

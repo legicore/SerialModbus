@@ -211,10 +211,10 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
 #if( configSFC03 == 1 )
                 case CHANGE_ASCII_INPUT_DELIMITER:
                 {
-                    if( isAscii( ( int ) request->object ) == true )
+                    if( isAscii( *( ( char * ) request->object ) ) == true )
                     {
-                        pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
-                        pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                        pucRequestFrame[ 4 ] = ( uint8_t ) *( ( char * ) request->object );
+                        pucRequestFrame[ 5 ] = 0x00;
                     }
                     else
                     {
@@ -706,11 +706,25 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     break;
                 }
 #endif
-#if( configSFC01 == 1 )
-                case RESTART_COMMUNICATIONS_OPTION:
-#endif
 #if( configSFC03 == 1 )
                 case CHANGE_ASCII_INPUT_DELIMITER:
+                {
+                    if( usREPLY_INPUT_DELIMITER == usREQUEST_INPUT_DELIMITER )
+                    {
+                        cAsciiInputDelimiter = ( char ) ucREPLY_INPUT_DELIMITER_HI;
+                    }
+                    else
+                    {
+                        xSetException( ILLEGAL_OUTPUT_VALUE );
+                        vSetState( PROCESSING_ERROR );
+                        return;
+                    }
+
+                    break;
+                }
+#endif
+#if( configSFC01 == 1 )
+                case RESTART_COMMUNICATIONS_OPTION:
 #endif
 #if( configSFC04 == 1 )
                 case FORCE_LISTEN_ONLY_MODE:
@@ -721,7 +735,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 #if( configSFC20 == 1 )
                 case CLEAR_OVERRUN_COUNTER_AND_FLAG:
 #endif
-#if( ( configSFC01 == 1 ) || ( configSFC03 == 1 ) || ( configSFC04 == 1 ) || \
+#if( ( configSFC01 == 1 ) || ( configSFC04 == 1 ) || \
      ( configSFC10 == 1 ) || ( configSFC20 == 1 ) )
                 {
                     if( usREPLY_DATA != usREQUEST_DATA )
