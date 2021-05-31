@@ -183,15 +183,14 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
 #if( configSFC00 == 1 )
                 case RETURN_QUERY_DATA:
                 {
-                    xRequestLength = 4;
-
                     if( request->object != NULL )
                     {
-                        for( size_t i = xRequestLength; i < request->objectSize; i++ )
+                        for( size_t i = 4; i < request->objectSize; i++ )
                         {
-                            pucRequestFrame[ i ] = ( ( uint8_t * ) request->object )[ i ];
-                            xRequestLength++;
+                            pucRequestFrame[ i ] = ( ( uint8_t * ) request->object )[ i - 4 ];
                         }
+
+                        xRequestLength = request->objectSize + 4;
                     }
                     else
                     {
@@ -693,14 +692,22 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 #if( configSFC00 == 1 )
                 case RETURN_QUERY_DATA:
                 {
-                    for( size_t i = 4; i < xReplyLength - 2; i++ )
+                    if( xReplyLength == xRequestLength )
                     {
-                        if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                        for( size_t i = 4; i < xReplyLength - 2; i++ )
                         {
-                            xSetException( ILLEGAL_QUERY_DATA );
-                            vSetState( PROCESSING_ERROR );
-                            return;
+                            if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
+                            {
+                                xSetException( ILLEGAL_QUERY_DATA );
+                                vSetState( PROCESSING_ERROR );
+                                return;
+                            }
                         }
+                    }
+                    else
+                    {
+                        xSetException( ILLEGAL_QUERY_DATA );
+                        vSetState( PROCESSING_ERROR );
                     }
 
                     break;
@@ -802,7 +809,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
         }
         else
         {
-            xSetException( ILLEGAL_OUTPUT_ADDRESS );
+            xSetException( ILLEGAL_REPLY_SUB_FUNCTION );
             vSetState( PROCESSING_ERROR );
         }
     }

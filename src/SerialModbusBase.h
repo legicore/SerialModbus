@@ -118,6 +118,7 @@ typedef enum MBException_e
     ILLEGAL_QUANTITY                        = 0x1A,
     ILLEGAL_QUERY_DATA                      = 0x1B,
     ILLEGAL_SUB_FUNCTION                    = 0x1C,
+    ILLEGAL_REPLY_SUB_FUNCTION              = 0x1D,
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 

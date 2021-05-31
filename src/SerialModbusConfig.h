@@ -106,8 +106,8 @@
     #warning Diagnostics (function code 8) does not work correctly when multi ID support is used!
 #endif
 
-#if( ( configFC08 == 1 ) && ( configSFC04 == 1 ) && ( configSFC00 == 0 ) )
-    #warning Sub-function code 0 is needed to deavtivate Listen Only Mode (sub-function code 4)!
+#if( ( configFC08 == 1 ) && ( configSFC04 == 1 ) && ( configSFC01 == 0 ) )
+    #warning Sub-function code 1 is needed to deavtivate Listen Only Mode (sub-function code 4)!
 #endif
 
 /*-----------------------------------------------------------*/

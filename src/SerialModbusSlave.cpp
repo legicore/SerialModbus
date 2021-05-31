@@ -816,10 +816,9 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             {
                 xReplyLength = 4;
 
-                for( size_t i = xReplyLength; i < xRequestLength - 2; i++ )
+                for( ; xReplyLength < xRequestLength - 2; xReplyLength++ )
                 {
-                    pucReplyFrame[ i ] = pucRequestFrame[ i ];
-                    xReplyLength++;
+                    pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
                 }
 
                 break;
