@@ -123,7 +123,7 @@ private:
     void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
-    uint16_t usExceptionErrorCount;
+    uint16_t usSlaveExceptionErrorCount;
     uint16_t usSlaveMessageCount;
     uint16_t usSlaveNoResponseCount;
     uint16_t usSlaveNAKCount;
@@ -145,7 +145,7 @@ private:
     #define vIncCPT( counter ) if( counter < 0xFFFF ) counter++
     #define vIncCPT1()  vIncCPT( usBusMessageCount )
     #define vIncCPT2()  vIncCPT( usBusCommunicationErrorCount )
-    #define vIncCPT3()  vIncCPT( usExceptionErrorCount )
+    #define vIncCPT3()  vIncCPT( usSlaveExceptionErrorCount )
     #define vIncCPT4()  vIncCPT( usSlaveMessageCount )
     #define vIncCPT5()  vIncCPT( usSlaveNoResponseCount )
     #define vIncCPT6()  vIncCPT( usSlaveNAKCount )

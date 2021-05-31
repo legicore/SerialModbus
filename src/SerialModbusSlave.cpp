@@ -287,24 +287,21 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                             #endif
 
                             vClearRequestFrame();
-                            break;
                         }
                     }
                     else
                     {
                         /* Receive buffer overflow -> Increment the bus
-                        charakter overrun counter and the bus communication
-                        error counter. */
+                        charakter overrun counter. */
                         vIncCPT8();
-                        vIncCPT2();
                         xSetException( CHARACTER_OVERRUN );
 
-                        /* We go directly back to the idle state because we
-                        don't want to send any kind of reply. It would cause bus
-                        collisions if every slave sends an error reply. */
+                        /* We go directly back to the idle state and don't send
+                        any reply because it would cause bus collisions if every
+                        slave sends an error reply. */
                         vClearRequestFrame();
-                        vSetState( SLAVE_IDLE );
 
+                        vSetState( SLAVE_IDLE );
                         break;
                     }
                 }
@@ -316,35 +313,37 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                     {
                         if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
+                            if( xRequestLength > 3 )
                             {
-                                /* Received a new valid request -> Increment the
-                                bus message counter. */
-                                vIncCPT1();
-
-                                while( bTimeoutInterFrameDelay() != true );
-
-                                #if( configSLAVE_MULTI_ID == 1 )
+                                if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                 {
-                                    ucSlaveId = ucREQUEST_ID;
+                                    /* Received a new valid request -> Increment
+                                    the bus message counter. */
+                                    vIncCPT1();
+
+                                    while( bTimeoutInterFrameDelay() != true );
+
+                                    #if( configSLAVE_MULTI_ID == 1 )
+                                    {
+                                        ucSlaveId = ucREQUEST_ID;
+                                    }
+                                    #endif
+
+                                    vSetState( CHECKING_REQUEST );
+                                    break;
                                 }
-                                #endif
-
-                                vSetState( CHECKING_REQUEST );
                             }
-                            else
-                            {
-                                /* Checksum error -> Increment the bus
-                                communication error counter. */
-                                vIncCPT2();
 
-                                /* We go directly back to the idle state
-                                because we don't want to send any kind of reply.
-                                It would cause bus collisions if every slave
-                                sends an error reply. */
-                                vClearRequestFrame();
-                                vSetState( SLAVE_IDLE );
-                            }
+                            /* Got an checksum error or received a frame that
+                            consists of <= 3 characters -> Increment the bus
+                            communication error counter. */
+                            vIncCPT2();
+
+                            /* We go directly back to the idle state and don't
+                            send any reply because it would cause bus collisions
+                            if every slave sends an error reply. */
+                            vClearRequestFrame();
+                            vSetState( SLAVE_IDLE );
                         }
                     }
                     #endif
@@ -371,12 +370,12 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 #endif
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
-                                    /* Received a new valid request ->
-                                    Increment the bus message counter. */
-                                    vIncCPT1();
-
                                     if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                     {
+                                        /* Received a new valid request ->
+                                        Increment the bus message counter. */
+                                        vIncCPT1();
+
                                         #if( configSLAVE_MULTI_ID == 1 )
                                         {
                                             ucSlaveId = ucREQUEST_ID;
@@ -384,7 +383,6 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                         #endif
 
                                         vSetState( CHECKING_REQUEST );
-
                                         break;
                                     }
 
@@ -410,6 +408,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
             case CHECKING_REQUEST :
             {
+                /* We received a valid request that is a broadcast or is
+                addressed to the Id of this deveice -> Increment the slave
+                message counter. */
                 vIncCPT4();
 
                 if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == OK )
@@ -815,8 +816,12 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             case RETURN_QUERY_DATA:
             {
                 xReplyLength = 4;
-
+#if( configMODE == configMODE_RTU )
                 for( ; xReplyLength < xRequestLength - 2; xReplyLength++ )
+#endif
+#if( configMODE == configMODE_ASCII )
+                for( ; xReplyLength < xRequestLength - 1; xReplyLength++ )
+#endif
                 {
                     pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
                 }
@@ -971,8 +976,8 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             {
                 if( usREQUEST_DATA == 0x0000 )
                 {
-                    ucREPLY_DATA_HI = highByte( usExceptionErrorCount );
-                    ucREPLY_DATA_LO =  lowByte( usExceptionErrorCount );
+                    ucREPLY_DATA_HI = highByte( usSlaveExceptionErrorCount );
+                    ucREPLY_DATA_LO =  lowByte( usSlaveExceptionErrorCount );
                 }
                 else
                 {
@@ -1089,8 +1094,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #endif
             default:
             {
-                vIncCPT3();
-
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
                     xSetException( SLV_ILLEGAL_SUB_FUNCTION );
@@ -1124,7 +1127,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
     {
         usBusMessageCount            = 0;
         usBusCommunicationErrorCount = 0;
-        usExceptionErrorCount        = 0;
+        usSlaveExceptionErrorCount   = 0;
         usSlaveMessageCount          = 0;
         usSlaveNoResponseCount       = 0;
         usSlaveNAKCount              = 0;

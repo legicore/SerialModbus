@@ -185,12 +185,13 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
                 {
                     if( request->object != NULL )
                     {
-                        for( size_t i = 4; i < request->objectSize; i++ )
-                        {
-                            pucRequestFrame[ i ] = ( ( uint8_t * ) request->object )[ i - 4 ];
-                        }
+                        xRequestLength = 4;
 
-                        xRequestLength = request->objectSize + 4;
+                        for( size_t i = 0; i < request->objectSize; i++ )
+                        {
+                            pucRequestFrame[ 4 + i ] = ( uint8_t ) ( ( char * ) request->object )[ i ];
+                            xRequestLength++;
+                        }
                     }
                     else
                     {
@@ -435,7 +436,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xReplyLength > 0 )
+                if( xReplyLength > 3 )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
@@ -708,6 +709,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                     {
                         xSetException( ILLEGAL_QUERY_DATA );
                         vSetState( PROCESSING_ERROR );
+                        return;
                     }
 
                     break;
