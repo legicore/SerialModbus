@@ -30,14 +30,13 @@ source code (8 data bits, no parity, 1 stop bit). */
 /* Check the architecture, based on the architecture of the tested boards. */
 #if defined( ARDUINO_ARCH_AVR ) || \
     defined( ARDUINO_ARCH_MEGAAVR ) || \
-    defined( ARDUINO_ARCH_MBED_NANO ) || defined( ARDUINO_ARCH_MBED ) || \
     defined( ARDUINO_ARCH_SAMD )
 
     /* Check for the known boards that are not (!) compatible with the Arduino
     SoftwareSerial library, and if none of them is selected, the compatibility
     gets activated. */
-    #if !defined( ARDUINO_NANO_RP2040_CONNECT ) && \
-        !defined( ARDUINO_SAMD_MKRZERO )
+    #if !defined( ARDUINO_SAMD_MKRZERO ) && \
+        !defined( ARDUINO_SAMD_NANO_33_IOT )
 
         #define COMPAT_SOFTWARE_SERIAL
 
@@ -49,8 +48,8 @@ source code (8 data bits, no parity, 1 stop bit). */
         defined( ARDUINO_AVR_MEGA2560 ) || \
         defined( ARDUINO_AVR_LEONARDO ) || \
         defined( ARDUINO_AVR_PRO ) || \
-        defined( ARDUINO_NANO_RP2040_CONNECT ) || \
-        defined( ARDUINO_SAMD_MKRZERO )
+        defined( ARDUINO_SAMD_MKRZERO ) || \
+        defined( ARDUINO_SAMD_NANO_33_IOT )
 
         #define Serial_t HardwareSerial
 
