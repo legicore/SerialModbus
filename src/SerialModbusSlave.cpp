@@ -846,7 +846,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -863,7 +862,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -908,7 +906,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -927,7 +924,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -944,7 +940,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -961,7 +956,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -978,7 +972,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -995,7 +988,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -1012,7 +1004,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -1029,7 +1020,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -1046,7 +1036,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -1063,7 +1052,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
@@ -1082,7 +1070,6 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 else
                 {
                     xSetException( ILLEGAL_DATA_VALUE );
-                    return;
                 }
 
                 break;
