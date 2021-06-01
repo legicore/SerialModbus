@@ -254,6 +254,7 @@ protected:
 
 #define ucREQUEST_BYTE_COUNT_2          pucRequestFrame[ 6 ]
 
+#define CLEAR_COM_EVENT_LOG             0xFF00
 #define ucREQUEST_SUB_FUNCTION_CODE_HI  pucRequestFrame[ 2 ]
 #define ucREQUEST_SUB_FUNCTION_CODE_LO  pucRequestFrame[ 3 ]
 #define usREQUEST_SUB_FUNCTION_CODE     ( ( ( uint16_t ) ucREQUEST_SUB_FUNCTION_CODE_HI << 8 ) | ucREQUEST_SUB_FUNCTION_CODE_LO )

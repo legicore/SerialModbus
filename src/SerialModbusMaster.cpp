@@ -266,7 +266,16 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
 #if( configSFC01 == 1 )
                 case RESTART_COMMUNICATIONS_OPTION:
                 {
-                    // TODO
+                    if( request->object != NULL )
+                    {
+                        pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                        pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                    }
+                    else
+                    {
+                        return xSetException( ILLEGAL_REQUEST );
+                    }
+
                     break;
                 }
 #endif

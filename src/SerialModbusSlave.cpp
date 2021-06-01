@@ -828,20 +828,22 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 #if( configSFC01 == 1 )
             case RESTART_COMMUNICATIONS_OPTION:
             {
-                if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == 0xFF00 ) )
+                if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == CLEAR_COM_EVENT_LOG ) )
                 {
-                    /* INFO: The Modbus spec says here to also clear an error
-                    flag, but this flag is nowhere specified. */
+                    /* INFO: The Modbus spec prescribes here to also an specific
+                    error flag, but this flag is nowhere specified. */
 
+                    /* Reset the Only Listen Mode. */
                     bListenOnlyMode = false;
 
-                    if( usREQUEST_DATA == 0xFF00 )
+                    if( usREQUEST_DATA == CLEAR_COM_EVENT_LOG )
                     {
-                        vClearDiagnosticCounters();
+                        /* INFO: The Modbus spec prescribes here to clear the
+                        communication event log, which is not implemented. */
                     }
 
-                    /* INFO: The Modbus spec says here to perform a complete
-                    restart of the device, but we skip that. */
+                    /* INFO: The Modbus spec prescribes here to perform a
+                    complete restart of the device, but we skip that. */
                 }
                 else
                 {
@@ -1064,8 +1066,8 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 {
                     usBusCharacterOverrunCount = 0;
 
-                    /* INFO: The Modbus spec says here to also clear an error
-                    flag, but this flag is nowhere specified. */
+                    /* INFO: The Modbus spec prescribes here to also clear an
+                    error flag, but this flag is nowhere specified. */
                 }
                 else
                 {
