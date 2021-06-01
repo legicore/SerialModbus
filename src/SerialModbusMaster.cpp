@@ -42,6 +42,8 @@ SerialModbusMaster::SerialModbusMaster()
 
     ulTimerResponseTimeoutUs = 0;
     ulTimerTurnaroundDelayUs = 0;
+
+    xStatusSimpleAPI = OK;
 }
 /*-----------------------------------------------------------*/
 
@@ -111,6 +113,66 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
     }
 
     return OK;
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusMaster::setRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
+{
+    static uint16_t usObject = 0x0000;
+    static MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
+
+    xRequest.id = id;
+    xRequest.functionCode = functionCode;
+    xRequest.address = address;
+    usObject = value;
+
+    xStatusSimpleAPI = setRequest( &xRequest );
+    if( xStatusSimpleAPI == OK )
+    {
+        xStatusSimpleAPI = processModbus();
+        if( xStatusSimpleAPI == OK )
+        {
+            return ( int16_t ) usObject;
+        }
+    }
+
+    return -1;
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusMaster::readHoldingRegister( uint8_t id, uint16_t address )
+{
+    return setRequest( id, READ_HOLDING_REGISTERS, address, 0 );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusMaster::readInputRegister( uint8_t id, uint16_t address )
+{
+    return setRequest( id, READ_INPUT_REGISTERS, address, 0 );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusMaster::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+{
+    return setRequest( id, WRITE_SINGLE_COIL, address, value );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusMaster::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+{
+    return setRequest( id, WRITE_SINGLE_REGISTER, address, value );
+}
+/*-----------------------------------------------------------*/
+
+MBStatus_t SerialModbusMaster::getLastException( void )
+{
+    return xStatusSimpleAPI;
+}
+/*-----------------------------------------------------------*/
+
+const char * SerialModbusMaster::getLastExceptionString( void )
+{
+    return getExceptionString( xStatusSimpleAPI );
 }
 /*-----------------------------------------------------------*/
 

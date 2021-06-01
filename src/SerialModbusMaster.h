@@ -71,6 +71,16 @@ public:
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
 
+    /* Simplified API functions */
+
+    int16_t setRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value = 0 );
+    int16_t readHoldingRegister( uint8_t id, uint16_t address );
+    int16_t readInputRegister( uint8_t id, uint16_t address );
+    int16_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value = 0 );
+    int16_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value = 0 );
+    MBStatus_t getLastException( void );
+    const char * getLastExceptionString( void );
+
 private:
 
     MBMasterState_t xState;
@@ -103,6 +113,7 @@ private:
 #if( configFC16 == 1 )
     void vHandlerFC16( void );
 #endif
+    MBStatus_t xStatusSimpleAPI;
 };
 /*-----------------------------------------------------------*/
 
