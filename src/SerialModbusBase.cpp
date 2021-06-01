@@ -29,6 +29,64 @@
 
 /*-----------------------------------------------------------*/
 
+typedef struct MBExceptionString_s
+{
+    uint8_t exceptionCode;
+    const char * exceptionString;
+}
+MBExceptionString_t;
+
+static const MBExceptionString_t pxExceptionStrings[] = {
+
+    /* Standard exception codes. */
+    { ILLEGAL_FUNCTION,                        "ILLEGAL_FUNCTION" },
+    { ILLEGAL_DATA_ADDRESS,                    "ILLEGAL_DATA_ADDRESS" },
+    { ILLEGAL_DATA_VALUE,                      "ILLEGAL_DATA_VALUE" },
+    { SLAVE_DEVICE_FAILURE,                    "SLAVE_DEVICE_FAILURE" },
+    { ACKNOWLEDGE,                             "ACKNOWLEDGE" },
+    { SLAVE_DEVICE_BUSY,                       "SLAVE_DEVICE_BUSY" },
+    { MEMORY_PARITY_ERROR,                     "MEMORY_PARITY_ERROR" },
+    { GATEWAY_PATH_UNAVAILABLE,                "GATEWAY_PATH_UNAVAILABLE" },
+    { GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND, "GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND" },
+
+    /* Non-standard exception codes. */
+    { ILLEGAL_REQUEST,                         "ILLEGAL_REQUEST" },
+    { CHARACTER_OVERRUN,                       "CHARACTER_OVERRUN" },
+    { NO_REPLY,                                "NO_REPLY" },
+    { ILLEGAL_CHECKSUM,                        "ILLEGAL_CHECKSUM" },
+    { ILLEGAL_STATE,                           "ILLEGAL_STATE" },
+    { ILLEGAL_BYTE_COUNT,                      "ILLEGAL_BYTE_COUNT" },
+    { ILLEGAL_COIL_VALUE,                      "ILLEGAL_COIL_VALUE" },
+    { ILLEGAL_OUTPUT_ADDRESS,                  "ILLEGAL_OUTPUT_ADDRESS" },
+    { ILLEGAL_OUTPUT_VALUE,                    "ILLEGAL_OUTPUT_VALUE" },
+    { ILLEGAL_QUANTITY,                        "ILLEGAL_QUANTITY" },
+    { ILLEGAL_QUERY_DATA,                      "ILLEGAL_QUERY_DATA" },
+    { ILLEGAL_SUB_FUNCTION,                    "ILLEGAL_SUB_FUNCTION" },
+    { ILLEGAL_REPLY_SUB_FUNCTION,              "ILLEGAL_REPLY_SUB_FUNCTION" },
+
+#if( configEXTENDED_EXCEPTION_CODES == 1 )
+
+    /* Extended exception codes for slave replies. */
+    { SLV_ILLEGAL_FUNCTION,                    "SLV_ILLEGAL_FUNCTION" },
+    { SLV_ILLEGAL_STATE,                       "SLV_ILLEGAL_STATE" },
+    { SLV_ILLEGAL_DATA_ADDRESS,                "SLV_ILLEGAL_DATA_ADDRESS" },
+    { SLV_ILLEGAL_ACCESS,                      "SLV_ILLEGAL_ACCESS" },
+    { SLV_ILLEGAL_QUANTITY,                    "SLV_ILLEGAL_QUANTITY" },
+    { SLV_ILLEGAL_COIL_VALUE,                  "SLV_ILLEGAL_COIL_VALUE" },
+    { SLV_ILLEGAL_INPUT_DELIMITER,             "SLV_ILLEGAL_INPUT_DELIMITER" },
+    { SLV_ILLEGAL_SUB_FUNCTION,                "SLV_ILLEGAL_SUB_FUNCTION" },
+    { SLV_ILLEGAL_DATA_VALUE,                  "SLV_ILLEGAL_DATA_VALUE" },
+
+#endif
+
+    { OK,  "OK" },
+    { NOK, "NOK" },
+
+    /* Marks the end of the list. */
+    { 0x00, NULL }
+};
+/*-----------------------------------------------------------*/
+
 SerialModbusBase::SerialModbusBase()
 {
     xRequestLength = 0;
@@ -701,3 +759,17 @@ void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 	}
 
 #endif
+/*-----------------------------------------------------------*/
+
+const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
+{
+    for( size_t i = 0; pxExceptionStrings[ i ].exceptionString != NULL; i++ )
+    {
+        if( pxExceptionStrings[ i ].exceptionCode == exceptionCode )
+        {
+            return pxExceptionStrings[ i ].exceptionString;
+        }
+    }
+
+    return "__NO_STRING__";
+}

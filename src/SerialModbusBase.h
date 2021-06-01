@@ -165,6 +165,7 @@ public:
     int8_t setInterCharacterTimeout( uint32_t timeUs );
     int8_t setInterFrameDelay( uint32_t timeUs );
 #endif
+    const char * getExceptionString( uint8_t exceptionCode );
 
 protected:
 
