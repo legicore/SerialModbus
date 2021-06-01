@@ -253,101 +253,85 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
 }
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
+uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
+{
+    uint16_t usCrc = 0xFFFF;
 
-    uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
+    for ( size_t xIndex = 0; xIndex < xDataLength; xIndex++ )
     {
-        uint16_t usCrc = 0xFFFF;
+        usCrc ^= ( uint16_t ) pucData[ xIndex ];
 
-        for ( size_t xIndex = 0; xIndex < xDataLength; xIndex++ )
+        for( size_t xBit = 8; xBit != 0; xBit-- )
         {
-            usCrc ^= ( uint16_t ) pucData[ xIndex ];
-
-            for( size_t xBit = 8; xBit != 0; xBit-- )
+            if( ( usCrc & 0x0001 ) != 0 )
             {
-                if( ( usCrc & 0x0001 ) != 0 )
-                {
-                    usCrc >>= 1;
-                    usCrc ^= 0xA001;
-                }
-                else
-                {
-                    usCrc >>= 1;
-                }
+                usCrc >>= 1;
+                usCrc ^= 0xA001;
+            }
+            else
+            {
+                usCrc >>= 1;
             }
         }
-
-        return usCrc;
     }
 
-#endif
+    return usCrc;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
+uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
+{
+    uint8_t ucLrc = 0;
 
-    uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
+    while( xDataLength-- > 0 )
     {
-        uint8_t ucLrc = 0;
-
-        while( xDataLength-- > 0 )
-        {
-            ucLrc += *pucData++;
-        }
-
-        return ( uint8_t ) ( -( ( int8_t ) ucLrc ) );
+        ucLrc += *pucData++;
     }
 
-#endif
+    return ( uint8_t ) ( -( ( int8_t ) ucLrc ) );
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
-
-    MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
+MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
+{
+    if( *pxFrameLength == 0 )
     {
-        if( *pxFrameLength == 0 )
-        {
-            return NOK;
-        }
-
-        pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
-        pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = ( uint8_t ) '\r';
-
-        for( size_t i = *pxFrameLength - 1; ( i + 1 ) > 0; i-- )
-        {
-            pucFrame[ ( i * 2 ) + 2 ] = ucByteToAsciiLo( pucFrame[ i ] );
-            pucFrame[ ( i * 2 ) + 1 ] = ucByteToAsciiHi( pucFrame[ i ] );
-        }
-
-        pucFrame[ 0 ] = ( uint8_t ) ':';
-
-        *pxFrameLength = ( *pxFrameLength * 2 ) + 3;
-
-        return OK;
+        return NOK;
     }
 
-#endif
+    pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
+    pucFrame[ ( *pxFrameLength * 2 ) + 1 ] = ( uint8_t ) '\r';
+
+    for( size_t i = *pxFrameLength - 1; ( i + 1 ) > 0; i-- )
+    {
+        pucFrame[ ( i * 2 ) + 2 ] = ucByteToAsciiLo( pucFrame[ i ] );
+        pucFrame[ ( i * 2 ) + 1 ] = ucByteToAsciiHi( pucFrame[ i ] );
+    }
+
+    pucFrame[ 0 ] = ( uint8_t ) ':';
+
+    *pxFrameLength = ( *pxFrameLength * 2 ) + 3;
+
+    return OK;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
-
-    MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
+MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
+{
+    if( *pxFrameLength == 0 )
     {
-        if( *pxFrameLength == 0 )
-        {
-            return NOK;
-        }
-
-        *pxFrameLength = ( *pxFrameLength - 3 ) / 2;
-
-        for( size_t i = 0; i < *pxFrameLength; i++ )
-        {
-            pucFrame[ i ] = ucAsciiToByte( pucFrame[ ( i * 2 ) + 1 ], pucFrame[ ( i * 2 ) + 2 ] );
-        }
-
-        return OK;
+        return NOK;
     }
 
-#endif
+    *pxFrameLength = ( *pxFrameLength - 3 ) / 2;
+
+    for( size_t i = 0; i < *pxFrameLength; i++ )
+    {
+        pucFrame[ i ] = ucAsciiToByte( pucFrame[ ( i * 2 ) + 1 ], pucFrame[ ( i * 2 ) + 2 ] );
+    }
+
+    return OK;
+}
 /*-----------------------------------------------------------*/
 
 void SerialModbusBase::vClearReplyFrame( void )
@@ -443,74 +427,46 @@ MBException_t SerialModbusBase::xSetException( MBException_t xExceptionPar )
 }
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    void SerialModbusBase::vStartInterFrameDelay( void )
-    {
-        ulTimerInterFrameDelayUs = micros();
-    }
-
-#endif
+void SerialModbusBase::vStartInterFrameDelay( void )
+{
+    ulTimerInterFrameDelayUs = micros();
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    void SerialModbusBase::vStartInterCharacterTimeout( void )
-    {
-        ulTimerInterCharacterTimeoutUs = micros();
-    }
-
-#endif
+void SerialModbusBase::vStartInterCharacterTimeout( void )
+{
+    ulTimerInterCharacterTimeoutUs = micros();
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    bool SerialModbusBase::bTimeoutInterFrameDelay( void ) const
-    {
-        return ( micros() - ulTimerInterFrameDelayUs ) >= ulInterFrameDelayUs;
-    }
-
-#endif
+bool SerialModbusBase::bTimeoutInterFrameDelay( void ) const
+{
+    return ( micros() - ulTimerInterFrameDelayUs ) >= ulInterFrameDelayUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    bool SerialModbusBase::bTimeoutInterCharacterTimeout( void ) const
-    {
-        return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
-    }
-
-#endif
+bool SerialModbusBase::bTimeoutInterCharacterTimeout( void ) const
+{
+    return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
-
-    uint8_t SerialModbusBase::ucByteToAsciiHi( uint8_t ucByte )
-    {
-        return ( ucByte >> 4 ) + ( ( ( ucByte >> 4 ) < 10 ) ? 48 : 55 );
-    }
-
-#endif
+uint8_t SerialModbusBase::ucByteToAsciiHi( uint8_t ucByte )
+{
+    return ( ucByte >> 4 ) + ( ( ( ucByte >> 4 ) < 10 ) ? 48 : 55 );
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
-
-    uint8_t SerialModbusBase::ucByteToAsciiLo( uint8_t ucByte )
-    {
-        return ( ucByte & 0x0F ) + ( ( ( ucByte & 0x0F ) < 10 ) ? 48 : 55 );
-    }
-
-#endif
+uint8_t SerialModbusBase::ucByteToAsciiLo( uint8_t ucByte )
+{
+    return ( ucByte & 0x0F ) + ( ( ( ucByte & 0x0F ) < 10 ) ? 48 : 55 );
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_ASCII )
-
-    uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
-    {
-        return ( ( ucAsciiHi - ( ( ucAsciiHi < 64 ) ? 48 : 55 ) ) << 4 ) | ( ucAsciiLo - ( ( ucAsciiLo < 64 ) ? 48 : 55 ) );
-    }
-
-#endif
+uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
+{
+    return ( ( ucAsciiHi - ( ( ucAsciiHi < 64 ) ? 48 : 55 ) ) << 4 ) | ( ucAsciiLo - ( ( ucAsciiLo < 64 ) ? 48 : 55 ) );
+}
 /*-----------------------------------------------------------*/
 
 bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength )
@@ -574,120 +530,116 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 }
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
+bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
+{
+    uint8_t ucNbrOfBits = 0;
 
-    bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
+    if( ulBaud > 19200 )
     {
-        uint8_t ucNbrOfBits = 0;
+        /* For transfer rates higer than 19200 Baud Modbus recommend fixed
+        values for the inter character timeout and the inter frame delay. */
+        ulInterCharacterTimeoutUs = 750;
+        ulInterFrameDelayUs = 1750;
+    }
+    else
+    {
+        /* For transfer rates lower than 19200 Baud the timing is more
+        critical and must be calculated. */
 
-        if( ulBaud > 19200 )
+        /* Calculation example for the inter character timeout with 19200
+        Baud (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
+
+            19200 Baud / 11 Bits = 1745.45'
+
+        That means 1745.45' characters could be transmitted in 1 Second.
+
+            1000 ms / 1745.45 = 0.5729167' ms
+
+        So one character needs 0.5729167' ms to be transmitted.
+        The inter character timeout is defined as 1.5x the time needed to
+        transfer one character (Inter frame delay is 3.5x).
+
+            0.5729167' ms * 1.5 = 0.859375 ms
+
+        And because our timers are working with microseconds we have a final
+        value of 859.375 us.
+
+            0.859375 ms * 1000 = 859.375 us */
+
+        switch( ulSerialConfig )
         {
-            /* For transfer rates higer than 19200 Baud Modbus recommend fixed
-            values for the inter character timeout and the inter frame delay. */
-            ulInterCharacterTimeoutUs = 750;
-            ulInterFrameDelayUs = 1750;
-        }
-        else
-        {
-            /* For transfer rates lower than 19200 Baud the timing is more
-            critical and must be calculated. */
-
-            /* Calculation example for the inter character timeout with 19200
-            Baud (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
-
-                19200 Baud / 11 Bits = 1745.45'
-
-            That means 1745.45' characters could be transmitted in 1 Second.
-
-                1000 ms / 1745.45 = 0.5729167' ms
-
-            So one character needs 0.5729167' ms to be transmitted.
-            The inter character timeout is defined as 1.5x the time needed to
-            transfer one character (Inter frame delay is 3.5x).
-
-                0.5729167' ms * 1.5 = 0.859375 ms
-
-            And because our timers are working with microseconds we have a final
-            value of 859.375 us.
-
-                0.859375 ms * 1000 = 859.375 us */
-
-            switch( ulSerialConfig )
+            case SERIAL_5N1 :
+            case SERIAL_5E1 :
+            case SERIAL_5O1 :
             {
-                case SERIAL_5N1 :
-                case SERIAL_5E1 :
-                case SERIAL_5O1 :
-                {
-                    ucNbrOfBits = 8;
-                    break;
-                }
-                case SERIAL_6N1 :
-                case SERIAL_5N2 :
-                case SERIAL_6E1 :
-                case SERIAL_5E2 :
-                case SERIAL_6O1 :
-                case SERIAL_5O2 :
-                {
-                    ucNbrOfBits = 9;
-                    break;
-                }
-                case SERIAL_7N1 :
-                case SERIAL_6N2 :
-                case SERIAL_7E1 :
-                case SERIAL_6E2 :
-                case SERIAL_7O1 :
-                case SERIAL_6O2 :
-                {
-                    ucNbrOfBits = 10;
-                    break;
-                }
-                case SERIAL_8N1 :
-                case SERIAL_7N2 :
-                case SERIAL_8E1 :
-                case SERIAL_7E2 :
-                case SERIAL_8O1 :
-                case SERIAL_7O2 :
-                {
-                    ucNbrOfBits = 11;
-                    break;
-                }
-                case SERIAL_8N2 :
-                case SERIAL_8E2 :
-                case SERIAL_8O2 :
-                {
-                    ucNbrOfBits = 12;
-                    break;
-                }
-                default :
-                {
-                    return false;
-                }
+                ucNbrOfBits = 8;
+                break;
             }
-
-            /* General formula:
-
-                          1000
-                timeout = ---- * nbrOfBits * characterTimes * 1000
-                          baud
-
-            Final formulas:
-
-                                        nbrOfBits * 1000000 * 1.5
-                interCharacterTimeout = -------------------------
-                                                baud
-
-                                  nbrOfBits * 1000000 * 3.5
-                interFrameDelay = -------------------------
-                                            baud */
-
-            ulInterCharacterTimeoutUs = ( ucNbrOfBits * 1500000 ) / ulBaud;
-            ulInterFrameDelayUs       = ( ucNbrOfBits * 3500000 ) / ulBaud;
+            case SERIAL_6N1 :
+            case SERIAL_5N2 :
+            case SERIAL_6E1 :
+            case SERIAL_5E2 :
+            case SERIAL_6O1 :
+            case SERIAL_5O2 :
+            {
+                ucNbrOfBits = 9;
+                break;
+            }
+            case SERIAL_7N1 :
+            case SERIAL_6N2 :
+            case SERIAL_7E1 :
+            case SERIAL_6E2 :
+            case SERIAL_7O1 :
+            case SERIAL_6O2 :
+            {
+                ucNbrOfBits = 10;
+                break;
+            }
+            case SERIAL_8N1 :
+            case SERIAL_7N2 :
+            case SERIAL_8E1 :
+            case SERIAL_7E2 :
+            case SERIAL_8O1 :
+            case SERIAL_7O2 :
+            {
+                ucNbrOfBits = 11;
+                break;
+            }
+            case SERIAL_8N2 :
+            case SERIAL_8E2 :
+            case SERIAL_8O2 :
+            {
+                ucNbrOfBits = 12;
+                break;
+            }
+            default :
+            {
+                return false;
+            }
         }
 
-        return true;
+        /* General formula:
+
+                        1000
+            timeout = ---- * nbrOfBits * characterTimes * 1000
+                        baud
+
+        Final formulas:
+
+                                    nbrOfBits * 1000000 * 1.5
+            interCharacterTimeout = -------------------------
+                                            baud
+
+                                nbrOfBits * 1000000 * 3.5
+            interFrameDelay = -------------------------
+                                        baud */
+
+        ulInterCharacterTimeoutUs = ( ucNbrOfBits * 1500000 ) / ulBaud;
+        ulInterFrameDelayUs       = ( ucNbrOfBits * 3500000 ) / ulBaud;
     }
 
-#endif
+    return true;
+}
 /*-----------------------------------------------------------*/
 
 void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
@@ -709,56 +661,40 @@ void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 }
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-	uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
-	{
-		return ulInterCharacterTimeoutUs;
-	}
-
-#endif
+uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
+{
+    return ulInterCharacterTimeoutUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-	uint32_t SerialModbusBase::getInterFrameDelay( void ) const
-	{
-		return ulInterFrameDelayUs;
-	}
-
-#endif
+uint32_t SerialModbusBase::getInterFrameDelay( void ) const
+{
+    return ulInterFrameDelayUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
+int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
+{
+    if( timeUs != 0 )
+    {
+        ulInterCharacterTimeoutUs = timeUs;
+        return 0;
+    }
 
-	int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
-	{
-		if( timeUs != 0 )
-		{
-			ulInterCharacterTimeoutUs = timeUs;
-			return 0;
-		}
-
-		return -1;
-	}
-
-#endif
+    return -1;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
+int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
+{
+    if( timeUs != 0 )
+    {
+        ulInterFrameDelayUs = timeUs;
+        return 0;
+    }
 
-	int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
-	{
-		if( timeUs != 0 )
-		{
-			ulInterFrameDelayUs = timeUs;
-			return 0;
-		}
-
-		return -1;
-	}
-
-#endif
+    return -1;
+}
 /*-----------------------------------------------------------*/
 
 const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )

@@ -159,12 +159,10 @@ public:
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
 #endif
     void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
-#if( configMODE == configMODE_RTU )
     uint32_t getInterCharacterTimeout( void ) const;
     uint32_t getInterFrameDelay( void ) const;
     int8_t setInterCharacterTimeout( uint32_t timeUs );
     int8_t setInterFrameDelay( uint32_t timeUs );
-#endif
     const char * getExceptionString( uint8_t exceptionCode );
 
 protected:
@@ -198,7 +196,6 @@ protected:
     uint64_t uxReplyQword( size_t xNbr, size_t xOffset = 3 );
     void vDelayUs( uint32_t ulDelayUs );
     void (*vCustomDelayUs)( uint32_t ulDelayUs );
-#if( configMODE == configMODE_RTU )
     uint16_t usCRC16( uint8_t * pucData, size_t xDataLength );
     uint32_t ulInterFrameDelayUs;
     uint32_t ulInterCharacterTimeoutUs;
@@ -209,15 +206,12 @@ protected:
     bool bTimeoutInterFrameDelay( void ) const;
     bool bTimeoutInterCharacterTimeout( void ) const;
     bool bCalculateTimeouts( uint32_t ulBaud );
-#endif
-#if( configMODE == configMODE_ASCII )
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
     uint8_t ucByteToAsciiHi( uint8_t ucByte );
     uint8_t ucByteToAsciiLo( uint8_t ucByte );
     uint8_t ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo );
     MBStatus_t xRtuToAscii( uint8_t * pucRtuFrame, size_t * pxFrameLength );
     MBStatus_t xAsciiToRtu( uint8_t * pucAsciiFrame, size_t * pxFrameLength );
-#endif
 #if( configPROCESS_LOOP_HOOK == 1 )
     void (*vProcessLoopHook)( void );
 #endif
