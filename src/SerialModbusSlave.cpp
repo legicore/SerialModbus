@@ -816,12 +816,8 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
             case RETURN_QUERY_DATA:
             {
                 xReplyLength = 4;
-#if( configMODE == configMODE_RTU )
-                for( ; xReplyLength < xRequestLength - 2; xReplyLength++ )
-#endif
-#if( configMODE == configMODE_ASCII )
-                for( ; xReplyLength < xRequestLength - 1; xReplyLength++ )
-#endif
+
+                for( ; xReplyLength < xRequestLength - xChecksumLength; xReplyLength++ )
                 {
                     pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
                 }

@@ -66,6 +66,17 @@ SerialModbusBase::SerialModbusBase()
     cAsciiInputDelimiter = configASCII_INPUT_DELIMITER;
 
     vCustomDelayUs = NULL;
+
+    #if( configMODE == configMODE_RTU )
+    {
+        xChecksumLength = 2;
+    }
+    #endif
+    #if( configMODE == configMODE_ASCII )
+    {
+        xChecksumLength = 1;
+    }
+    #endif
 }
 /*-----------------------------------------------------------*/
 

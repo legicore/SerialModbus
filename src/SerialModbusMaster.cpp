@@ -695,7 +695,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 {
                     if( xReplyLength == xRequestLength )
                     {
-                        for( size_t i = 4; i < xReplyLength - 2; i++ )
+                        for( size_t i = 4; i < xReplyLength - xChecksumLength; i++ )
                         {
                             if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
                             {

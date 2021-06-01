@@ -221,6 +221,7 @@ protected:
     void (*vProcessLoopHook)( void );
 #endif
     char cAsciiInputDelimiter;
+    size_t xChecksumLength;
 };
 /*-----------------------------------------------------------*/
 
