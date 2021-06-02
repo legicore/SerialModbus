@@ -98,21 +98,11 @@ private:
     bool bTimeoutResponseTimeout( void ) const;
     void vStartTurnaroundDelay( void );
     void vStartResponseTimeout( void );
-#if( configFC03 == 1 || configFC04 == 1 )
     void vHandlerFC03_04( void );
-#endif
-#if( configFC05 == 1 )
     void vHandlerFC05( void );
-#endif
-#if( configFC06 == 1 )
     void vHandlerFC06( void );
-#endif
-#if( configFC08 == 1 )
     void vHandlerFC08( void );
-#endif
-#if( configFC16 == 1 )
     void vHandlerFC16( void );
-#endif
     MBStatus_t xStatusSimpleAPI;
 };
 /*-----------------------------------------------------------*/

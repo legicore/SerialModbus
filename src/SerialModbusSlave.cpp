@@ -114,7 +114,7 @@ SerialModbusSlave::SerialModbusSlave()
     #if( configFC08 == 1 )
     {
         vClearDiagnosticCounters();
-        usDiagnosticRegister = 0;
+        usDiagnosticRegister = 0x0000;
     }
     #endif
 
@@ -128,11 +128,6 @@ SerialModbusSlave::SerialModbusSlave()
     #if( configSLAVE_MULTI_ID == 1 )
     {
         xIdCount = 0;
-
-        for( size_t i = 0; i < configMAX_ID_COUNT; i++ )
-        {
-            ucIdMap[ i ] = 0x00;
-        }
     }
     #endif
 }
@@ -684,28 +679,499 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 }
 /*-----------------------------------------------------------*/
 
-#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
+void SerialModbusSlave::vHandlerFC03_04( void )
+{
+    size_t xOffset = 0;
 
-    void SerialModbusSlave::vHandlerFC03_04( void )
+    if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007D ) )
     {
-        size_t xOffset = 0;
+        xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
-        if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007D ) )
+        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
         {
-            xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
+            for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
+            {
+                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
+            }
 
-            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+            ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
+            ucREPLY_BYTE_COUNT    = ( uint8_t ) usREQUEST_QUANTITY * 2;
+
+            xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
+
+            if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+            {
+                (*pxRegisterMap[ xRegisterMapIndex ].action)();
+            }
+
+            return;
+        }
+    }
+
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_QUANTITY );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_VALUE );
+    }
+    #endif
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::vHandlerFC05( void )
+{
+    if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
+    {
+        pxRegisterMap[ xRegisterMapIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
+
+        ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
+        ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
+        ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
+        ucREPLY_COIL_VALUE_HI = ucREQUEST_COIL_VALUE_HI;
+        ucREPLY_COIL_VALUE_LO = ucREQUEST_COIL_VALUE_LO;
+
+        xReplyLength = 6;
+
+        if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+        {
+            (*pxRegisterMap[ xRegisterMapIndex ].action)();
+        }
+
+        return;
+    }
+
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        xSetException( SLV_ILLEGAL_COIL_VALUE );
+    }
+    #else
+    {
+        xSetException( ILLEGAL_DATA_VALUE );
+    }
+    #endif
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::vHandlerFC06( void )
+{
+    size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
+
+    pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
+
+    ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
+    ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
+    ucREPLY_ADDRESS_LO        = ucREQUEST_ADDRESS_LO;
+    ucREPLY_REGISTER_VALUE_HI = ucREQUEST_REGISTER_VALUE_HI;
+    ucREPLY_REGISTER_VALUE_LO = ucREQUEST_REGISTER_VALUE_LO;
+
+    xReplyLength = 6;
+
+    if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+    {
+        (*pxRegisterMap[ xRegisterMapIndex ].action)();
+    }
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::vHandlerFC08( void )
+{
+    /* Set the common reply data for all diagnostic sub functions. */
+    ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
+    ucREPLY_SUB_FUNCTION_CODE_HI = ucREQUEST_SUB_FUNCTION_CODE_HI;
+    ucREPLY_SUB_FUNCTION_CODE_LO = ucREQUEST_SUB_FUNCTION_CODE_LO;
+
+    /* Some of the diagnoostic sub functions just return the received
+    request data (which is in most cases 0x0000). So we apply this data
+    directly at the beginning of the handler and will change it only in the
+    specific cases - the same goes for the reply length. */
+    ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
+    ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
+    xReplyLength = 6;
+
+    switch( usREQUEST_SUB_FUNCTION_CODE )
+    {
+#if( configSFC00 == 1 )
+        case RETURN_QUERY_DATA:
+        {
+            xReplyLength = 4;
+
+            for( ; xReplyLength < xRequestLength - xChecksumLength; xReplyLength++ )
+            {
+                pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
+            }
+
+            break;
+        }
+#endif
+#if( configSFC01 == 1 )
+        case RESTART_COMMUNICATIONS_OPTION:
+        {
+            if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == CLEAR_COM_EVENT_LOG ) )
+            {
+                /* INFO: The Modbus spec prescribes here to also an specific
+                error flag, but this flag is nowhere specified. */
+
+                /* Reset the Only Listen Mode. */
+                bListenOnlyMode = false;
+
+                if( usREQUEST_DATA == CLEAR_COM_EVENT_LOG )
+                {
+                    /* INFO: The Modbus spec prescribes here to clear the
+                    communication event log, which is not implemented. */
+                }
+
+                /* INFO: The Modbus spec prescribes here to perform a
+                complete restart of the device, but we skip that. */
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC02 == 1 )
+        case RETURN_DIAGNOSTIC_REGISTER:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usDiagnosticRegister );
+                ucREPLY_DATA_LO =  lowByte( usDiagnosticRegister );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC03 == 1 )
+        case CHANGE_ASCII_INPUT_DELIMITER:
+        {
+            if( ( isAscii( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
+                ( ucREQUEST_INPUT_DELIMITER_LO                     == 0x00 ) )
+            {
+                cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
+
+                ucREPLY_INPUT_DELIMITER_HI = ( uint8_t ) cAsciiInputDelimiter;
+                ucREPLY_INPUT_DELIMITER_LO = 0x00;
+            }
+            else
+            {
+                #if( configEXTENDED_EXCEPTION_CODES == 1 )
+                {
+                    xSetException( SLV_ILLEGAL_INPUT_DELIMITER );
+                }
+                #else
+                {
+                    xSetException( ILLEGAL_DATA_VALUE );
+                }
+                #endif
+
+                return;
+            }
+
+            break;
+        }
+#endif
+#if( configSFC04 == 1 )
+        case FORCE_LISTEN_ONLY_MODE:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                bListenOnlyMode = true;
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC10 == 1 )
+        case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                vClearDiagnosticCounters();
+                diagRegClear();
+
+                xReplyLength = xRequestLength;
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC11 == 1 )
+        case RETURN_BUS_MESSAGE_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usBusMessageCount );
+                ucREPLY_DATA_LO =  lowByte( usBusMessageCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC12 == 1 )
+        case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usBusCommunicationErrorCount );
+                ucREPLY_DATA_LO =  lowByte( usBusCommunicationErrorCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC13 == 1 )
+        case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usSlaveExceptionErrorCount );
+                ucREPLY_DATA_LO =  lowByte( usSlaveExceptionErrorCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC14 == 1 )
+        case RETURN_SLAVE_MESSAGE_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usSlaveMessageCount );
+                ucREPLY_DATA_LO =  lowByte( usSlaveMessageCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC15 == 1 )
+        case RETURN_SLAVE_NO_RESPONSE_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usSlaveNoResponseCount );
+                ucREPLY_DATA_LO =  lowByte( usSlaveNoResponseCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC16 == 1 )
+        case RETURN_SLAVE_NAK_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usSlaveNAKCount );
+                ucREPLY_DATA_LO =  lowByte( usSlaveNAKCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC17 == 1 )
+        case RETURN_SLAVE_BUSY_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usSlaveBusyCount );
+                ucREPLY_DATA_LO =  lowByte( usSlaveBusyCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC18 == 1 )
+        case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                ucREPLY_DATA_HI = highByte( usBusCharacterOverrunCount );
+                ucREPLY_DATA_LO =  lowByte( usBusCharacterOverrunCount );
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+#if( configSFC20 == 1 )
+        case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+        {
+            if( usREQUEST_DATA == 0x0000 )
+            {
+                usBusCharacterOverrunCount = 0;
+
+                /* INFO: The Modbus spec prescribes here to also clear an
+                error flag, but this flag is nowhere specified. */
+            }
+            else
+            {
+                xSetException( ILLEGAL_DATA_VALUE );
+            }
+
+            break;
+        }
+#endif
+        default:
+        {
+            #if( configEXTENDED_EXCEPTION_CODES == 1 )
+            {
+                xSetException( SLV_ILLEGAL_SUB_FUNCTION );
+            }
+            #else
+            {
+                xSetException( ILLEGAL_FUNCTION );
+            }
+            #endif
+
+            return;
+        }
+    }
+
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
+    {
+        if( xException == ILLEGAL_DATA_VALUE )
+        {
+            xSetException( SLV_ILLEGAL_DATA_VALUE );
+        }
+    }
+    #endif
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::vClearDiagnosticCounters( void )
+{
+    usBusMessageCount            = 0;
+    usBusCommunicationErrorCount = 0;
+    usSlaveExceptionErrorCount   = 0;
+    usSlaveMessageCount          = 0;
+    usSlaveNoResponseCount       = 0;
+    usSlaveNAKCount              = 0;
+    usSlaveBusyCount             = 0;
+    usBusCharacterOverrunCount   = 0;
+}
+/*-----------------------------------------------------------*/
+
+uint16_t SerialModbusSlave::diagRegGet( void )
+{
+    return usDiagnosticRegister;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusSlave::diagRegGet( size_t bit )
+{
+    if( bit <= 15 )
+    {
+        if( bitRead( usDiagnosticRegister, bit ) == 1 )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusSlave::diagRegSet( size_t bit )
+{
+    if( bit <= 15 )
+    {
+        bitSet( usDiagnosticRegister, bit );
+        return true;
+    }
+
+    return false;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusSlave::diagRegClear( size_t bit )
+{
+    if( bit <= 15 )
+    {
+        bitClear( usDiagnosticRegister, bit );
+        return true;
+    }
+
+    return false;
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::diagRegClear( void )
+{
+    usDiagnosticRegister = 0x0000;
+}
+/*-----------------------------------------------------------*/
+
+void SerialModbusSlave::vHandlerFC16( void )
+{
+    size_t xOffset = 0;
+
+    if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007B ) )
+    {
+        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
+
+        if( ( size_t ) usREQUEST_QUANTITY + xOffset <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+        {
+            if( ucREQUEST_BYTE_COUNT_2 == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
-                    pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
-                    pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
+                    pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
                 }
 
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
-                ucREPLY_BYTE_COUNT    = ( uint8_t ) usREQUEST_QUANTITY * 2;
+                ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
+                ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
+                ucREPLY_QUANTITY_HI   = ucREQUEST_QUANTITY_HI;
+                ucREPLY_QUANTITY_LO   = ucREQUEST_QUANTITY_LO;
 
-                xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
+                xReplyLength = 6;
 
                 if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
                 {
@@ -715,530 +1181,15 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 return;
             }
         }
-
-        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-        {
-            xSetException( SLV_ILLEGAL_QUANTITY );
-        }
-        #else
-        {
-            xSetException( ILLEGAL_DATA_VALUE );
-        }
-        #endif
     }
 
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC05 == 1 )
-
-    void SerialModbusSlave::vHandlerFC05( void )
+    #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
-        {
-            pxRegisterMap[ xRegisterMapIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
-
-            ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
-            ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
-            ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
-            ucREPLY_COIL_VALUE_HI = ucREQUEST_COIL_VALUE_HI;
-            ucREPLY_COIL_VALUE_LO = ucREQUEST_COIL_VALUE_LO;
-
-            xReplyLength = 6;
-
-            if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
-            {
-                (*pxRegisterMap[ xRegisterMapIndex ].action)();
-            }
-
-            return;
-        }
-
-        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-        {
-            xSetException( SLV_ILLEGAL_COIL_VALUE );
-        }
-        #else
-        {
-            xSetException( ILLEGAL_DATA_VALUE );
-        }
-        #endif
+        xSetException( SLV_ILLEGAL_QUANTITY );
     }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC06 == 1 )
-
-    void SerialModbusSlave::vHandlerFC06( void )
+    #else
     {
-        size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
-
-        pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
-
-        ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
-        ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
-        ucREPLY_ADDRESS_LO        = ucREQUEST_ADDRESS_LO;
-        ucREPLY_REGISTER_VALUE_HI = ucREQUEST_REGISTER_VALUE_HI;
-        ucREPLY_REGISTER_VALUE_LO = ucREQUEST_REGISTER_VALUE_LO;
-
-        xReplyLength = 6;
-
-        if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
-        {
-            (*pxRegisterMap[ xRegisterMapIndex ].action)();
-        }
+        xSetException( ILLEGAL_DATA_VALUE );
     }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    void SerialModbusSlave::vHandlerFC08( void )
-    {
-        /* Set the common reply data for all diagnostic sub functions. */
-        ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
-        ucREPLY_SUB_FUNCTION_CODE_HI = ucREQUEST_SUB_FUNCTION_CODE_HI;
-        ucREPLY_SUB_FUNCTION_CODE_LO = ucREQUEST_SUB_FUNCTION_CODE_LO;
-
-        /* Some of the diagnoostic sub functions just return the received
-        request data (which is in most cases 0x0000). So we apply this data
-        directly at the beginning of the handler and will change it only in the
-        specific cases - the same goes for the reply length. */
-        ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
-        ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
-        xReplyLength = 6;
-
-        switch( usREQUEST_SUB_FUNCTION_CODE )
-        {
-#if( configSFC00 == 1 )
-            case RETURN_QUERY_DATA:
-            {
-                xReplyLength = 4;
-
-                for( ; xReplyLength < xRequestLength - xChecksumLength; xReplyLength++ )
-                {
-                    pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
-                }
-
-                break;
-            }
-#endif
-#if( configSFC01 == 1 )
-            case RESTART_COMMUNICATIONS_OPTION:
-            {
-                if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == CLEAR_COM_EVENT_LOG ) )
-                {
-                    /* INFO: The Modbus spec prescribes here to also an specific
-                    error flag, but this flag is nowhere specified. */
-
-                    /* Reset the Only Listen Mode. */
-                    bListenOnlyMode = false;
-
-                    if( usREQUEST_DATA == CLEAR_COM_EVENT_LOG )
-                    {
-                        /* INFO: The Modbus spec prescribes here to clear the
-                        communication event log, which is not implemented. */
-                    }
-
-                    /* INFO: The Modbus spec prescribes here to perform a
-                    complete restart of the device, but we skip that. */
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC02 == 1 )
-            case RETURN_DIAGNOSTIC_REGISTER:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usDiagnosticRegister );
-                    ucREPLY_DATA_LO =  lowByte( usDiagnosticRegister );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC03 == 1 )
-            case CHANGE_ASCII_INPUT_DELIMITER:
-            {
-                if( ( isAscii( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
-                    ( ucREQUEST_INPUT_DELIMITER_LO                     == 0x00 ) )
-                {
-                    cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
-
-                    ucREPLY_INPUT_DELIMITER_HI = ( uint8_t ) cAsciiInputDelimiter;
-                    ucREPLY_INPUT_DELIMITER_LO = 0x00;
-                }
-                else
-                {
-                    #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                    {
-                        xSetException( SLV_ILLEGAL_INPUT_DELIMITER );
-                    }
-                    #else
-                    {
-                        xSetException( ILLEGAL_DATA_VALUE );
-                    }
-                    #endif
-
-                    return;
-                }
-
-                break;
-            }
-#endif
-#if( configSFC04 == 1 )
-            case FORCE_LISTEN_ONLY_MODE:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    bListenOnlyMode = true;
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC10 == 1 )
-            case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    vClearDiagnosticCounters();
-                    diagRegClear();
-
-                    xReplyLength = xRequestLength;
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC11 == 1 )
-            case RETURN_BUS_MESSAGE_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usBusMessageCount );
-                    ucREPLY_DATA_LO =  lowByte( usBusMessageCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC12 == 1 )
-            case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usBusCommunicationErrorCount );
-                    ucREPLY_DATA_LO =  lowByte( usBusCommunicationErrorCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC13 == 1 )
-            case RETURN_BUS_EXCEPTION_ERROR_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usSlaveExceptionErrorCount );
-                    ucREPLY_DATA_LO =  lowByte( usSlaveExceptionErrorCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC14 == 1 )
-            case RETURN_SLAVE_MESSAGE_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usSlaveMessageCount );
-                    ucREPLY_DATA_LO =  lowByte( usSlaveMessageCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC15 == 1 )
-            case RETURN_SLAVE_NO_RESPONSE_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usSlaveNoResponseCount );
-                    ucREPLY_DATA_LO =  lowByte( usSlaveNoResponseCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC16 == 1 )
-            case RETURN_SLAVE_NAK_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usSlaveNAKCount );
-                    ucREPLY_DATA_LO =  lowByte( usSlaveNAKCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC17 == 1 )
-            case RETURN_SLAVE_BUSY_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usSlaveBusyCount );
-                    ucREPLY_DATA_LO =  lowByte( usSlaveBusyCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC18 == 1 )
-            case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    ucREPLY_DATA_HI = highByte( usBusCharacterOverrunCount );
-                    ucREPLY_DATA_LO =  lowByte( usBusCharacterOverrunCount );
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-#if( configSFC20 == 1 )
-            case CLEAR_OVERRUN_COUNTER_AND_FLAG:
-            {
-                if( usREQUEST_DATA == 0x0000 )
-                {
-                    usBusCharacterOverrunCount = 0;
-
-                    /* INFO: The Modbus spec prescribes here to also clear an
-                    error flag, but this flag is nowhere specified. */
-                }
-                else
-                {
-                    xSetException( ILLEGAL_DATA_VALUE );
-                }
-
-                break;
-            }
-#endif
-            default:
-            {
-                #if( configEXTENDED_EXCEPTION_CODES == 1 )
-                {
-                    xSetException( SLV_ILLEGAL_SUB_FUNCTION );
-                }
-                #else
-                {
-                    xSetException( ILLEGAL_FUNCTION );
-                }
-                #endif
-
-                return;
-            }
-        }
-
-        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-        {
-            if( xException == ILLEGAL_DATA_VALUE )
-            {
-                xSetException( SLV_ILLEGAL_DATA_VALUE );
-            }
-        }
-        #endif
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    void SerialModbusSlave::vClearDiagnosticCounters( void )
-    {
-        usBusMessageCount            = 0;
-        usBusCommunicationErrorCount = 0;
-        usSlaveExceptionErrorCount   = 0;
-        usSlaveMessageCount          = 0;
-        usSlaveNoResponseCount       = 0;
-        usSlaveNAKCount              = 0;
-        usSlaveBusyCount             = 0;
-        usBusCharacterOverrunCount   = 0;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    uint16_t SerialModbusSlave::diagRegGet( void )
-    {
-        return usDiagnosticRegister;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    bool SerialModbusSlave::diagRegGet( size_t bit )
-    {
-        if( bit <= 15 )
-        {
-            if( bitRead( usDiagnosticRegister, bit ) == 1 )
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    bool SerialModbusSlave::diagRegSet( size_t bit )
-    {
-        if( bit <= 15 )
-        {
-            bitSet( usDiagnosticRegister, bit );
-            return true;
-        }
-
-        return false;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    bool SerialModbusSlave::diagRegClear( size_t bit )
-    {
-        if( bit <= 15 )
-        {
-            bitClear( usDiagnosticRegister, bit );
-            return true;
-        }
-
-        return false;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC08 == 1 )
-
-    void SerialModbusSlave::diagRegClear( void )
-    {
-        usDiagnosticRegister = 0x0000;
-    }
-
-#endif
-/*-----------------------------------------------------------*/
-
-#if( configFC16 == 1 )
-
-    void SerialModbusSlave::vHandlerFC16( void )
-    {
-        size_t xOffset = 0;
-
-        if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007B ) )
-        {
-            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
-
-            if( ( size_t ) usREQUEST_QUANTITY + xOffset <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
-            {
-                if( ucREQUEST_BYTE_COUNT_2 == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
-                {
-                    for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
-                    {
-                        pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
-                    }
-
-                    ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
-                    ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
-                    ucREPLY_ADDRESS_LO    = ucREQUEST_ADDRESS_LO;
-                    ucREPLY_QUANTITY_HI   = ucREQUEST_QUANTITY_HI;
-                    ucREPLY_QUANTITY_LO   = ucREQUEST_QUANTITY_LO;
-
-                    xReplyLength = 6;
-
-                    if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
-                    {
-                        (*pxRegisterMap[ xRegisterMapIndex ].action)();
-                    }
-
-                    return;
-                }
-            }
-        }
-
-        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-        {
-            xSetException( SLV_ILLEGAL_QUANTITY );
-        }
-        #else
-        {
-            xSetException( ILLEGAL_DATA_VALUE );
-        }
-        #endif
-    }
-
-#endif
+    #endif
+}

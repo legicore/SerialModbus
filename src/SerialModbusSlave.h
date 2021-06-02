@@ -90,13 +90,11 @@ public:
 #endif
     MBStatus_t processModbus( void );
     void setRegisterMap( const MBRegister_t * registerMap );
-#if( configFC08 == 1 )
     uint16_t diagRegGet( void );
     bool diagRegGet( size_t bit );
     bool diagRegSet( size_t bit );
     bool diagRegClear( size_t bit );
     void diagRegClear( void );
-#endif
 
 private:
 
@@ -106,19 +104,10 @@ private:
     const MBRegister_t * pxRegisterMap;
     size_t xRegisterMapIndex;
     MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
-#if( configFC03 == 1 || configFC04 == 1 )
     void vHandlerFC03_04( void );
-#endif
-#if( configFC05 == 1 )
     void vHandlerFC05( void );
-#endif
-#if( configFC06 == 1 )
     void vHandlerFC06( void );
-#endif
-#if( configFC16 == 1 )
     void vHandlerFC16( void );
-#endif
-#if( configFC08 == 1 )
     void vHandlerFC08( void );
     void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
@@ -130,7 +119,6 @@ private:
     uint16_t usSlaveBusyCount;
     uint16_t usBusCharacterOverrunCount;
     uint16_t usDiagnosticRegister;
-#endif
     bool bListenOnlyMode;
 #if( configSLAVE_MULTI_ID == 1 )
     uint8_t ucIdMap[ configMAX_ID_COUNT ];
@@ -143,14 +131,46 @@ private:
 
 #if( configFC08 == 1 )
     #define vIncCPT( counter ) if( counter < 0xFFFF ) counter++
+#if( configSFC11 == 1 )
     #define vIncCPT1()  vIncCPT( usBusMessageCount )
+#else
+    #define vIncCPT1()
+#endif
+#if( configSFC12 == 1 )
     #define vIncCPT2()  vIncCPT( usBusCommunicationErrorCount )
+#else
+    #define vIncCPT2()
+#endif
+#if( configSFC13 == 1 )
     #define vIncCPT3()  vIncCPT( usSlaveExceptionErrorCount )
+#else
+    #define vIncCPT3()
+#endif
+#if( configSFC14 == 1 )
     #define vIncCPT4()  vIncCPT( usSlaveMessageCount )
+#else
+    #define vIncCPT4()
+#endif
+#if( configSFC15 == 1 )
     #define vIncCPT5()  vIncCPT( usSlaveNoResponseCount )
+#else
+    #define vIncCPT5()
+#endif
+#if( configSFC16 == 1 )
     #define vIncCPT6()  vIncCPT( usSlaveNAKCount )
+#else
+    #define vIncCPT6()
+#endif
+#if( configSFC17 == 1 )
     #define vIncCPT7()  vIncCPT( usSlaveBusyCount )
+#else
+    #define vIncCPT7()
+#endif
+#if( configSFC18 == 1 )
     #define vIncCPT8()  vIncCPT( usBusCharacterOverrunCount )
+#else
+    #define vIncCPT8()
+#endif
 #else
     #define vIncCPT1()
     #define vIncCPT2()
