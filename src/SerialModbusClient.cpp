@@ -116,10 +116,10 @@ MBStatus_t SerialModbusClient::xProcessRequestMap( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::setRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
 {
-    static uint16_t usObject = 0x0000;
-    static MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
+    uint16_t usObject = 0x0000;
+    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
 
     xRequest.id = id;
     xRequest.functionCode = functionCode;
@@ -142,25 +142,25 @@ int16_t SerialModbusClient::setRequest( uint8_t id, uint8_t functionCode, uint16
 
 int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
-    return setRequest( id, READ_HOLDING_REGISTERS, address, 0 );
+    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0 );
 }
 /*-----------------------------------------------------------*/
 
 int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
-    return setRequest( id, READ_INPUT_REGISTERS, address, 0 );
+    return sendRequest( id, READ_INPUT_REGISTERS, address, 0 );
 }
 /*-----------------------------------------------------------*/
 
 int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
 {
-    return setRequest( id, WRITE_SINGLE_COIL, address, value );
+    return sendRequest( id, WRITE_SINGLE_COIL, address, value );
 }
 /*-----------------------------------------------------------*/
 
 int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
 {
-    return setRequest( id, WRITE_SINGLE_REGISTER, address, value );
+    return sendRequest( id, WRITE_SINGLE_REGISTER, address, value );
 }
 /*-----------------------------------------------------------*/
 
