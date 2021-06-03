@@ -42,9 +42,9 @@ static const MBExceptionString_t pxExceptionStrings[] = {
     { ILLEGAL_FUNCTION,                        "ILLEGAL_FUNCTION" },
     { ILLEGAL_DATA_ADDRESS,                    "ILLEGAL_DATA_ADDRESS" },
     { ILLEGAL_DATA_VALUE,                      "ILLEGAL_DATA_VALUE" },
-    { SLAVE_DEVICE_FAILURE,                    "SLAVE_DEVICE_FAILURE" },
+    { SERVER_DEVICE_FAILURE,                   "SERVER_DEVICE_FAILURE" },
     { ACKNOWLEDGE,                             "ACKNOWLEDGE" },
-    { SLAVE_DEVICE_BUSY,                       "SLAVE_DEVICE_BUSY" },
+    { SERVER_DEVICE_BUSY,                      "SERVER_DEVICE_BUSY" },
     { MEMORY_PARITY_ERROR,                     "MEMORY_PARITY_ERROR" },
     { GATEWAY_PATH_UNAVAILABLE,                "GATEWAY_PATH_UNAVAILABLE" },
     { GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND, "GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND" },
@@ -66,16 +66,16 @@ static const MBExceptionString_t pxExceptionStrings[] = {
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 
-    /* Extended exception codes for slave replies. */
-    { SLV_ILLEGAL_FUNCTION,                    "SLV_ILLEGAL_FUNCTION" },
-    { SLV_ILLEGAL_STATE,                       "SLV_ILLEGAL_STATE" },
-    { SLV_ILLEGAL_DATA_ADDRESS,                "SLV_ILLEGAL_DATA_ADDRESS" },
-    { SLV_ILLEGAL_ACCESS,                      "SLV_ILLEGAL_ACCESS" },
-    { SLV_ILLEGAL_QUANTITY,                    "SLV_ILLEGAL_QUANTITY" },
-    { SLV_ILLEGAL_COIL_VALUE,                  "SLV_ILLEGAL_COIL_VALUE" },
-    { SLV_ILLEGAL_INPUT_DELIMITER,             "SLV_ILLEGAL_INPUT_DELIMITER" },
-    { SLV_ILLEGAL_SUB_FUNCTION,                "SLV_ILLEGAL_SUB_FUNCTION" },
-    { SLV_ILLEGAL_DATA_VALUE,                  "SLV_ILLEGAL_DATA_VALUE" },
+    /* Extended exception codes for server replies. */
+    { SERVER_ILLEGAL_FUNCTION,                 "SERVER_ILLEGAL_FUNCTION" },
+    { SERVER_ILLEGAL_STATE,                    "SERVER_ILLEGAL_STATE" },
+    { SERVER_ILLEGAL_DATA_ADDRESS,             "SERVER_ILLEGAL_DATA_ADDRESS" },
+    { SERVER_ILLEGAL_ACCESS,                   "SERVER_ILLEGAL_ACCESS" },
+    { SERVER_ILLEGAL_QUANTITY,                 "SERVER_ILLEGAL_QUANTITY" },
+    { SERVER_ILLEGAL_COIL_VALUE,               "SERVER_ILLEGAL_COIL_VALUE" },
+    { SERVER_ILLEGAL_INPUT_DELIMITER,          "SERVER_ILLEGAL_INPUT_DELIMITER" },
+    { SERVER_ILLEGAL_SUB_FUNCTION,             "SERVER_ILLEGAL_SUB_FUNCTION" },
+    { SERVER_ILLEGAL_DATA_VALUE,               "SERVER_ILLEGAL_DATA_VALUE" },
 
 #endif
 

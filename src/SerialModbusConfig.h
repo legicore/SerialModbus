@@ -35,7 +35,7 @@
 /*-----------------------------------------------------------*/
 
 #define configID_BROADCAST              ( ( uint8_t ) 0 )
-#define configID_SLAVE_MAX              ( ( uint8_t ) 247 )
+#define configID_SERVER_MAX             ( ( uint8_t ) 247 )
 
 #define configASCII_INPUT_DELIMITER     ( ( char ) '\n' )
 
@@ -48,7 +48,7 @@
 
 #define configEXTENDED_EXCEPTION_CODES  0
 
-#define configSLAVE_MULTI_ID            0
+#define configSERVER_MULTI_ID           0
 #define configMAX_ID_COUNT              8
 
 /*-----------------------------------------------------------*/
@@ -79,7 +79,7 @@
 #define configFC08      1   /* DIAGNOSTIC */
 #define configFC11      N   /* GET_COM_EVENT_COUNTER */
 #define configFC12      N   /* GET_COM_EVENT_LOG */
-#define configFC17      N   /* REPORT_SLAVE_ID */
+#define configFC17      N   /* REPORT_SERVER_ID */
 
 /* Diagnostic Sub-Function Codes */
 #define configSFC00     1   /* RETURN_QUERY_DATA */
@@ -91,10 +91,10 @@
 #define configSFC11     1   /* RETURN_BUS_MESSAGE_COUNT */
 #define configSFC12     1   /* RETURN_BUS_COMMUNICATION_ERROR_COUNT */
 #define configSFC13     1   /* RETURN_BUS_EXCEPTION_ERROR_COUNT */
-#define configSFC14     1   /* RETURN_SLAVE_MESSAGE_COUNT */
-#define configSFC15     1   /* RETURN_SLAVE_NO_RESPONSE_COUNT */
-#define configSFC16     1   /* RETURN_SLAVE_NAK_COUNT */
-#define configSFC17     1   /* RETURN_SLAVE_BUSY_COUNT */
+#define configSFC14     1   /* RETURN_SERVER_MESSAGE_COUNT */
+#define configSFC15     1   /* RETURN_SERVER_NO_RESPONSE_COUNT */
+#define configSFC16     1   /* RETURN_SERVER_NAK_COUNT */
+#define configSFC17     1   /* RETURN_SERVER_BUSY_COUNT */
 #define configSFC18     1   /* RETURN_BUS_CHARACTER_OVERRUN_COUNT */
 #define configSFC20     1   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
 
@@ -102,7 +102,7 @@
 
 /*-----------------------------------------------------------*/
 
-#if( ( configSLAVE_MULTI_ID == 1 ) && ( configFC08 == 1 ) )
+#if( ( configSERVER_MULTI_ID == 1 ) && ( configFC08 == 1 ) )
     #warning Diagnostics (function code 8) does not work correctly when multi ID support is used!
 #endif
 

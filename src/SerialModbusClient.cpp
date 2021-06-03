@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * @file        SerialModbusMaster.cpp
+ * @file        SerialModbusClient.cpp
  * 
  * @author      Martin Legleiter
  * 
@@ -22,15 +22,15 @@
 #include "SerialModbusConfig.h"
 #include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
-#include "SerialModbusMaster.h"
+#include "SerialModbusClient.h"
 
 #include <Arduino.h>
 
 /*-----------------------------------------------------------*/
 
-SerialModbusMaster::SerialModbusMaster()
+SerialModbusClient::SerialModbusClient()
 {
-    xState = MASTER_IDLE;
+    xState = CLIENT_IDLE;
 
     pxRequestMap = NULL;
     xRequestMapIndex = 0;
@@ -47,56 +47,56 @@ SerialModbusMaster::SerialModbusMaster()
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vSetState( MBMasterState_t xStatePar )
+void SerialModbusClient::vSetState( MBClientState_t xStatePar )
 {
     xState = xStatePar;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vStartTurnaroundDelay( void )
+void SerialModbusClient::vStartTurnaroundDelay( void )
 {
     ulTimerTurnaroundDelayUs = micros();
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vStartResponseTimeout( void )
+void SerialModbusClient::vStartResponseTimeout( void )
 {
     ulTimerResponseTimeoutUs = micros();
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusMaster::bTimeoutTurnaroundDelay( void ) const
+bool SerialModbusClient::bTimeoutTurnaroundDelay( void ) const
 {
     return ( micros() - ulTimerTurnaroundDelayUs ) >= ulTurnaroundDelayUs;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusMaster::bTimeoutResponseTimeout( void ) const
+bool SerialModbusClient::bTimeoutResponseTimeout( void ) const
 {
     return ( micros() - ulTimerResponseTimeoutUs ) >= ulResponseTimeoutUs;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::setResponseTimeout( uint32_t timeMs )
+void SerialModbusClient::setResponseTimeout( uint32_t timeMs )
 {
     ulResponseTimeoutUs = timeMs * 1000;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::setTurnaroundDelay( uint32_t timeMs )
+void SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
 {
     ulTurnaroundDelayUs = timeMs * 1000;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::setRequestMap( const MBRequest_t * requestMap )
+void SerialModbusClient::setRequestMap( const MBRequest_t * requestMap )
 {
     pxRequestMap = requestMap;
     xRequestMapIndex = 0;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
+MBStatus_t SerialModbusClient::xProcessRequestMap( void )
 {
     if( pxRequestMap != NULL )
     {
@@ -116,7 +116,7 @@ MBStatus_t SerialModbusMaster::xProcessRequestMap( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusMaster::setRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::setRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
 {
     static uint16_t usObject = 0x0000;
     static MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
@@ -140,43 +140,43 @@ int16_t SerialModbusMaster::setRequest( uint8_t id, uint8_t functionCode, uint16
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusMaster::readHoldingRegister( uint8_t id, uint16_t address )
+int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
     return setRequest( id, READ_HOLDING_REGISTERS, address, 0 );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusMaster::readInputRegister( uint8_t id, uint16_t address )
+int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
     return setRequest( id, READ_INPUT_REGISTERS, address, 0 );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusMaster::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
 {
     return setRequest( id, WRITE_SINGLE_COIL, address, value );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusMaster::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
 {
     return setRequest( id, WRITE_SINGLE_REGISTER, address, value );
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::getLastException( void )
+MBStatus_t SerialModbusClient::getLastException( void )
 {
     return xStatusSimpleAPI;
 }
 /*-----------------------------------------------------------*/
 
-const char * SerialModbusMaster::getLastExceptionString( void )
+const char * SerialModbusClient::getLastExceptionString( void )
 {
     return getExceptionString( xStatusSimpleAPI );
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool requestMap )
+MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool requestMap )
 {
     if( request == NULL )
     {
@@ -190,7 +190,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
 
     xSetException( OK );
 
-    if( ( request->id           >  configID_SLAVE_MAX ) ||
+    if( ( request->id           >  configID_SERVER_MAX ) ||
         ( request->functionCode == 0x00               ) ||
         ( request->objectSize   == 0                  ) )
     {
@@ -314,16 +314,16 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
                 case RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
 #if( configSFC14 == 1 )
-                case RETURN_SLAVE_MESSAGE_COUNT:
+                case RETURN_SERVER_MESSAGE_COUNT:
 #endif
 #if( configSFC15 == 1 )
-                case RETURN_SLAVE_NO_RESPONSE_COUNT:
+                case RETURN_SERVER_NO_RESPONSE_COUNT:
 #endif
 #if( configSFC16 == 1 )
-                case RETURN_SLAVE_NAK_COUNT:
+                case RETURN_SERVER_NAK_COUNT:
 #endif
 #if( configSFC17 == 1 )
-                case RETURN_SLAVE_BUSY_COUNT:
+                case RETURN_SERVER_BUSY_COUNT:
 #endif
 #if( configSFC18 == 1 )
                 case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
@@ -391,7 +391,7 @@ MBStatus_t SerialModbusMaster::setRequest( const MBRequest_t * request, bool req
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusMaster::processModbus( void )
+MBStatus_t SerialModbusClient::processModbus( void )
 {
     if( bSkipRequestMap == false )
     {
@@ -411,7 +411,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
         /* Get the current state and select the associated action. */
         switch( xState )
         {
-            case MASTER_IDLE :
+            case CLIENT_IDLE :
             {
                 vClearReplyFrame();
 
@@ -456,7 +456,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 {
                     /* Nothing ... clear buffer and go on */
                     vClearRequestFrame();
-                    vSetState( MASTER_IDLE );
+                    vSetState( CLIENT_IDLE );
                 }
 
                 break;
@@ -616,7 +616,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
 
                 if( xState != PROCESSING_ERROR )
                 {
-                    vSetState( MASTER_IDLE );
+                    vSetState( CLIENT_IDLE );
                 }
 
                 break;
@@ -627,7 +627,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
                 vClearRequestFrame();
                 vClearReplyFrame();
 
-                vSetState( MASTER_IDLE );
+                vSetState( CLIENT_IDLE );
 
                 break;
             }
@@ -635,7 +635,7 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             default :
             {
                 xSetException( ILLEGAL_STATE );
-                vSetState( MASTER_IDLE );
+                vSetState( CLIENT_IDLE );
             }
         }
 
@@ -644,20 +644,20 @@ MBStatus_t SerialModbusMaster::processModbus( void )
             /* The process loop hook will only be executed when the state
             mashine is not in the idle state. Otherwise the loop hook would be
             execetued with every run through processModbus(). */
-            if( ( vProcessLoopHook != NULL ) && ( xState != MASTER_IDLE ) )
+            if( ( vProcessLoopHook != NULL ) && ( xState != CLIENT_IDLE ) )
             {
                 (*vProcessLoopHook)();
             }
         }
         #endif
     }
-    while( xState != MASTER_IDLE );
+    while( xState != CLIENT_IDLE );
 
     return xException;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vHandlerFC03_04( void )
+void SerialModbusClient::vHandlerFC03_04( void )
 {
     size_t xOffset = 0;
 
@@ -687,7 +687,7 @@ void SerialModbusMaster::vHandlerFC03_04( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vHandlerFC05( void )
+void SerialModbusClient::vHandlerFC05( void )
 {
     /* Check the response output address */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
@@ -714,7 +714,7 @@ void SerialModbusMaster::vHandlerFC05( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vHandlerFC06( void )
+void SerialModbusClient::vHandlerFC06( void )
 {
     /* Check the response output address */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
@@ -741,7 +741,7 @@ void SerialModbusMaster::vHandlerFC06( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vHandlerFC08( void )
+void SerialModbusClient::vHandlerFC08( void )
 {
     if( usREPLY_SUB_FUNCTION_CODE == usREQUEST_SUB_FUNCTION_CODE )
     {
@@ -827,16 +827,16 @@ void SerialModbusMaster::vHandlerFC08( void )
             case RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
 #if( configSFC14 == 1 )
-            case RETURN_SLAVE_MESSAGE_COUNT:
+            case RETURN_SERVER_MESSAGE_COUNT:
 #endif
 #if( configSFC15 == 1 )
-            case RETURN_SLAVE_NO_RESPONSE_COUNT:
+            case RETURN_SERVER_NO_RESPONSE_COUNT:
 #endif
 #if( configSFC16 == 1 )
-            case RETURN_SLAVE_NAK_COUNT:
+            case RETURN_SERVER_NAK_COUNT:
 #endif
 #if( configSFC17 == 1 )
-            case RETURN_SLAVE_BUSY_COUNT:
+            case RETURN_SERVER_BUSY_COUNT:
 #endif
 #if( configSFC18 == 1 )
             case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
@@ -874,7 +874,7 @@ void SerialModbusMaster::vHandlerFC08( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusMaster::vHandlerFC16( void )
+void SerialModbusClient::vHandlerFC16( void )
 {
     /* Check the response output address */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )

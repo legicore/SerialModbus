@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * @file        SerialModbusMaster.h
+ * @file        SerialModbusClient.h
  * 
  * @author      Martin Legleiter
  * 
@@ -14,8 +14,8 @@
  */
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SERIAL_MODBUS_MASTER_H__
-#define __SERIAL_MODBUS_MASTER_H__
+#ifndef __SERIAL_MODBUS_CLIENT_H__
+#define __SERIAL_MODBUS_CLIENT_H__
 
 /*-----------------------------------------------------------*/
 
@@ -32,15 +32,15 @@
 /*-----------------------------------------------------------*/
 
 /** TODO */
-typedef enum MBMasterState_e
+typedef enum MBClientState_e
 {
-    MASTER_IDLE,
+    CLIENT_IDLE,
     WAITING_TURNAROUND_DELAY,
     WAITING_FOR_REPLY,
     PROCESSING_REPLY,
     PROCESSING_ERROR
 }
-MBMasterState_t;
+MBClientState_t;
 
 /** TODO */
 typedef struct MBRequest_s
@@ -55,16 +55,16 @@ typedef struct MBRequest_s
 MBRequest_t;
 
 /** TODO */
-#define REQUEST_MAP_END { configID_SLAVE_MAX, 0x00, 0x0000, NULL, 0, NULL }
+#define REQUEST_MAP_END { configID_SERVER_MAX, 0x00, 0x0000, NULL, 0, NULL }
 
 /*-----------------------------------------------------------*/
 
 /** TODO */
-class SerialModbusMaster : public SerialModbusBase
+class SerialModbusClient : public SerialModbusBase
 {
 public:
 
-    SerialModbusMaster();
+    SerialModbusClient();
     void setRequestMap( const MBRequest_t * requestMap );
     MBStatus_t setRequest( const MBRequest_t * request, bool requestMap = false );
     MBStatus_t processModbus( void );
@@ -83,8 +83,8 @@ public:
 
 private:
 
-    MBMasterState_t xState;
-    void vSetState( MBMasterState_t xStatePar );
+    MBClientState_t xState;
+    void vSetState( MBClientState_t xStatePar );
     MBStatus_t xProcessRequestMap( void );
     const MBRequest_t * pxRequest;
     const MBRequest_t * pxRequestMap;
@@ -107,4 +107,4 @@ private:
 };
 /*-----------------------------------------------------------*/
 
-#endif /* __SERIAL_MODBUS_MASTER_H__ */
+#endif /* __SERIAL_MODBUS_CLIENT_H__ */

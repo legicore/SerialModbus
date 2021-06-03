@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * @file        BasicRS485Slave.ino
+ * @file        BasicRS485Client.ino
  * 
  * @author      Martin Legleiter
  * 
@@ -14,22 +14,22 @@
  */
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <SerialModbusSlave.h>
+#include <SerialModbusClient.h>
 
 /*-----------------------------------------------------------*/
 
-SerialModbusSlave Slave;
-
+SerialModbusClient ModbusClient;
+    
 uint16_t object1[ 1 ] = { 0 };
 uint16_t object2[ 1 ] = { 0 };
 
 void action1( void );
 void action2( void );
 
-const MBRegister_t registerMap[] = {
-    { WR, 0x1000, object1, 1, action1 },
-    { RD, 0x2000, object2, 1, action2 },
-    REGISTER_MAP_END
+const MBRequest_t requestMap[] = {
+    { 1, WRITE_SINGLE_REGISTER, 0x1000, object1, 1, action1 },
+    { 1, READ_INPUT_REGISTERS,  0x2000, object2, 1, action2 },
+    REQUEST_MAP_END
 };
 /*-----------------------------------------------------------*/
 
@@ -47,28 +47,32 @@ void setup( void )
 
     pinMode( MAX485_CTRL_PIN, OUTPUT );
 
-    Slave.setSerialCtrl( max485Tx, max485Rx );
-    Slave.setRegisterMap( registerMap );
-    Slave.begin( 1, 9600 );
+    ModbusClient.setSerialCtrl( max485Tx, max485Rx );
+    ModbusClient.setRequestMap( requestMap );
+    ModbusClient.begin( 9600 );
 }
 /*-----------------------------------------------------------*/
 
 void loop( void )
 {
-    Slave.processModbus();
+    ModbusClient.processModbus();
+    delay( 100 );
 }
 /*-----------------------------------------------------------*/
 
 void action1( void )
 {
     digitalWrite( LED_BUILTIN, HIGH );
-    object2[ 0 ] = object1[ 0 ] + 1;
 }
 /*-----------------------------------------------------------*/
 
 void action2( void )
 {
-    digitalWrite( LED_BUILTIN, LOW );
+    if( object2[ 0 ] == object1[ 0 ] + 1 )
+    {
+        digitalWrite( LED_BUILTIN, LOW );
+        object1[ 0 ] = object2[ 0 ];
+    }
 }
 /*-----------------------------------------------------------*/
 

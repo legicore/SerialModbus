@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * @file        SerialModbusSlave.cpp
+ * @file        SerialModbusServer.cpp
  * 
  * @author      Martin Legleiter
  * 
@@ -22,7 +22,7 @@
 #include "SerialModbusConfig.h"
 #include "SerialModbusCompat.h"
 #include "SerialModbusBase.h"
-#include "SerialModbusSlave.h"
+#include "SerialModbusServer.h"
 
 #include <Arduino.h>
 #if defined( COMPAT_SOFTWARE_SERIAL )
@@ -99,7 +99,7 @@ static const MBAccessRights_t pxAccessRights[] = {
     { RD, GET_COM_EVENT_LOG },
 #endif
 #if( configFC17 == 1 )
-    { RD, REPORT_SLAVE_ID },
+    { RD, REPORT_SERVER_ID },
 #endif
 
     /* Marks the end of the list. */
@@ -107,9 +107,9 @@ static const MBAccessRights_t pxAccessRights[] = {
 };
 /*-----------------------------------------------------------*/
 
-SerialModbusSlave::SerialModbusSlave()
+SerialModbusServer::SerialModbusServer()
 {
-    xState = SLAVE_IDLE;
+    xState = SERVER_IDLE;
 
     #if( configFC08 == 1 )
     {
@@ -123,9 +123,9 @@ SerialModbusSlave::SerialModbusSlave()
     pxRegisterMap = NULL;
     xRegisterMapIndex = 0;
 
-    ucSlaveId = 0xFF;
+    ucServerId = 0xFF;
 
-    #if( configSLAVE_MULTI_ID == 1 )
+    #if( configSERVER_MULTI_ID == 1 )
     {
         xIdCount = 0;
     }
@@ -133,14 +133,14 @@ SerialModbusSlave::SerialModbusSlave()
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, Serial_t * serial, uint32_t config )
+bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, Serial_t * serial, uint32_t config )
 {
-    if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+    if( serverId == 0 || serverId > configID_SERVER_MAX )
     {
         return false;
     }
 
-    ucSlaveId = slaveId;
+    ucServerId = serverId;
 
     return SerialModbusBase::begin( baud, serial, config );
 }
@@ -148,14 +148,14 @@ bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, Serial_t * serial
 
 #if defined( COMPAT_SOFTWARE_SERIAL )
 
-    bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial )
+    bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial )
     {
-        if( slaveId == 0 || slaveId > configID_SLAVE_MAX )
+        if( serverId == 0 || serverId > configID_SERVER_MAX )
         {
             return false;
         }
 
-        ucSlaveId = slaveId;
+        ucServerId = serverId;
 
         return SerialModbusBase::begin( baud, serial );
     }
@@ -163,17 +163,17 @@ bool SerialModbusSlave::begin( uint8_t slaveId, uint32_t baud, Serial_t * serial
 #endif
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vSetState( MBSlaveState_t xStatePar )
+void SerialModbusServer::vSetState( MBServerState_t xStatePar )
 {
     xState = xStatePar;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
+void SerialModbusServer::setRegisterMap( const MBRegister_t * registerMap )
 {
     pxRegisterMap = registerMap;
 
-    #if( configSLAVE_MULTI_ID == 1 )
+    #if( configSERVER_MULTI_ID == 1 )
     {
         vSetIdMap();
     }
@@ -181,9 +181,9 @@ void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 }
 /*-----------------------------------------------------------*/
 
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
     
-    void SerialModbusSlave::vSetIdMap( void )
+    void SerialModbusServer::vSetIdMap( void )
     {
         bool bIdFound = false;
 
@@ -209,9 +209,9 @@ void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 #endif
 /*-----------------------------------------------------------*/
 
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
     
-    bool SerialModbusSlave::bCheckId( uint8_t ucId )
+    bool SerialModbusServer::bCheckId( uint8_t ucId )
     {
         for( size_t i = 0; i < xIdCount; i++ )
         {
@@ -227,7 +227,7 @@ void SerialModbusSlave::setRegisterMap( const MBRegister_t * registerMap )
 #endif
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusSlave::processModbus( void )
+MBStatus_t SerialModbusServer::processModbus( void )
 {
     xSetException( OK );
 
@@ -236,7 +236,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
         /* Get the current state and select the associated action */
         switch( xState )
         {
-            case SLAVE_IDLE :
+            case SERVER_IDLE :
             {
                 if( xReplyLength > 0 )
                 {
@@ -258,10 +258,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             #if( configMODE == configMODE_RTU )
                             {
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
                                 if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
 #else
-                                if( ( ucREQUEST_ID == ucSlaveId          ) ||
+                                if( ( ucREQUEST_ID == ucServerId         ) ||
 #endif
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
@@ -293,10 +293,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                         /* We go directly back to the idle state and don't send
                         any reply because it would cause bus collisions if every
-                        slave sends an error reply. */
+                        server sends an error reply. */
                         vClearRequestFrame();
 
-                        vSetState( SLAVE_IDLE );
+                        vSetState( SERVER_IDLE );
                         break;
                     }
                 }
@@ -318,9 +318,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                     while( bTimeoutInterFrameDelay() != true );
 
-                                    #if( configSLAVE_MULTI_ID == 1 )
+                                    #if( configSERVER_MULTI_ID == 1 )
                                     {
-                                        ucSlaveId = ucREQUEST_ID;
+                                        ucServerId = ucREQUEST_ID;
                                     }
                                     #endif
 
@@ -336,9 +336,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                             /* We go directly back to the idle state and don't
                             send any reply because it would cause bus collisions
-                            if every slave sends an error reply. */
+                            if every server sends an error reply. */
                             vClearRequestFrame();
-                            vSetState( SLAVE_IDLE );
+                            vSetState( SERVER_IDLE );
                         }
                     }
                     #endif
@@ -358,10 +358,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                 /* Check if the received request is dedicated to
                                 us or if it is a broadcast. */
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
                                 if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
 #else
-                                if( ( ucREQUEST_ID == ucSlaveId          ) ||
+                                if( ( ucREQUEST_ID == ucServerId         ) ||
 #endif
                                     ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
@@ -371,9 +371,9 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                                         Increment the bus message counter. */
                                         vIncCPT1();
 
-                                        #if( configSLAVE_MULTI_ID == 1 )
+                                        #if( configSERVER_MULTI_ID == 1 )
                                         {
-                                            ucSlaveId = ucREQUEST_ID;
+                                            ucServerId = ucREQUEST_ID;
                                         }
                                         #endif
 
@@ -388,10 +388,10 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 
                                 /* We go directly back to the idle state because
                                 we don't want to send any kind of reply. It
-                                would cause bus collisions if every slave
+                                would cause bus collisions if every server
                                 sends an error reply. */
                                 vClearRequestFrame();
-                                vSetState( SLAVE_IDLE );
+                                vSetState( SERVER_IDLE );
                             }
                         }
                     }
@@ -404,7 +404,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             case CHECKING_REQUEST :
             {
                 /* We received a valid request that is a broadcast or is
-                addressed to the Id of this deveice -> Increment the slave
+                addressed to the Id of this deveice -> Increment the server
                 message counter. */
                 vIncCPT4();
 
@@ -475,7 +475,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                         {
                             #if( configEXTENDED_EXCEPTION_CODES == 1 )
                             {
-                                xSetException( SLV_ILLEGAL_FUNCTION );
+                                xSetException( SERVER_ILLEGAL_FUNCTION );
                             }
                             #else
                             {
@@ -510,18 +510,18 @@ MBStatus_t SerialModbusSlave::processModbus( void )
 #endif
 
                 vClearRequestFrame();
-                vSetState( SLAVE_IDLE );
+                vSetState( SERVER_IDLE );
 
                 break;
             }
 
             case FORMATTING_NORMAL_REPLY :
             {
-                ucREPLY_ID = ucSlaveId;
+                ucREPLY_ID = ucServerId;
                 xSetChecksum( pucReplyFrame, &xReplyLength );
 
                 vClearRequestFrame();
-                vSetState( SLAVE_IDLE );
+                vSetState( SERVER_IDLE );
 
                 break;
             }
@@ -530,7 +530,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             {
                 vIncCPT3();
 
-                ucREPLY_ID = ucSlaveId;
+                ucREPLY_ID = ucServerId;
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
                 ucREPLY_ERROR_CODE = ( uint8_t ) xException;
 
@@ -539,7 +539,7 @@ MBStatus_t SerialModbusSlave::processModbus( void )
                 xSetChecksum( pucReplyFrame, &xReplyLength );
 
                 vClearRequestFrame();
-                vSetState( SLAVE_IDLE );
+                vSetState( SERVER_IDLE );
 
                 break;
             }
@@ -548,11 +548,11 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             {
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SLV_ILLEGAL_STATE );
+                    xSetException( SERVER_ILLEGAL_STATE );
                 }
                 #else
                 {
-                    xSetException( SLAVE_DEVICE_FAILURE );
+                    xSetException( SERVER_DEVICE_FAILURE );
                 }
                 #endif
 
@@ -565,20 +565,20 @@ MBStatus_t SerialModbusSlave::processModbus( void )
             /* The process loop hook will only be executed when the state
             mashine is not in the idle state. Otherwise the loop hook would be
             execetued with every run through processModbus(). */
-            if( ( vProcessLoopHook != NULL ) && ( xState != SLAVE_IDLE ) )
+            if( ( vProcessLoopHook != NULL ) && ( xState != SERVER_IDLE ) )
             {
                 (*vProcessLoopHook)();
             }
         }
         #endif
     }
-    while( xState != SLAVE_IDLE );
+    while( xState != SERVER_IDLE );
 
     return xException;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
+MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
 {
     /* Do nothing if the register map is not set. */
     if( pxRegisterMap == NULL )
@@ -607,7 +607,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
     find a matching register map entry. */
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_DATA_ADDRESS );
+        xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
     }
     #else
     {
@@ -619,8 +619,8 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
     range of one of the mapped register entries. */
     for( ; pxRegisterMap[ xRegisterMapIndex ].address != 0x0000; xRegisterMapIndex++ )
     {
-#if( configSLAVE_MULTI_ID == 1 )
-        if( pxRegisterMap[ xRegisterMapIndex ].id == ucSlaveId )
+#if( configSERVER_MULTI_ID == 1 )
+        if( pxRegisterMap[ xRegisterMapIndex ].id == ucServerId )
         {
 #endif
             if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
@@ -644,11 +644,11 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                         and abort the for loop. */
                         #if( configEXTENDED_EXCEPTION_CODES == 1 )
                         {
-                            xSetException( SLV_ILLEGAL_ACCESS );
+                            xSetException( SERVER_ILLEGAL_ACCESS );
                         }
                         #else
                         {
-                            xSetException( SLAVE_DEVICE_FAILURE );
+                            xSetException( SERVER_DEVICE_FAILURE );
                         }
                         #endif
 
@@ -660,7 +660,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
                 so we set the exception and abort the for loop. */
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SLV_ILLEGAL_FUNCTION );
+                    xSetException( SERVER_ILLEGAL_FUNCTION );
                 }
                 #else
                 {
@@ -670,7 +670,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 
                 break;
             }
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
         }
 #endif
     }
@@ -679,7 +679,7 @@ MBStatus_t SerialModbusSlave::xCheckRequest( uint16_t usReqAddress, uint8_t ucRe
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vHandlerFC03_04( void )
+void SerialModbusServer::vHandlerFC03_04( void )
 {
     size_t xOffset = 0;
 
@@ -711,7 +711,7 @@ void SerialModbusSlave::vHandlerFC03_04( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_QUANTITY );
+        xSetException( SERVER_ILLEGAL_QUANTITY );
     }
     #else
     {
@@ -721,7 +721,7 @@ void SerialModbusSlave::vHandlerFC03_04( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vHandlerFC05( void )
+void SerialModbusServer::vHandlerFC05( void )
 {
     if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
     {
@@ -745,7 +745,7 @@ void SerialModbusSlave::vHandlerFC05( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_COIL_VALUE );
+        xSetException( SERVER_ILLEGAL_COIL_VALUE );
     }
     #else
     {
@@ -755,7 +755,7 @@ void SerialModbusSlave::vHandlerFC05( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vHandlerFC06( void )
+void SerialModbusServer::vHandlerFC06( void )
 {
     size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
@@ -776,7 +776,7 @@ void SerialModbusSlave::vHandlerFC06( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vHandlerFC08( void )
+void SerialModbusServer::vHandlerFC08( void )
 {
     /* Set the common reply data for all diagnostic sub functions. */
     ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -865,7 +865,7 @@ void SerialModbusSlave::vHandlerFC08( void )
             {
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SLV_ILLEGAL_INPUT_DELIMITER );
+                    xSetException( SERVER_ILLEGAL_INPUT_DELIMITER );
                 }
                 #else
                 {
@@ -949,8 +949,8 @@ void SerialModbusSlave::vHandlerFC08( void )
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usSlaveExceptionErrorCount );
-                ucREPLY_DATA_LO =  lowByte( usSlaveExceptionErrorCount );
+                ucREPLY_DATA_HI = highByte( usServerExceptionErrorCount );
+                ucREPLY_DATA_LO =  lowByte( usServerExceptionErrorCount );
             }
             else
             {
@@ -961,12 +961,12 @@ void SerialModbusSlave::vHandlerFC08( void )
         }
 #endif
 #if( configSFC14 == 1 )
-        case RETURN_SLAVE_MESSAGE_COUNT:
+        case RETURN_SERVER_MESSAGE_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usSlaveMessageCount );
-                ucREPLY_DATA_LO =  lowByte( usSlaveMessageCount );
+                ucREPLY_DATA_HI = highByte( usServerMessageCount );
+                ucREPLY_DATA_LO =  lowByte( usServerMessageCount );
             }
             else
             {
@@ -977,12 +977,12 @@ void SerialModbusSlave::vHandlerFC08( void )
         }
 #endif
 #if( configSFC15 == 1 )
-        case RETURN_SLAVE_NO_RESPONSE_COUNT:
+        case RETURN_SERVER_NO_RESPONSE_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usSlaveNoResponseCount );
-                ucREPLY_DATA_LO =  lowByte( usSlaveNoResponseCount );
+                ucREPLY_DATA_HI = highByte( usServerNoResponseCount );
+                ucREPLY_DATA_LO =  lowByte( usServerNoResponseCount );
             }
             else
             {
@@ -993,12 +993,12 @@ void SerialModbusSlave::vHandlerFC08( void )
         }
 #endif
 #if( configSFC16 == 1 )
-        case RETURN_SLAVE_NAK_COUNT:
+        case RETURN_SERVER_NAK_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usSlaveNAKCount );
-                ucREPLY_DATA_LO =  lowByte( usSlaveNAKCount );
+                ucREPLY_DATA_HI = highByte( usServerNAKCount );
+                ucREPLY_DATA_LO =  lowByte( usServerNAKCount );
             }
             else
             {
@@ -1009,12 +1009,12 @@ void SerialModbusSlave::vHandlerFC08( void )
         }
 #endif
 #if( configSFC17 == 1 )
-        case RETURN_SLAVE_BUSY_COUNT:
+        case RETURN_SERVER_BUSY_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usSlaveBusyCount );
-                ucREPLY_DATA_LO =  lowByte( usSlaveBusyCount );
+                ucREPLY_DATA_HI = highByte( usServerBusyCount );
+                ucREPLY_DATA_LO =  lowByte( usServerBusyCount );
             }
             else
             {
@@ -1062,7 +1062,7 @@ void SerialModbusSlave::vHandlerFC08( void )
         {
             #if( configEXTENDED_EXCEPTION_CODES == 1 )
             {
-                xSetException( SLV_ILLEGAL_SUB_FUNCTION );
+                xSetException( SERVER_ILLEGAL_SUB_FUNCTION );
             }
             #else
             {
@@ -1078,33 +1078,33 @@ void SerialModbusSlave::vHandlerFC08( void )
     {
         if( xException == ILLEGAL_DATA_VALUE )
         {
-            xSetException( SLV_ILLEGAL_DATA_VALUE );
+            xSetException( SERVER_ILLEGAL_DATA_VALUE );
         }
     }
     #endif
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vClearDiagnosticCounters( void )
+void SerialModbusServer::vClearDiagnosticCounters( void )
 {
     usBusMessageCount            = 0;
     usBusCommunicationErrorCount = 0;
-    usSlaveExceptionErrorCount   = 0;
-    usSlaveMessageCount          = 0;
-    usSlaveNoResponseCount       = 0;
-    usSlaveNAKCount              = 0;
-    usSlaveBusyCount             = 0;
+    usServerExceptionErrorCount  = 0;
+    usServerMessageCount         = 0;
+    usServerNoResponseCount      = 0;
+    usServerNAKCount             = 0;
+    usServerBusyCount            = 0;
     usBusCharacterOverrunCount   = 0;
 }
 /*-----------------------------------------------------------*/
 
-uint16_t SerialModbusSlave::diagRegGet( void )
+uint16_t SerialModbusServer::diagRegGet( void )
 {
     return usDiagnosticRegister;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::diagRegGet( size_t bit )
+bool SerialModbusServer::diagRegGet( size_t bit )
 {
     if( bit <= 15 )
     {
@@ -1118,7 +1118,7 @@ bool SerialModbusSlave::diagRegGet( size_t bit )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::diagRegSet( size_t bit )
+bool SerialModbusServer::diagRegSet( size_t bit )
 {
     if( bit <= 15 )
     {
@@ -1130,7 +1130,7 @@ bool SerialModbusSlave::diagRegSet( size_t bit )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusSlave::diagRegClear( size_t bit )
+bool SerialModbusServer::diagRegClear( size_t bit )
 {
     if( bit <= 15 )
     {
@@ -1142,13 +1142,13 @@ bool SerialModbusSlave::diagRegClear( size_t bit )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::diagRegClear( void )
+void SerialModbusServer::diagRegClear( void )
 {
     usDiagnosticRegister = 0x0000;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusSlave::vHandlerFC16( void )
+void SerialModbusServer::vHandlerFC16( void )
 {
     size_t xOffset = 0;
 
@@ -1185,7 +1185,7 @@ void SerialModbusSlave::vHandlerFC16( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SLV_ILLEGAL_QUANTITY );
+        xSetException( SERVER_ILLEGAL_QUANTITY );
     }
     #else
     {

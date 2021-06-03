@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /**
- * @file        SerialModbusSlave.h
+ * @file        SerialModbusServer.h
  * 
  * @author      Martin Legleiter
  * 
@@ -14,8 +14,8 @@
  */
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __SERIAL_MODBUS_SLAVE_H__
-#define __SERIAL_MODBUS_SLAVE_H__
+#ifndef __SERIAL_MODBUS_SERVER_H__
+#define __SERIAL_MODBUS_SERVER_H__
 
 /*-----------------------------------------------------------*/
 
@@ -35,15 +35,15 @@
 /*-----------------------------------------------------------*/
 
 /** TODO */
-typedef enum MBSlaveState_e
+typedef enum MBServerState_e
 {
-    SLAVE_IDLE,
+    SERVER_IDLE,
     CHECKING_REQUEST,
     PROCESSING_REQUIRED_ACTION,
     FORMATTING_NORMAL_REPLY,
     FORMATTING_ERROR_REPLY
 }
-MBSlaveState_t;
+MBServerState_t;
 
 /** TODO */
 typedef enum MBAccess_e
@@ -58,7 +58,7 @@ MBAccess_t;
 /** TODO */
 typedef struct MBRegister_s
 {
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
     uint8_t id;
 #endif
     MBAccess_t access;
@@ -70,7 +70,7 @@ typedef struct MBRegister_s
 MBRegister_t;
 
 /** TODO */
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
     #define REGISTER_MAP_END { 0x00, NA, 0x0000, NULL, 0, NULL }
 #else
     #define REGISTER_MAP_END { NA, 0x0000, NULL, 0, NULL }
@@ -79,14 +79,14 @@ MBRegister_t;
 /*-----------------------------------------------------------*/
 
 /** TODO */
-class SerialModbusSlave : public SerialModbusBase
+class SerialModbusServer : public SerialModbusBase
 {
 public:
 
-    SerialModbusSlave();
-    bool begin( uint8_t slaveId, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_CONFIG_DEFAULT );
+    SerialModbusServer();
+    bool begin( uint8_t serverId, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_CONFIG_DEFAULT );
 #if defined( COMPAT_SOFTWARE_SERIAL )
-    bool begin( uint8_t slaveId, uint32_t baud, SoftwareSerial * serial );
+    bool begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial );
 #endif
     MBStatus_t processModbus( void );
     void setRegisterMap( const MBRegister_t * registerMap );
@@ -98,9 +98,9 @@ public:
 
 private:
 
-    uint8_t ucSlaveId;
-    MBSlaveState_t xState;
-    void vSetState( MBSlaveState_t xStatePar );
+    uint8_t ucServerId;
+    MBServerState_t xState;
+    void vSetState( MBServerState_t xStatePar );
     const MBRegister_t * pxRegisterMap;
     size_t xRegisterMapIndex;
     MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
@@ -112,15 +112,15 @@ private:
     void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
-    uint16_t usSlaveExceptionErrorCount;
-    uint16_t usSlaveMessageCount;
-    uint16_t usSlaveNoResponseCount;
-    uint16_t usSlaveNAKCount;
-    uint16_t usSlaveBusyCount;
+    uint16_t usServerExceptionErrorCount;
+    uint16_t usServerMessageCount;
+    uint16_t usServerNoResponseCount;
+    uint16_t usServerNAKCount;
+    uint16_t usServerBusyCount;
     uint16_t usBusCharacterOverrunCount;
     uint16_t usDiagnosticRegister;
     bool bListenOnlyMode;
-#if( configSLAVE_MULTI_ID == 1 )
+#if( configSERVER_MULTI_ID == 1 )
     uint8_t ucIdMap[ configMAX_ID_COUNT ];
     size_t xIdCount;
     void vSetIdMap( void );
@@ -142,27 +142,27 @@ private:
     #define vIncCPT2()
 #endif
 #if( configSFC13 == 1 )
-    #define vIncCPT3()  vIncCPT( usSlaveExceptionErrorCount )
+    #define vIncCPT3()  vIncCPT( usServerExceptionErrorCount )
 #else
     #define vIncCPT3()
 #endif
 #if( configSFC14 == 1 )
-    #define vIncCPT4()  vIncCPT( usSlaveMessageCount )
+    #define vIncCPT4()  vIncCPT( usServerMessageCount )
 #else
     #define vIncCPT4()
 #endif
 #if( configSFC15 == 1 )
-    #define vIncCPT5()  vIncCPT( usSlaveNoResponseCount )
+    #define vIncCPT5()  vIncCPT( usServerNoResponseCount )
 #else
     #define vIncCPT5()
 #endif
 #if( configSFC16 == 1 )
-    #define vIncCPT6()  vIncCPT( usSlaveNAKCount )
+    #define vIncCPT6()  vIncCPT( usServerNAKCount )
 #else
     #define vIncCPT6()
 #endif
 #if( configSFC17 == 1 )
-    #define vIncCPT7()  vIncCPT( usSlaveBusyCount )
+    #define vIncCPT7()  vIncCPT( usServerBusyCount )
 #else
     #define vIncCPT7()
 #endif
@@ -184,4 +184,4 @@ private:
 
 /*-----------------------------------------------------------*/
 
-#endif /* __SERIAL_MODBUS_SLAVE_H__ */
+#endif /* __SERIAL_MODBUS_SERVER_H__ */

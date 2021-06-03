@@ -60,7 +60,7 @@ typedef enum MBFunctionCode_e
     DIAGNOSTIC                      = 8,
     GET_COM_EVENT_COUNTER           = 11,
     GET_COM_EVENT_LOG               = 12,
-    REPORT_SLAVE_ID                 = 17
+    REPORT_SERVER_ID                = 17
 }
 MBFunctionCode_t;
 
@@ -78,10 +78,10 @@ typedef enum MBSubFunctionCode_e
     RETURN_BUS_MESSAGE_COUNT                = 11,
     RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 12,
     RETURN_BUS_EXCEPTION_ERROR_COUNT        = 13,
-    RETURN_SLAVE_MESSAGE_COUNT              = 14,
-    RETURN_SLAVE_NO_RESPONSE_COUNT          = 15,
-    RETURN_SLAVE_NAK_COUNT                  = 16,
-    RETURN_SLAVE_BUSY_COUNT                 = 17,
+    RETURN_SERVER_MESSAGE_COUNT             = 14,
+    RETURN_SERVER_NO_RESPONSE_COUNT         = 15,
+    RETURN_SERVER_NAK_COUNT                 = 16,
+    RETURN_SERVER_BUSY_COUNT                = 17,
     RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 18,
     CLEAR_OVERRUN_COUNTER_AND_FLAG          = 20
 }
@@ -98,9 +98,9 @@ typedef enum MBException_e
     ILLEGAL_FUNCTION                        = 0x01,
     ILLEGAL_DATA_ADDRESS                    = 0x02,
     ILLEGAL_DATA_VALUE                      = 0x03,
-    SLAVE_DEVICE_FAILURE                    = 0x04,
+    SERVER_DEVICE_FAILURE                   = 0x04,
     ACKNOWLEDGE                             = 0x05,
-    SLAVE_DEVICE_BUSY                       = 0x06,
+    SERVER_DEVICE_BUSY                      = 0x06,
     MEMORY_PARITY_ERROR                     = 0x08,
     GATEWAY_PATH_UNAVAILABLE                = 0x0A,
     GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
@@ -122,16 +122,16 @@ typedef enum MBException_e
 
 #if( configEXTENDED_EXCEPTION_CODES == 1 )
 
-    /* Extended exception codes for slave replies. */
-    SLV_ILLEGAL_FUNCTION                    = 0x21,
-    SLV_ILLEGAL_STATE                       = 0x22,
-    SLV_ILLEGAL_DATA_ADDRESS                = 0x23,
-    SLV_ILLEGAL_ACCESS                      = 0x24,
-    SLV_ILLEGAL_QUANTITY                    = 0x25,
-    SLV_ILLEGAL_COIL_VALUE                  = 0x26,
-    SLV_ILLEGAL_INPUT_DELIMITER             = 0x27,
-    SLV_ILLEGAL_SUB_FUNCTION                = 0x28,
-    SLV_ILLEGAL_DATA_VALUE                  = 0x29,
+    /* Extended exception codes for server replies. */
+    SERVER_ILLEGAL_FUNCTION                 = 0x21,
+    SERVER_ILLEGAL_STATE                    = 0x22,
+    SERVER_ILLEGAL_DATA_ADDRESS             = 0x23,
+    SERVER_ILLEGAL_ACCESS                   = 0x24,
+    SERVER_ILLEGAL_QUANTITY                 = 0x25,
+    SERVER_ILLEGAL_COIL_VALUE               = 0x26,
+    SERVER_ILLEGAL_INPUT_DELIMITER          = 0x27,
+    SERVER_ILLEGAL_SUB_FUNCTION             = 0x28,
+    SERVER_ILLEGAL_DATA_VALUE               = 0x29,
 
 #endif
 
