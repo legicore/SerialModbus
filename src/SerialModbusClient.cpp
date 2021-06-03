@@ -191,8 +191,8 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
     xSetException( OK );
 
     if( ( request->id           >  configID_SERVER_MAX ) ||
-        ( request->functionCode == 0x00               ) ||
-        ( request->objectSize   == 0                  ) )
+        ( request->functionCode == 0x00                ) ||
+        ( request->objectSize   == 0                   ) )
     {
         return xSetException( ILLEGAL_REQUEST );
     }

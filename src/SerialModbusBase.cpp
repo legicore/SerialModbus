@@ -166,7 +166,7 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
 
     bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
     {
-        if( baud == 0 || serial == NULL )
+        if( ( baud == 0 ) || ( serial == NULL ) )
         {
             return false;
         }
@@ -543,11 +543,11 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
     }
     else
     {
-        /* For transfer rates lower than 19200 Baud the timing is more
-        critical and must be calculated. */
+        /* For transfer rates lower than 19200 Baud the timing is more critical
+        and must be calculated. */
 
-        /* Calculation example for the inter character timeout with 19200
-        Baud (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
+        /* Calculation example for the inter character timeout with 19200 baud
+        (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
 
             19200 Baud / 11 Bits = 1745.45'
 
@@ -555,9 +555,9 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
 
             1000 ms / 1745.45 = 0.5729167' ms
 
-        So one character needs 0.5729167' ms to be transmitted.
-        The inter character timeout is defined as 1.5x the time needed to
-        transfer one character (Inter frame delay is 3.5x).
+        So, one character needs 0.5729167' ms to be transmitted. The inter
+        character timeout is defined as 1.5x the time needed to transfer one
+        character (Inter frame delay is 3.5x).
 
             0.5729167' ms * 1.5 = 0.859375 ms
 

@@ -135,7 +135,7 @@ SerialModbusServer::SerialModbusServer()
 
 bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, Serial_t * serial, uint32_t config )
 {
-    if( serverId == 0 || serverId > configID_SERVER_MAX )
+    if( ( serverId == 0 ) || ( serverId > configID_SERVER_MAX ) )
     {
         return false;
     }
@@ -150,7 +150,7 @@ bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, Serial_t * seri
 
     bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial )
     {
-        if( serverId == 0 || serverId > configID_SERVER_MAX )
+        if( ( serverId == 0 ) || ( serverId > configID_SERVER_MAX ) )
         {
             return false;
         }
@@ -823,8 +823,8 @@ void SerialModbusServer::vHandlerFC08( void )
                     communication event log, which is not implemented. */
                 }
 
-                /* INFO: The Modbus spec prescribes here to perform a
-                complete restart of the device, but we skip that. */
+                /* INFO: The Modbus spec prescribes here to perform a complete
+                restart of the device, but we skip that. */
             }
             else
             {
@@ -1047,8 +1047,8 @@ void SerialModbusServer::vHandlerFC08( void )
             {
                 usBusCharacterOverrunCount = 0;
 
-                /* INFO: The Modbus spec prescribes here to also clear an
-                error flag, but this flag is nowhere specified. */
+                /* INFO: The Modbus spec prescribes here to also clear an error
+                flag, but this flag is nowhere specified. */
             }
             else
             {
