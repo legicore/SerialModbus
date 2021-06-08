@@ -470,12 +470,9 @@ MBStatus_t SerialModbusClient::processModbus( void )
                     {
                         #if( configMODE == configMODE_RTU )
                         {
-                            if( ucREPLY_ID == ucREQUEST_ID )
-                            {
-                                vStartInterFrameDelay();
-                                vStartInterCharacterTimeout();
-                                break;
-                            }
+                            vStartInterFrameDelay();
+                            vStartInterCharacterTimeout();
+                            break;
                         }
                         #endif
 
@@ -507,7 +504,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xReplyLength > 3 )
+                if( xReplyLength >= 3 )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
@@ -515,8 +512,11 @@ MBStatus_t SerialModbusClient::processModbus( void )
                         {
                             if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
                             {
-                                while( bTimeoutInterFrameDelay() != true );
-                                vSetState( PROCESSING_REPLY );
+                                if( ucREPLY_ID == ucREQUEST_ID )
+                                {
+                                    while( bTimeoutInterFrameDelay() != true );
+                                    vSetState( PROCESSING_REPLY );
+                                }
                             }
                             else
                             {
@@ -539,9 +539,9 @@ MBStatus_t SerialModbusClient::processModbus( void )
                                 xAsciiToRtu( pucReplyFrame, &xReplyLength );
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
-                                if( ucREPLY_ID == ucREQUEST_ID )
+                                if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
                                 {
-                                    if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
+                                    if( ucREPLY_ID == ucREQUEST_ID )
                                     {
                                         vSetState( PROCESSING_REPLY );
                                         break;

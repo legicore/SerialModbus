@@ -258,17 +258,9 @@ MBStatus_t SerialModbusServer::processModbus( void )
                         {
                             #if( configMODE == configMODE_RTU )
                             {
-#if( configSERVER_MULTI_ID == 1 )
-                                if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
-#else
-                                if( ( ucREQUEST_ID == ucServerId         ) ||
-#endif
-                                    ( ucREQUEST_ID == configID_BROADCAST ) )
-                                {
-                                    vStartInterFrameDelay();
-                                    vStartInterCharacterTimeout();
-                                    break;
-                                }
+                                vStartInterFrameDelay();
+                                vStartInterCharacterTimeout();
+                                break;
                             }
                             #endif
 
@@ -308,13 +300,25 @@ MBStatus_t SerialModbusServer::processModbus( void )
                     {
                         if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            if( xRequestLength > 3 )
+                            if( xRequestLength >= 3 )
                             {
                                 if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                 {
                                     /* Received a new valid request -> Increment
                                     the bus message counter. */
                                     vIncCPT1();
+
+#if( configSERVER_MULTI_ID == 1 )
+                                    if( ( bCheckId( ucREQUEST_ID ) != true   ) &&
+#else
+                                    if( ( ucREQUEST_ID != ucServerId         ) &&
+#endif
+                                        ( ucREQUEST_ID != configID_BROADCAST ) )
+                                    {
+                                        vClearRequestFrame();
+                                        vSetState( SERVER_IDLE );
+                                        break;
+                                    }
 
                                     while( bTimeoutInterFrameDelay() != true );
 
@@ -356,20 +360,21 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                 format and update the request length. */
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
-                                /* Check if the received request is dedicated to
-                                us or if it is a broadcast. */
-#if( configSERVER_MULTI_ID == 1 )
-                                if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
-#else
-                                if( ( ucREQUEST_ID == ucServerId         ) ||
-#endif
-                                    ( ucREQUEST_ID == configID_BROADCAST ) )
+                                if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                 {
-                                    if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
+                                    /* Received a new valid request ->
+                                    Increment the bus message counter. */
+                                    vIncCPT1();
+
+                                    /* Check if the received request is
+                                    dedicated to us or if it is a broadcast. */
+#if( configSERVER_MULTI_ID == 1 )
+                                    if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
+#else
+                                    if( ( ucREQUEST_ID == ucServerId         ) ||
+#endif
+                                        ( ucREQUEST_ID == configID_BROADCAST ) )
                                     {
-                                        /* Received a new valid request ->
-                                        Increment the bus message counter. */
-                                        vIncCPT1();
 
                                         #if( configSERVER_MULTI_ID == 1 )
                                         {
@@ -380,7 +385,9 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                         vSetState( CHECKING_REQUEST );
                                         break;
                                     }
-
+                                }
+                                else
+                                {
                                     /* Checksum error -> Increment the bus
                                     communication error counter. */
                                     vIncCPT2();
