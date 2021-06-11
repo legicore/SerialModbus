@@ -89,19 +89,34 @@ public:
     bool begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial );
 #endif
     MBStatus_t processModbus( void );
-    void setRegisterMap( const MBRegister_t * registerMap );
+    void setRegisterMap( MBRegister_t * registerMap );
+
+    /* Only for function code 8 (DIAGNOSTIC). */
+
     uint16_t diagRegGet( void );
     bool diagRegGet( size_t bit );
     bool diagRegSet( size_t bit );
     bool diagRegClear( size_t bit );
     void diagRegClear( void );
 
+    /* Simplified API functions */
+
+    int16_t createCoils( uint16_t address, size_t number );
+    int16_t createInputResgisters( uint16_t address, size_t number );
+    int16_t createHoldingRegisters( uint16_t address, size_t number );
+    uint16_t getCoil( uint16_t address );
+    int16_t setCoil( uint16_t address, uint16_t value );
+    uint16_t getInputResgister( uint16_t address );
+    int16_t setInputResgister( uint16_t address, uint16_t value );
+    uint16_t getHoldingRegister( uint16_t address );
+    int16_t setHoldingRegister( uint16_t address, uint16_t value );
+
 private:
 
     uint8_t ucServerId;
     MBServerState_t xState;
     void vSetState( MBServerState_t xStatePar );
-    const MBRegister_t * pxRegisterMap;
+    MBRegister_t * pxRegisterMap;
     size_t xRegisterMapIndex;
     MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
     void vHandlerFC03_04( void );
@@ -126,6 +141,10 @@ private:
     void vSetIdMap( void );
     bool bCheckId( uint8_t ucId );
 #endif
+    size_t xRegisterMapSize;
+    int16_t sCreateRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber );
+    uint16_t sGetRegister( uint16_t address );
+    int16_t sSetRegister( uint16_t address, uint16_t value );
 };
 /*-----------------------------------------------------------*/
 

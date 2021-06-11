@@ -26,7 +26,7 @@ uint16_t object2[ 1 ] = { 0 };
 void action1( void );
 void action2( void );
 
-const MBRegister_t registerMap[] = {
+MBRegister_t registerMap[] = {
     { WR, 0x1000, object1, 1, action1 },
     { RD, 0x2000, object2, 1, action2 },
     REGISTER_MAP_END
