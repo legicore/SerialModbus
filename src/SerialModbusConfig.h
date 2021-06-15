@@ -107,7 +107,7 @@
 #endif
 
 #if( ( configFC08 == 1 ) && ( configSFC04 == 1 ) && ( configSFC01 == 0 ) )
-    #warning Sub-function code 1 is needed to deavtivate Listen Only Mode (sub-function code 4)!
+    #warning Sub-function code 1 is needed to deactivate Listen Only Mode (sub-function code 4)!
 #endif
 
 /*-----------------------------------------------------------*/

@@ -116,66 +116,6 @@ MBStatus_t SerialModbusClient::xProcessRequestMap( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
-{
-    uint16_t usObject = 0x0000;
-    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
-
-    xRequest.id = id;
-    xRequest.functionCode = functionCode;
-    xRequest.address = address;
-    usObject = value;
-
-    xStatusSimpleAPI = setRequest( &xRequest );
-    if( xStatusSimpleAPI == OK )
-    {
-        xStatusSimpleAPI = processModbus();
-        if( xStatusSimpleAPI == OK )
-        {
-            return ( int16_t ) usObject;
-        }
-    }
-
-    return -1;
-}
-/*-----------------------------------------------------------*/
-
-int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
-{
-    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0 );
-}
-/*-----------------------------------------------------------*/
-
-int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
-{
-    return sendRequest( id, READ_INPUT_REGISTERS, address, 0 );
-}
-/*-----------------------------------------------------------*/
-
-int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
-{
-    return sendRequest( id, WRITE_SINGLE_COIL, address, value );
-}
-/*-----------------------------------------------------------*/
-
-int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
-{
-    return sendRequest( id, WRITE_SINGLE_REGISTER, address, value );
-}
-/*-----------------------------------------------------------*/
-
-MBStatus_t SerialModbusClient::getLastException( void )
-{
-    return xStatusSimpleAPI;
-}
-/*-----------------------------------------------------------*/
-
-const char * SerialModbusClient::getLastExceptionString( void )
-{
-    return getExceptionString( xStatusSimpleAPI );
-}
-/*-----------------------------------------------------------*/
-
 MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool requestMap )
 {
     if( request == NULL )
@@ -898,4 +838,64 @@ void SerialModbusClient::vHandlerFC16( void )
         xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
+{
+    uint16_t usObject = 0x0000;
+    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
+
+    xRequest.id = id;
+    xRequest.functionCode = functionCode;
+    xRequest.address = address;
+    usObject = value;
+
+    xStatusSimpleAPI = setRequest( &xRequest );
+    if( xStatusSimpleAPI == OK )
+    {
+        xStatusSimpleAPI = processModbus();
+        if( xStatusSimpleAPI == OK )
+        {
+            return ( int16_t ) usObject;
+        }
+    }
+
+    return -1;
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
+{
+    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0 );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
+{
+    return sendRequest( id, READ_INPUT_REGISTERS, address, 0 );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+{
+    return sendRequest( id, WRITE_SINGLE_COIL, address, value );
+}
+/*-----------------------------------------------------------*/
+
+int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+{
+    return sendRequest( id, WRITE_SINGLE_REGISTER, address, value );
+}
+/*-----------------------------------------------------------*/
+
+MBStatus_t SerialModbusClient::getLastException( void )
+{
+    return xStatusSimpleAPI;
+}
+/*-----------------------------------------------------------*/
+
+const char * SerialModbusClient::getLastExceptionString( void )
+{
+    return getExceptionString( xStatusSimpleAPI );
 }
