@@ -59,6 +59,7 @@ source code (8 data bits, no parity, 1 stop bit). */
         #define Serial_t UartClass
 
     #else
+
         /* The selected board has a known architecture, but has not yet been
         tested. So the assumed default values for the Arduino serial port will
         be set, and the SoftwareSerial compatibility gets deactivated. */

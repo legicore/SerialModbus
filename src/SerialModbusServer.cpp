@@ -816,7 +816,7 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == CLEAR_COM_EVENT_LOG ) )
             {
-                /* INFO: The Modbus spec prescribes here to also an specific
+                /* INFO: The Modbus spec prescribes here to set an specific
                 error flag, but this flag is nowhere specified. */
 
                 /* Reset the Only Listen Mode. */
