@@ -665,42 +665,6 @@ void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 }
 /*-----------------------------------------------------------*/
 
-uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
-{
-    return ulInterCharacterTimeoutUs;
-}
-/*-----------------------------------------------------------*/
-
-uint32_t SerialModbusBase::getInterFrameDelay( void ) const
-{
-    return ulInterFrameDelayUs;
-}
-/*-----------------------------------------------------------*/
-
-int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
-{
-    if( timeUs != 0 )
-    {
-        ulInterCharacterTimeoutUs = timeUs;
-        return 0;
-    }
-
-    return -1;
-}
-/*-----------------------------------------------------------*/
-
-int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
-{
-    if( timeUs != 0 )
-    {
-        ulInterFrameDelayUs = timeUs;
-        return 0;
-    }
-
-    return -1;
-}
-/*-----------------------------------------------------------*/
-
 const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
 {
     for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
@@ -713,3 +677,55 @@ const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
 
     return "__NO_STRING__";
 }
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+
+    uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
+    {
+        return ulInterCharacterTimeoutUs;
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+
+    uint32_t SerialModbusBase::getInterFrameDelay( void ) const
+    {
+        return ulInterFrameDelayUs;
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+
+    int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
+    {
+        if( timeUs != 0 )
+        {
+            ulInterCharacterTimeoutUs = timeUs;
+            return 0;
+        }
+
+        return -1;
+    }
+
+#endif
+/*-----------------------------------------------------------*/
+
+#if( configMODE == configMODE_RTU )
+
+    int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
+    {
+        if( timeUs != 0 )
+        {
+            ulInterFrameDelayUs = timeUs;
+            return 0;
+        }
+
+        return -1;
+    }
+
+#endif
