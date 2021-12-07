@@ -289,8 +289,8 @@ MBStatus_t SerialModbusServer::processModbus( void )
                         any reply because it would cause bus collisions if every
                         server sends an error reply. */
                         vClearRequestFrame();
-
                         vSetState( SERVER_IDLE );
+
                         break;
                     }
                 }
@@ -432,11 +432,11 @@ MBStatus_t SerialModbusServer::processModbus( void )
             case PROCESSING_REQUIRED_ACTION :
             {
 #if( configFC08 == 1 )
-                /* If the Listen Only Mode is active we only monitor all bus
+                /* If the Listen Only Mode is active we monitor all bus
                 messages, but we perform no data processing. Only a request with
                 function code 8 (DIAGNOSTIC) and sub function code 1
                 (RESTART_COMMUNICATIONS_OPTION) will be processed, because it is
-                needed to deavtivate the only listen mode. */
+                needed to deactivate the only listen mode. */
                 if( ( bListenOnlyMode == false ) ||
                     ( ( ucREQUEST_FUNCTION_CODE == DIAGNOSTIC ) &&
                       ( usREQUEST_SUB_FUNCTION_CODE == RESTART_COMMUNICATIONS_OPTION ) ) )
@@ -595,17 +595,13 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
         return NOK;
     }
 
-    #if( configFC08 == 1 )
+    /* If the diagnostic functions are enabled we don't need to do the normal
+    request check. All diagnoctic functions are a part of the Modbus protocol
+    (and don't need any definition as a register etc.). */
+    if( ucREQUEST_FUNCTION_CODE == ( uint8_t ) DIAGNOSTIC )
     {
-        /* If the diagnostic functions are enabled we don't need to do the
-        normal request check. All diagnoctic functions are a part of the Modbus
-        protocol (and don't need any definition as a register etc.). */
-        if( ucREQUEST_FUNCTION_CODE == ( uint8_t ) DIAGNOSTIC )
-        {
-            return OK;
-        }
+        return OK;
     }
-    #endif
 
     /* Reset the register map index. */
     xRegisterMapIndex = 0;

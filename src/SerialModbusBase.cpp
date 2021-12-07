@@ -31,8 +31,8 @@
 
 typedef struct MBExceptionString_s
 {
-    uint8_t exceptionCode;
-    const char * exceptionString;
+    uint8_t ucExceptionCode;
+    const char * pcExceptionString;
 }
 MBExceptionString_t;
 
@@ -203,6 +203,8 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
         usTempChecksum = usCRC16( pucFrame, *pxFrameLength );
         pucFrame[ (*pxFrameLength)++ ] =  lowByte( usTempChecksum );
         pucFrame[ (*pxFrameLength)++ ] = highByte( usTempChecksum );
+
+        return OK;
     }
     #endif
 
@@ -210,10 +212,12 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
     {
         usTempChecksum = ( uint16_t ) ucLRC( pucFrame, *pxFrameLength );
         pucFrame[ (*pxFrameLength)++ ] = ( uint8_t ) usTempChecksum;
+
+        return OK;
     }
     #endif
 
-    return OK;
+    return NOK;
 }
 /*-----------------------------------------------------------*/
 
@@ -620,9 +624,9 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
 
         /* General formula:
 
-                        1000
+                      1000
             timeout = ---- * nbrOfBits * characterTimes * 1000
-                        baud
+                      baud
 
         Final formulas:
 
@@ -630,7 +634,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
             interCharacterTimeout = -------------------------
                                             baud
 
-                                nbrOfBits * 1000000 * 3.5
+                              nbrOfBits * 1000000 * 3.5
             interFrameDelay = -------------------------
                                         baud */
 
@@ -699,11 +703,11 @@ int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
 
 const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
 {
-    for( size_t i = 0; pxExceptionStrings[ i ].exceptionString != NULL; i++ )
+    for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
     {
-        if( pxExceptionStrings[ i ].exceptionCode == exceptionCode )
+        if( pxExceptionStrings[ i ].ucExceptionCode == exceptionCode )
         {
-            return pxExceptionStrings[ i ].exceptionString;
+            return pxExceptionStrings[ i ].pcExceptionString;
         }
     }
 

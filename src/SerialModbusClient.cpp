@@ -392,9 +392,10 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
             case WAITING_TURNAROUND_DELAY :
             {
+                /* Check if the Turnaround Delay has elapsed. */
                 if( bTimeoutTurnaroundDelay() == true )
                 {
-                    /* Nothing ... clear buffer and go on */
+                    /* Just clear the request buffer and go back to idle. */
                     vClearRequestFrame();
                     vSetState( CLIENT_IDLE );
                 }

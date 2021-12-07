@@ -120,8 +120,6 @@ typedef enum MBException_e
     ILLEGAL_SUB_FUNCTION                    = 0x1C,
     ILLEGAL_REPLY_SUB_FUNCTION              = 0x1D,
 
-#if( configEXTENDED_EXCEPTION_CODES == 1 )
-
     /* Extended exception codes for server replies. */
     SERVER_ILLEGAL_FUNCTION                 = 0x21,
     SERVER_ILLEGAL_STATE                    = 0x22,
@@ -132,8 +130,6 @@ typedef enum MBException_e
     SERVER_ILLEGAL_INPUT_DELIMITER          = 0x27,
     SERVER_ILLEGAL_SUB_FUNCTION             = 0x28,
     SERVER_ILLEGAL_DATA_VALUE               = 0x29,
-
-#endif
 
     NOK = 0xFF
 }
