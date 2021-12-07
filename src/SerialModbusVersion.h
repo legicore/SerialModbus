@@ -19,9 +19,13 @@
 
 /*-----------------------------------------------------------*/
 
+#include <stdint.h>
+
+/*-----------------------------------------------------------*/
+
 #define SERIALMODBUS_VERSION_MAJOR      1
 #define SERIALMODBUS_VERSION_MINOR      0
-#define SERIALMODBUS_VERSION_PATCH      0
+#define SERIALMODBUS_VERSION_PATCH      13
 
 #define STR_HELPER( x )                 #x
 #define STR( x )                        STR_HELPER( x )
@@ -29,9 +33,9 @@
                                         STR( SERIALMODBUS_VERSION_MINOR ) "."   \
                                         STR( SERIALMODBUS_VERSION_PATCH )
 
-#define SERIALMODBUS_VERSION_HEX        ( ( SERIALMODBUS_VERSION_MAJOR << 16 ) |    \
-                                          ( SERIALMODBUS_VERSION_MINOR <<  8 ) |    \
-                                          ( SERIALMODBUS_VERSION_PATCH <<  0 ) )
+#define SERIALMODBUS_VERSION_HEX        ( ( ( uint32_t ) SERIALMODBUS_VERSION_MAJOR << 16 ) |   \
+                                          ( ( uint32_t ) SERIALMODBUS_VERSION_MINOR <<  8 ) |   \
+                                            ( uint32_t ) SERIALMODBUS_VERSION_PATCH         )
 
 #define SERIALMODBUS_VERSION_CHK_EQ( major, minor, patch )  \
 (                                                           \
