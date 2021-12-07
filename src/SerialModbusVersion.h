@@ -33,17 +33,63 @@
                                           ( SERIALMODBUS_VERSION_MINOR <<  8 ) |    \
                                           ( SERIALMODBUS_VERSION_PATCH <<  0 ) )
 
-#define SERIALMODBUS_VERSION_CHECK( major, minor, patch )   \
-    ( (                                                     \
-        SERIALMODBUS_VERSION_MAJOR >  ( major )             \
-    ) || (                                                  \
-        SERIALMODBUS_VERSION_MAJOR == ( major ) &&          \
-        SERIALMODBUS_VERSION_MINOR >  ( minor )             \
-    ) || (                                                  \
-        SERIALMODBUS_VERSION_MAJOR == ( major ) &&          \
-        SERIALMODBUS_VERSION_MINOR == ( minor ) &&          \
-        SERIALMODBUS_VERSION_PATCH >= ( patch )             \
-    ) )
+#define SERIALMODBUS_VERSION_CHK_EQ( major, minor, patch )  \
+(                                                           \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&            \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&            \
+      SERIALMODBUS_VERSION_PATCH == ( patch ) )             \
+)
+
+#define SERIALMODBUS_VERSION_CHK_NE( major, minor, patch )  \
+    !SERIALMODBUS_VERSION_CHK_EQ( major, minor, patch )
+
+#define SERIALMODBUS_VERSION_CHK_LT( major, minor, patch )  \
+(                                                           \
+    ( SERIALMODBUS_VERSION_MAJOR <  ( major ) )             \
+    ||                                                      \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&            \
+      SERIALMODBUS_VERSION_MINOR <  ( minor ) )             \
+    ||                                                      \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&            \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&            \
+      SERIALMODBUS_VERSION_PATCH <  ( patch ) )             \
+)
+
+#define SERIALMODBUS_VERSION_CHK_GT( major, minor, patch )  \
+(                                                           \
+    ( SERIALMODBUS_VERSION_MAJOR >  ( major ) )             \
+    ||                                                      \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&            \
+      SERIALMODBUS_VERSION_MINOR >  ( minor ) )             \
+    ||                                                      \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&            \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&            \
+      SERIALMODBUS_VERSION_PATCH >  ( patch ) )             \
+)
+
+#define SERIALMODBUS_VERSION_CHK_LTOE( major, minor, patch )    \
+(                                                               \
+    ( SERIALMODBUS_VERSION_MAJOR >  ( major ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR >  ( minor ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&                \
+      SERIALMODBUS_VERSION_PATCH >= ( patch ) )                 \
+)
+
+#define SERIALMODBUS_VERSION_CHK_GTOE( major, minor, patch )    \
+(                                                               \
+    ( SERIALMODBUS_VERSION_MAJOR <  ( major ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR <  ( minor ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&                \
+      SERIALMODBUS_VERSION_PATCH <= ( patch ) )                 \
+)
 
 /*-----------------------------------------------------------*/
 
