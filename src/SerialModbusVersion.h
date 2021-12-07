@@ -69,18 +69,6 @@
 
 #define SERIALMODBUS_VERSION_CHK_LTOE( major, minor, patch )    \
 (                                                               \
-    ( SERIALMODBUS_VERSION_MAJOR >  ( major ) )                 \
-    ||                                                          \
-    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
-      SERIALMODBUS_VERSION_MINOR >  ( minor ) )                 \
-    ||                                                          \
-    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
-      SERIALMODBUS_VERSION_MINOR == ( minor ) &&                \
-      SERIALMODBUS_VERSION_PATCH >= ( patch ) )                 \
-)
-
-#define SERIALMODBUS_VERSION_CHK_GTOE( major, minor, patch )    \
-(                                                               \
     ( SERIALMODBUS_VERSION_MAJOR <  ( major ) )                 \
     ||                                                          \
     ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
@@ -89,6 +77,18 @@
     ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
       SERIALMODBUS_VERSION_MINOR == ( minor ) &&                \
       SERIALMODBUS_VERSION_PATCH <= ( patch ) )                 \
+)
+
+#define SERIALMODBUS_VERSION_CHK_GTOE( major, minor, patch )    \
+(                                                               \
+    ( SERIALMODBUS_VERSION_MAJOR >  ( major ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR >  ( minor ) )                 \
+    ||                                                          \
+    ( SERIALMODBUS_VERSION_MAJOR == ( major ) &&                \
+      SERIALMODBUS_VERSION_MINOR == ( minor ) &&                \
+      SERIALMODBUS_VERSION_PATCH >= ( patch ) )                 \
 )
 
 /*-----------------------------------------------------------*/
