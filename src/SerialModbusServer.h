@@ -47,10 +47,10 @@ MBServerState_t;
 /** TODO */
 typedef enum MBAccess_e
 {
-    NA = 0b00,  /** No Access. */
-    RD = 0b01,  /** Read only. */
-    WR = 0b10,  /** Write only. */
-    RW = 0b11   /** Read and write. */
+    NA = 0b00,  /** No Access */
+    RD = 0b01,  /** Read only */
+    WR = 0b10,  /** Write only */
+    RW = 0b11   /** Read and write */
 }
 MBAccess_t;
 
@@ -98,7 +98,7 @@ public:
     bool diagRegClear( size_t bit );
     void diagRegClear( void );
 
-    /* Simplified API functions */
+    /* Simplified API functions. */
 
     int16_t createCoils( uint16_t address, size_t number );
     int16_t createInputResgisters( uint16_t address, size_t number );

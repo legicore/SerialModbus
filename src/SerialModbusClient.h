@@ -69,7 +69,7 @@ public:
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
 
-    /* Simplified API functions */
+    /* Simplified API functions. */
 
     int16_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value = 0 );
     int16_t readHoldingRegister( uint8_t id, uint16_t address );

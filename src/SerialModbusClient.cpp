@@ -356,14 +356,15 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
                 #if( configMODE == configMODE_ASCII )
                 {
-                    /* Convert request to ascii and update the pdu length */
+                    /* We are in ASCII mode, so we convert the frame to the
+                    ASCII format (this also updates the pdu length). */
                     xRtuToAscii( pucRequestFrame, &xRequestLength );
                 }
                 #endif
 
                 vSendData( pucRequestFrame, xRequestLength );
 
-                /* Check for broadcast or normal reqest */
+                /* Check if we have a broadcast or a normal reqest. */
 #if( configMODE == configMODE_RTU )
                 if( ucREQUEST_ID == configID_BROADCAST )
 #endif
@@ -371,18 +372,16 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 if( ucAsciiToByte( pucRequestFrame[ 1 ], pucRequestFrame[ 2 ] ) == configID_BROADCAST )
 #endif
                 {
-                    /* Broadcast (request id is 0) */
-                    vSetState( WAITING_TURNAROUND_DELAY );
+                    /* Broadcast */
 
-                    /* Start timer for turnaround-delay */
+                    vSetState( WAITING_TURNAROUND_DELAY );
                     vStartTurnaroundDelay();
                 }
                 else
                 {
                     /* Normal request */
-                    vSetState( WAITING_FOR_REPLY );
 
-                    /* Start timer for resposne-timeout */
+                    vSetState( WAITING_FOR_REPLY );
                     vStartResponseTimeout();
                 }
 
@@ -469,13 +468,14 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
                     #if( configMODE == configMODE_ASCII )
                     {
-                        /* Check for Newline (frame end) */
+                        /* Check for the currently set ASCII input delimiter. */
                         if( pucReplyFrame[ xReplyLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
-                            /* Check for Carriage Return (frame end) */
+                            /* Check for a Carriage Return (frame end). */
                             if( pucReplyFrame[ xReplyLength - 2 ] == ( uint8_t ) '\r' )
                             {
-                                /* Convert the frame from rtu to ascii format */
+                                /* From this point we handle the request and
+                                reply frames in the rtu format. */
                                 xAsciiToRtu( pucReplyFrame, &xReplyLength );
                                 xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
@@ -540,7 +540,8 @@ MBStatus_t SerialModbusClient::processModbus( void )
 #endif
                     default :
                     {
-                        /* Check for Error Code */
+                        /* The received reply could not be processed, so we
+                        check if it was illegal or an error reply. */
                         if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
                         {
                             xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
@@ -601,7 +602,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
 {
     size_t xOffset = 0;
 
-    /* Check the response byte count */
+    /* Check the reply byte count. */
     if( ucREPLY_BYTE_COUNT == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
     {
         if( pxRequest->object != NULL )
@@ -629,10 +630,10 @@ void SerialModbusClient::vHandlerFC03_04( void )
 
 void SerialModbusClient::vHandlerFC05( void )
 {
-    /* Check the response output address */
+    /* Check the reply output address. */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
     {
-        /* Check the response output value */
+        /* Check the reply output value. */
         if( usREPLY_COIL_VALUE == usREQUEST_COIL_VALUE )
         {
             if( pxRequest->action != NULL )
@@ -656,10 +657,10 @@ void SerialModbusClient::vHandlerFC05( void )
 
 void SerialModbusClient::vHandlerFC06( void )
 {
-    /* Check the response output address */
+    /* Check the reply output address. */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
     {
-        /* Check the response output value */
+        /* Check the reply output value. */
         if( usREPLY_OUTPUT_VALUE == usREQUEST_OUTPUT_VALUE )
         {
             if( pxRequest->action != NULL )
@@ -816,10 +817,10 @@ void SerialModbusClient::vHandlerFC08( void )
 
 void SerialModbusClient::vHandlerFC16( void )
 {
-    /* Check the response output address */
+    /* Check the reply output address. */
     if( usREPLY_ADDRESS == usREQUEST_ADDRESS )
     {
-        /* Check the response output value */
+        /* Check the reply output quantity. */
         if( usREPLY_QUANTITY == usREQUEST_QUANTITY )
         {
             if( pxRequest->action != NULL )

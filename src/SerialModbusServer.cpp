@@ -235,7 +235,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
 
     do
     {
-        /* Get the current state and select the associated action */
+        /* Get the current state and select the associated action. */
         switch( xState )
         {
             case SERVER_IDLE :
@@ -244,7 +244,8 @@ MBStatus_t SerialModbusServer::processModbus( void )
                 {
                     #if( configMODE == configMODE_ASCII )
                     {
-                        /* Convert request to ascii and update the pdu length */
+                        /* We are in ASCII mode, so we convert the frame to the
+                        ASCII format (this also updates the pdu length). */
                         xRtuToAscii( pucReplyFrame, &xReplyLength );
                     }
                     #endif
