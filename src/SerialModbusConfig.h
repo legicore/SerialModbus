@@ -42,6 +42,8 @@
 #define configTURNAROUND_DELAY_US       ( ( uint32_t ) 200000 )
 #define configRESPONSE_TIMEOUT_US       ( ( uint32_t ) 1000000 )
 
+#define configMIN_FRAME_LEN             ( ( size_t ) 3 )
+
 /*-----------------------------------------------------------*/
 
 #define configPROCESS_LOOP_HOOK         1

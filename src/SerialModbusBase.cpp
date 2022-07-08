@@ -125,11 +125,7 @@ SerialModbusBase::SerialModbusBase()
 
     vCustomDelayUs = NULL;
 
-    #if( configMODE == configMODE_RTU )
-    {
-        xChecksumLength = 2;
-    }
-    #endif
+    xChecksumLength = 2;
     #if( configMODE == configMODE_ASCII )
     {
         xChecksumLength = 1;
@@ -193,7 +189,7 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
 {
     uint16_t usTempChecksum;
 
-    if( *pxFrameLength == 0 )
+    if( *pxFrameLength < configMIN_FRAME_LEN )
     {
         return NOK;
     }
@@ -225,7 +221,7 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
 {
     uint16_t usTempChecksum;
 
-    if( xFrameLength == 0 )
+    if( xFrameLength < configMIN_FRAME_LEN )
     {
         return NOK;
     }
@@ -298,7 +294,7 @@ uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 
 MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( *pxFrameLength == 0 )
+    if( *pxFrameLength >= configMIN_FRAME_LEN )
     {
         return NOK;
     }
@@ -322,7 +318,7 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
 
 MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( *pxFrameLength == 0 )
+    if( *pxFrameLength >= ( configMIN_FRAME_LEN * 2 ) )
     {
         return NOK;
     }
@@ -496,7 +492,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
     }
 #endif
 
-    return false ;
+    return false;
 }
 /*-----------------------------------------------------------*/
 

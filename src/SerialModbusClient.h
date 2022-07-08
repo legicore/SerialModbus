@@ -76,7 +76,7 @@ public:
     int16_t readInputRegister( uint8_t id, uint16_t address );
     int16_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value );
     int16_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value );
-    MBStatus_t getLastException( void );
+    MBStatus_t getLastException( void ) const;
     const char * getLastExceptionString( void );
 
 private:

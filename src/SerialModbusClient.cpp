@@ -444,7 +444,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xReplyLength >= 3 )
+                if( xReplyLength >= configMIN_FRAME_LEN )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
@@ -889,7 +889,7 @@ int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, u
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::getLastException( void )
+MBStatus_t SerialModbusClient::getLastException( void ) const
 {
     return xStatusSimpleAPI;
 }

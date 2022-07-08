@@ -78,6 +78,7 @@ source code (8 data bits, no parity, 1 stop bit). */
     #endif
 
 #else
+
     /* The selected board and its architecture have not yet been tested. So the
     assumed default values for the Arduino serial port will be set. */
 
