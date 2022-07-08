@@ -602,7 +602,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
     size_t xOffset = 0;
 
     /* Check the response byte count */
-    if( ucREPLY_BYTE_COUNT == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
+    if( ucREPLY_BYTE_COUNT == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
     {
         if( pxRequest->object != NULL )
         {

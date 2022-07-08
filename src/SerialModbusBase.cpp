@@ -136,7 +136,7 @@ SerialModbusBase::SerialModbusBase()
 
 bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config )
 {
-    if( baud == 0 || serial == NULL || config == 0 )
+    if( ( baud == 0 ) || ( serial == NULL ) || ( config == 0 ) )
     {
         return false;
     }

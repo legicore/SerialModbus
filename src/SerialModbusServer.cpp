@@ -1161,9 +1161,9 @@ void SerialModbusServer::vHandlerFC16( void )
     {
         xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
 
-        if( ( size_t ) usREQUEST_QUANTITY + xOffset <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
         {
-            if( ucREQUEST_BYTE_COUNT_2 == ( uint8_t ) ( 2 * usREQUEST_QUANTITY ) )
+            if( ucREQUEST_BYTE_COUNT_2 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
