@@ -127,7 +127,7 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
         bSkipRequestMap = true;
     }
 
-    xSetException( OK );
+    ( void ) xSetException( OK );
 
     if( ( request->id           >  configID_SERVER_MAX ) ||
         ( request->functionCode == 0x00                ) ||
@@ -336,7 +336,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
     {
         if( xProcessRequestMap() != OK )
         {
-            xSetException( ILLEGAL_REQUEST );
+            ( void ) xSetException( ILLEGAL_REQUEST );
             vSetState( PROCESSING_ERROR );
         }
     }
@@ -430,14 +430,14 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 }
                 else
                 {
-                    xSetException( CHARACTER_OVERRUN );
+                    ( void ) xSetException( CHARACTER_OVERRUN );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    xSetException( NO_REPLY );
+                    ( void ) xSetException( NO_REPLY );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
@@ -459,7 +459,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                             }
                             else
                             {
-                                xSetException( ILLEGAL_CHECKSUM );
+                                ( void ) xSetException( ILLEGAL_CHECKSUM );
                                 vSetState( PROCESSING_ERROR );
                             }
                         }
@@ -476,8 +476,8 @@ MBStatus_t SerialModbusClient::processModbus( void )
                             {
                                 /* From this point we handle the request and
                                 reply frames in the rtu format. */
-                                xAsciiToRtu( pucReplyFrame, &xReplyLength );
-                                xAsciiToRtu( pucRequestFrame, &xRequestLength );
+                                ( void ) xAsciiToRtu( pucReplyFrame, &xReplyLength );
+                                ( void ) xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
                                 if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
                                 {
@@ -544,11 +544,11 @@ MBStatus_t SerialModbusClient::processModbus( void )
                         check if it was illegal or an error reply. */
                         if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
                         {
-                            xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
+                            ( void ) xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
                         }
                         else
                         {
-                            xSetException( ILLEGAL_FUNCTION );
+                            ( void ) xSetException( ILLEGAL_FUNCTION );
                         }
 
                         vSetState( PROCESSING_ERROR );
@@ -575,7 +575,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
             default :
             {
-                xSetException( ILLEGAL_STATE );
+                ( void ) xSetException( ILLEGAL_STATE );
                 vSetState( CLIENT_IDLE );
             }
         }
@@ -622,7 +622,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
     }
     else
     {
-        xSetException( ILLEGAL_BYTE_COUNT );
+        ( void ) xSetException( ILLEGAL_BYTE_COUNT );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -643,13 +643,13 @@ void SerialModbusClient::vHandlerFC05( void )
         }
         else
         {
-            xSetException( ILLEGAL_COIL_VALUE );
+            ( void ) xSetException( ILLEGAL_COIL_VALUE );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -670,13 +670,13 @@ void SerialModbusClient::vHandlerFC06( void )
         }
         else
         {
-            xSetException( ILLEGAL_OUTPUT_VALUE );
+            ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -697,7 +697,7 @@ void SerialModbusClient::vHandlerFC08( void )
                     {
                         if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
                         {
-                            xSetException( ILLEGAL_QUERY_DATA );
+                            ( void ) xSetException( ILLEGAL_QUERY_DATA );
                             vSetState( PROCESSING_ERROR );
                             return;
                         }
@@ -705,7 +705,7 @@ void SerialModbusClient::vHandlerFC08( void )
                 }
                 else
                 {
-                    xSetException( ILLEGAL_QUERY_DATA );
+                    ( void ) xSetException( ILLEGAL_QUERY_DATA );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -722,7 +722,7 @@ void SerialModbusClient::vHandlerFC08( void )
                 }
                 else
                 {
-                    xSetException( ILLEGAL_OUTPUT_VALUE );
+                    ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -747,7 +747,7 @@ void SerialModbusClient::vHandlerFC08( void )
             {
                 if( usREPLY_DATA != usREQUEST_DATA )
                 {
-                    xSetException( ILLEGAL_OUTPUT_VALUE );
+                    ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -796,7 +796,7 @@ void SerialModbusClient::vHandlerFC08( void )
 #endif
             default:
             {
-                xSetException( ILLEGAL_SUB_FUNCTION );
+                ( void ) xSetException( ILLEGAL_SUB_FUNCTION );
                 vSetState( PROCESSING_ERROR );
                 return;
             }
@@ -809,7 +809,7 @@ void SerialModbusClient::vHandlerFC08( void )
     }
     else
     {
-        xSetException( ILLEGAL_REPLY_SUB_FUNCTION );
+        ( void ) xSetException( ILLEGAL_REPLY_SUB_FUNCTION );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -830,13 +830,13 @@ void SerialModbusClient::vHandlerFC16( void )
         }
         else
         {
-            xSetException( ILLEGAL_QUANTITY );
+            ( void ) xSetException( ILLEGAL_QUANTITY );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }

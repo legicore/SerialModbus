@@ -231,7 +231,7 @@ void SerialModbusServer::setRegisterMap( MBRegister_t * registerMap )
 
 MBStatus_t SerialModbusServer::processModbus( void )
 {
-    xSetException( OK );
+    ( void ) xSetException( OK );
 
     do
     {
@@ -246,7 +246,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                     {
                         /* We are in ASCII mode, so we convert the frame to the
                         ASCII format (this also updates the pdu length). */
-                        xRtuToAscii( pucReplyFrame, &xReplyLength );
+                        ( void ) xRtuToAscii( pucReplyFrame, &xReplyLength );
                     }
                     #endif
 
@@ -284,7 +284,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                         /* Receive buffer overflow -> Increment the bus
                         charakter overrun counter. */
                         vIncCPT8();
-                        xSetException( CHARACTER_OVERRUN );
+                        ( void ) xSetException( CHARACTER_OVERRUN );
 
                         /* We go directly back to the idle state and don't send
                         any reply because it would cause bus collisions if every
@@ -361,7 +361,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                             {
                                 /* Convert the request frame from ASCII to RTU
                                 format and update the request length. */
-                                xAsciiToRtu( pucRequestFrame, &xRequestLength );
+                                ( void ) xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
                                 if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                                 {
@@ -485,11 +485,11 @@ MBStatus_t SerialModbusServer::processModbus( void )
                         {
                             #if( configEXTENDED_EXCEPTION_CODES == 1 )
                             {
-                                xSetException( SERVER_ILLEGAL_FUNCTION );
+                                ( void ) xSetException( SERVER_ILLEGAL_FUNCTION );
                             }
                             #else
                             {
-                                xSetException( ILLEGAL_FUNCTION );
+                                ( void ) xSetException( ILLEGAL_FUNCTION );
                             }
                             #endif
                         }
@@ -528,7 +528,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
             case FORMATTING_NORMAL_REPLY :
             {
                 ucREPLY_ID = ucServerId;
-                xSetChecksum( pucReplyFrame, &xReplyLength );
+                ( void ) xSetChecksum( pucReplyFrame, &xReplyLength );
 
                 vClearRequestFrame();
                 vSetState( SERVER_IDLE );
@@ -546,7 +546,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
 
                 xReplyLength = 3;
 
-                xSetChecksum( pucReplyFrame, &xReplyLength );
+                ( void ) xSetChecksum( pucReplyFrame, &xReplyLength );
 
                 vClearRequestFrame();
                 vSetState( SERVER_IDLE );
@@ -558,11 +558,11 @@ MBStatus_t SerialModbusServer::processModbus( void )
             {
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SERVER_ILLEGAL_STATE );
+                    ( void ) xSetException( SERVER_ILLEGAL_STATE );
                 }
                 #else
                 {
-                    xSetException( SERVER_DEVICE_FAILURE );
+                    ( void ) xSetException( SERVER_DEVICE_FAILURE );
                 }
                 #endif
 
@@ -613,11 +613,11 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
     find a matching register map entry. */
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
+        ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
     }
     #else
     {
-        xSetException( ILLEGAL_DATA_ADDRESS );
+        ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
     }
     #endif
 
@@ -650,11 +650,11 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
                         and abort the for loop. */
                         #if( configEXTENDED_EXCEPTION_CODES == 1 )
                         {
-                            xSetException( SERVER_ILLEGAL_ACCESS );
+                            ( void ) xSetException( SERVER_ILLEGAL_ACCESS );
                         }
                         #else
                         {
-                            xSetException( SERVER_DEVICE_FAILURE );
+                            ( void ) xSetException( SERVER_DEVICE_FAILURE );
                         }
                         #endif
 
@@ -666,11 +666,11 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
                 so we set the exception and abort the for loop. */
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SERVER_ILLEGAL_FUNCTION );
+                    ( void ) xSetException( SERVER_ILLEGAL_FUNCTION );
                 }
                 #else
                 {
-                    xSetException( ILLEGAL_FUNCTION );
+                    ( void ) xSetException( ILLEGAL_FUNCTION );
                 }
                 #endif
 
@@ -717,11 +717,11 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SERVER_ILLEGAL_QUANTITY );
+        ( void ) xSetException( SERVER_ILLEGAL_QUANTITY );
     }
     #else
     {
-        xSetException( ILLEGAL_DATA_VALUE );
+        ( void ) xSetException( ILLEGAL_DATA_VALUE );
     }
     #endif
 }
@@ -751,11 +751,11 @@ void SerialModbusServer::vHandlerFC05( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SERVER_ILLEGAL_COIL_VALUE );
+        ( void ) xSetException( SERVER_ILLEGAL_COIL_VALUE );
     }
     #else
     {
-        xSetException( ILLEGAL_DATA_VALUE );
+        ( void ) xSetException( ILLEGAL_DATA_VALUE );
     }
     #endif
 }
@@ -834,7 +834,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -850,7 +850,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -871,11 +871,11 @@ void SerialModbusServer::vHandlerFC08( void )
             {
                 #if( configEXTENDED_EXCEPTION_CODES == 1 )
                 {
-                    xSetException( SERVER_ILLEGAL_INPUT_DELIMITER );
+                    ( void ) xSetException( SERVER_ILLEGAL_INPUT_DELIMITER );
                 }
                 #else
                 {
-                    xSetException( ILLEGAL_DATA_VALUE );
+                    ( void ) xSetException( ILLEGAL_DATA_VALUE );
                 }
                 #endif
 
@@ -894,7 +894,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -912,7 +912,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -928,7 +928,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -944,7 +944,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -960,7 +960,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -976,7 +976,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -992,7 +992,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -1008,7 +1008,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -1024,7 +1024,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -1040,7 +1040,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -1058,7 +1058,7 @@ void SerialModbusServer::vHandlerFC08( void )
             }
             else
             {
-                xSetException( ILLEGAL_DATA_VALUE );
+                ( void ) xSetException( ILLEGAL_DATA_VALUE );
             }
 
             break;
@@ -1068,11 +1068,11 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             #if( configEXTENDED_EXCEPTION_CODES == 1 )
             {
-                xSetException( SERVER_ILLEGAL_SUB_FUNCTION );
+                ( void ) xSetException( SERVER_ILLEGAL_SUB_FUNCTION );
             }
             #else
             {
-                xSetException( ILLEGAL_FUNCTION );
+                ( void ) xSetException( ILLEGAL_FUNCTION );
             }
             #endif
 
@@ -1084,7 +1084,7 @@ void SerialModbusServer::vHandlerFC08( void )
     {
         if( xException == ILLEGAL_DATA_VALUE )
         {
-            xSetException( SERVER_ILLEGAL_DATA_VALUE );
+            ( void ) xSetException( SERVER_ILLEGAL_DATA_VALUE );
         }
     }
     #endif
@@ -1191,11 +1191,11 @@ void SerialModbusServer::vHandlerFC16( void )
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
     {
-        xSetException( SERVER_ILLEGAL_QUANTITY );
+        ( void ) xSetException( SERVER_ILLEGAL_QUANTITY );
     }
     #else
     {
-        xSetException( ILLEGAL_DATA_VALUE );
+        ( void ) xSetException( ILLEGAL_DATA_VALUE );
     }
     #endif
 }
