@@ -35,7 +35,7 @@
 
 #define SERIALMODBUS_VERSION_HEX        ( ( ( uint32_t ) SERIALMODBUS_VERSION_MAJOR << 16 ) |   \
                                           ( ( uint32_t ) SERIALMODBUS_VERSION_MINOR <<  8 ) |   \
-                                            ( uint32_t ) SERIALMODBUS_VERSION_PATCH         )
+                                            ( uint32_t ) SERIALMODBUS_VERSION_PATCH           )
 
 /*-----------------------------------------------------------*/
 
