@@ -187,31 +187,29 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
 
 MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    uint16_t usTempChecksum;
+    uint16_t usTempChecksum = 0;
 
-    if( *pxFrameLength < configMIN_FRAME_LEN )
+    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configMIN_FRAME_LEN ) )
     {
-        return NOK;
+        #if( configMODE == configMODE_RTU )
+        {
+            usTempChecksum = usCRC16( pucFrame, *pxFrameLength );
+            pucFrame[ (*pxFrameLength)++ ] =  lowByte( usTempChecksum );
+            pucFrame[ (*pxFrameLength)++ ] = highByte( usTempChecksum );
+
+            return OK;
+        }
+        #endif
+
+        #if( configMODE == configMODE_ASCII )
+        {
+            usTempChecksum = ( uint16_t ) ucLRC( pucFrame, *pxFrameLength );
+            pucFrame[ (*pxFrameLength)++ ] = ( uint8_t ) usTempChecksum;
+
+            return OK;
+        }
+        #endif
     }
-
-    #if( configMODE == configMODE_RTU )
-    {
-        usTempChecksum = usCRC16( pucFrame, *pxFrameLength );
-        pucFrame[ (*pxFrameLength)++ ] =  lowByte( usTempChecksum );
-        pucFrame[ (*pxFrameLength)++ ] = highByte( usTempChecksum );
-
-        return OK;
-    }
-    #endif
-
-    #if( configMODE == configMODE_ASCII )
-    {
-        usTempChecksum = ( uint16_t ) ucLRC( pucFrame, *pxFrameLength );
-        pucFrame[ (*pxFrameLength)++ ] = ( uint8_t ) usTempChecksum;
-
-        return OK;
-    }
-    #endif
 
     return NOK;
 }
@@ -219,35 +217,33 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
 
 MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLength )
 {
-    uint16_t usTempChecksum;
+    uint16_t usTempChecksum = 0;
 
-    if( xFrameLength < configMIN_FRAME_LEN )
+    if( ( pucFrame != NULL ) && ( xFrameLength >= configMIN_FRAME_LEN ) )
     {
-        return NOK;
-    }
-
-    #if( configMODE == configMODE_RTU )
-    {
-        usTempChecksum = usCRC16( pucFrame, xFrameLength - 2 );
-        if( pucFrame[ xFrameLength - 2 ] == lowByte( usTempChecksum ) )
+        #if( configMODE == configMODE_RTU )
         {
-            if( pucFrame[ xFrameLength - 1 ] == highByte( usTempChecksum ) )
+            usTempChecksum = usCRC16( pucFrame, xFrameLength - 2 );
+            if( pucFrame[ xFrameLength - 2 ] == lowByte( usTempChecksum ) )
+            {
+                if( pucFrame[ xFrameLength - 1 ] == highByte( usTempChecksum ) )
+                {
+                    return OK;
+                }
+            }
+        }
+        #endif
+
+        #if( configMODE == configMODE_ASCII )
+        {
+            usTempChecksum = ( uint16_t ) ucLRC( pucFrame, xFrameLength - 1 );
+            if( pucFrame[ xFrameLength - 1 ] == ( uint8_t ) usTempChecksum )
             {
                 return OK;
             }
         }
+        #endif
     }
-    #endif
-
-    #if( configMODE == configMODE_ASCII )
-    {
-        usTempChecksum = ( uint16_t ) ucLRC( pucFrame, xFrameLength - 1 );
-        if( pucFrame[ xFrameLength - 1 ] == ( uint8_t ) usTempChecksum )
-        {
-            return OK;
-        }
-    }
-    #endif
 
     return NOK;
 }
@@ -294,7 +290,7 @@ uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 
 MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( *pxFrameLength >= configMIN_FRAME_LEN )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < configMIN_FRAME_LEN ) )
     {
         return NOK;
     }
@@ -318,7 +314,7 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
 
 MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( *pxFrameLength >= ( configMIN_FRAME_LEN * 2 ) )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < ( configMIN_FRAME_LEN * 2 ) ) )
     {
         return NOK;
     }
@@ -336,22 +332,25 @@ MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLe
 
 void SerialModbusBase::vClearReplyFrame( void )
 {
-    //memset( pucReplyFrame, 0x00, xReplyLength );
+//    ( void ) memset( pucReplyFrame, 0x00, xReplyLength );
     xReplyLength = 0;
 }
 /*-----------------------------------------------------------*/
 
 void SerialModbusBase::vClearRequestFrame( void )
 {
-    //memset( pucRequestFrame, 0x00, xRequestLength );
+//    ( void ) memset( pucRequestFrame, 0x00, xRequestLength );
     xRequestLength = 0;
 }
 /*-----------------------------------------------------------*/
 
 void SerialModbusBase::setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) )
 {
-    vSerialCtrlTx = serialCtrlTx;
-    vSerialCtrlRx = serialCtrlRx;
+    if( ( serialCtrlTx != NULL ) && ( serialCtrlRx != NULL ) )
+    {
+        vSerialCtrlTx = serialCtrlTx;
+        vSerialCtrlRx = serialCtrlRx;
+    }
 }
 /*-----------------------------------------------------------*/
 
@@ -407,14 +406,7 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 
     void SerialModbusBase::setProcessLoopHook( void (*loopHookFunction)( void ) )
     {
-        if( loopHookFunction != NULL )
-        {
-            vProcessLoopHook = loopHookFunction;
-        }
-        else
-        {
-            vProcessLoopHook = NULL;
-        }
+        vProcessLoopHook = loopHookFunction;
     }
 
 #endif
@@ -471,26 +463,29 @@ uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
 
 bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength )
 {
-    if( pxSerial != NULL )
+    if( pucReceiveBuffer != NULL )
     {
-        if( pxSerial->available() > 0 )
+        if( pxSerial != NULL )
         {
-            pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSerial->read();
+            if( pxSerial->available() > 0 )
+            {
+                pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSerial->read();
 
-            return true;
+                return true;
+            }
         }
-    }
 #if defined( COMPAT_SOFTWARE_SERIAL )
-    else if( pxSerialSoftware != NULL )
-    {
-        if( pxSerialSoftware->available() > 0 )
+        else if( pxSerialSoftware != NULL )
         {
-            pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSerialSoftware->read();
+            if( pxSerialSoftware->available() > 0 )
+            {
+                pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSerialSoftware->read();
 
-            return true;
+                return true;
+            }
         }
-    }
 #endif
+    }
 
     return false;
 }
@@ -498,34 +493,37 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
 
 void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength )
 {
-    if( vSerialCtrlTx != NULL )
+    if( pucSendBuffer != NULL )
     {
-        (*vSerialCtrlTx)();
-    }
+        if( vSerialCtrlTx != NULL )
+        {
+            (*vSerialCtrlTx)();
+        }
 
-    if( pxSerial != NULL )
-    {
-        pxSerial->write( pucSendBuffer, pxBufferLength );
-        pxSerial->flush();
-    }
+        if( pxSerial != NULL )
+        {
+            pxSerial->write( pucSendBuffer, pxBufferLength );
+            pxSerial->flush();
+        }
 #if defined( COMPAT_SOFTWARE_SERIAL )
-    else if( pxSerialSoftware != NULL )
-    {
-        pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
-    }
+        else if( pxSerialSoftware != NULL )
+        {
+            pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
+        }
 #endif
 
-    #if( configMODE == configMODE_RTU )
-    {
-        /* Wait the amount of microseconds for the Inter Frame Delay to let the
-        receiving device detect the end of the frame. */
-        vDelayUs( ulInterFrameDelayUs );
-    }
-    #endif
+        #if( configMODE == configMODE_RTU )
+        {
+            /* Wait the amount of microseconds for the Inter Frame Delay to let the
+            receiving device detect the end of the frame. */
+            vDelayUs( ulInterFrameDelayUs );
+        }
+        #endif
 
-    if( vSerialCtrlRx != NULL )
-    {
-        (*vSerialCtrlRx)();
+        if( vSerialCtrlRx != NULL )
+        {
+            (*vSerialCtrlRx)();
+        }
     }
 }
 /*-----------------------------------------------------------*/
@@ -657,7 +655,10 @@ void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
 
 void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
 {
-    vCustomDelayUs = customDelay;
+    if( customDelay != NULL )
+    {
+        vCustomDelayUs = customDelay;
+    }
 }
 /*-----------------------------------------------------------*/
 
