@@ -303,37 +303,34 @@ MBStatus_t SerialModbusServer::processModbus( void )
                     {
                         if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            if( xRequestLength >= 3 )
+                            if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
                             {
-                                if( xCheckChecksum( pucRequestFrame, xRequestLength ) == OK )
-                                {
-                                    /* Received a new valid request -> Increment
-                                    the bus message counter. */
-                                    vIncCPT1();
+                                /* Received a new valid request -> Increment the
+                                bus message counter. */
+                                vIncCPT1();
 
 #if( configSERVER_MULTI_ID == 1 )
-                                    if( ( bCheckId( ucREQUEST_ID ) != true   ) &&
+                                if( ( bCheckId( ucREQUEST_ID ) != true   ) &&
 #else
-                                    if( ( ucREQUEST_ID != ucServerId         ) &&
+                                if( ( ucREQUEST_ID != ucServerId         ) &&
 #endif
-                                        ( ucREQUEST_ID != configID_BROADCAST ) )
-                                    {
-                                        vClearRequestFrame();
-                                        vSetState( SERVER_IDLE );
-                                        break;
-                                    }
-
-                                    while( bTimeoutInterFrameDelay() != true );
-
-                                    #if( configSERVER_MULTI_ID == 1 )
-                                    {
-                                        ucServerId = ucREQUEST_ID;
-                                    }
-                                    #endif
-
-                                    vSetState( CHECKING_REQUEST );
+                                    ( ucREQUEST_ID != configID_BROADCAST ) )
+                                {
+                                    vClearRequestFrame();
+                                    vSetState( SERVER_IDLE );
                                     break;
                                 }
+
+                                while( bTimeoutInterFrameDelay() != true );
+
+                                #if( configSERVER_MULTI_ID == 1 )
+                                {
+                                    ucServerId = ucREQUEST_ID;
+                                }
+                                #endif
+
+                                vSetState( CHECKING_REQUEST );
+                                break;
                             }
 
                             /* Got an checksum error or received a frame that
