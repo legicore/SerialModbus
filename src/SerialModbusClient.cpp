@@ -358,7 +358,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 {
                     /* We are in ASCII mode, so we convert the frame to the
                     ASCII format (this also updates the pdu length). */
-                    xRtuToAscii( pucRequestFrame, &xRequestLength );
+                    ( void ) xRtuToAscii( pucRequestFrame, &xRequestLength );
                 }
                 #endif
 
