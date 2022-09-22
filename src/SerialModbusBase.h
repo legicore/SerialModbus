@@ -123,12 +123,11 @@ typedef enum MBException_e
     /* Extended exception codes for server replies. */
     SERVER_ILLEGAL_FUNCTION                 = 0x21,
     SERVER_ILLEGAL_STATE                    = 0x22,
-    SERVER_ILLEGAL_DATA_ADDRESS             = 0x23,
-    SERVER_ILLEGAL_ACCESS                   = 0x24,
-    SERVER_ILLEGAL_QUANTITY                 = 0x25,
-    SERVER_ILLEGAL_COIL_VALUE               = 0x26,
-    SERVER_ILLEGAL_INPUT_DELIMITER          = 0x27,
-    SERVER_ILLEGAL_SUB_FUNCTION             = 0x28,
+    SERVER_ILLEGAL_ACCESS                   = 0x23,
+    SERVER_ILLEGAL_QUANTITY                 = 0x24,
+    SERVER_ILLEGAL_COIL_VALUE               = 0x25,
+    SERVER_ILLEGAL_INPUT_DELIMITER          = 0x26,
+    SERVER_ILLEGAL_SUB_FUNCTION             = 0x27,
 
     NOK = 0xFF
 }

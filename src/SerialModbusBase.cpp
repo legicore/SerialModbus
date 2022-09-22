@@ -69,7 +69,6 @@ static const MBExceptionString_t pxExceptionStrings[] = {
     /* Extended exception codes for server replies. */
     { SERVER_ILLEGAL_FUNCTION,                  "SERVER_ILLEGAL_FUNCTION" },
     { SERVER_ILLEGAL_STATE,                     "SERVER_ILLEGAL_STATE" },
-    { SERVER_ILLEGAL_DATA_ADDRESS,              "SERVER_ILLEGAL_DATA_ADDRESS" },
     { SERVER_ILLEGAL_ACCESS,                    "SERVER_ILLEGAL_ACCESS" },
     { SERVER_ILLEGAL_QUANTITY,                  "SERVER_ILLEGAL_QUANTITY" },
     { SERVER_ILLEGAL_COIL_VALUE,                "SERVER_ILLEGAL_COIL_VALUE" },

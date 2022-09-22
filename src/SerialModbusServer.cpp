@@ -608,15 +608,7 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
     default. If successful the exception is reset to 'OK' or will be overwritten
     if another error occurs. Otherwise it persists which means that we could not
     find a matching register map entry. */
-    #if( configEXTENDED_EXCEPTION_CODES == 1 )
-    {
-        ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
-    }
-    #else
-    {
-        ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
-    }
-    #endif
+    ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
 
     /* Scan the register map and check if the request address value lies in the
     range of one of the mapped register entries. */
@@ -711,15 +703,7 @@ void SerialModbusServer::vHandlerFC03_04( void )
             return;
         }
 
-        #if( configEXTENDED_EXCEPTION_CODES == 1 )
-        {
-            ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
-        }
-        #else
-        {
-            ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
-        }
-        #endif
+        ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
 
         return;
     }
@@ -1185,15 +1169,7 @@ void SerialModbusServer::vHandlerFC16( void )
                 return;
             }
 
-            #if( configEXTENDED_EXCEPTION_CODES == 1 )
-            {
-                ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
-            }
-            #else
-            {
-                ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
-            }
-            #endif
+            ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
 
             return;
         }
