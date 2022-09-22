@@ -710,6 +710,18 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
             return;
         }
+
+        #if( configEXTENDED_EXCEPTION_CODES == 1 )
+        {
+            ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
+        }
+        #else
+        {
+            ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
+        }
+        #endif
+
+        return;
     }
 
     #if( configEXTENDED_EXCEPTION_CODES == 1 )
@@ -857,7 +869,7 @@ void SerialModbusServer::vHandlerFC08( void )
         case CHANGE_ASCII_INPUT_DELIMITER:
         {
             if( ( isAscii( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
-                ( ucREQUEST_INPUT_DELIMITER_LO                     == 0x00 ) )
+                ( ucREQUEST_INPUT_DELIMITER_LO == 0x00 ) )
             {
                 cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
 
@@ -1157,11 +1169,11 @@ void SerialModbusServer::vHandlerFC16( void )
 
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007B ) )
     {
-        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
-
-        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+        if( ucREQUEST_BYTE_COUNT_2 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
         {
-            if( ucREQUEST_BYTE_COUNT_2 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
+            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
+
+            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
@@ -1183,6 +1195,18 @@ void SerialModbusServer::vHandlerFC16( void )
 
                 return;
             }
+
+            #if( configEXTENDED_EXCEPTION_CODES == 1 )
+            {
+                ( void ) xSetException( SERVER_ILLEGAL_DATA_ADDRESS );
+            }
+            #else
+            {
+                ( void ) xSetException( ILLEGAL_DATA_ADDRESS );
+            }
+            #endif
+
+            return;
         }
     }
 
@@ -1209,6 +1233,10 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
         pxRegisterMapTemp = ( MBRegister_t * ) malloc( sizeof( MBRegister_t ) * xRegisterMapSize );
         if(pxRegisterMapTemp != NULL  )
         {
+
+#if( configSERVER_MULTI_ID == 1 )
+            pxRegisterMapTemp[ 0 ].id = ucServerId;
+#endif
             pxRegisterMapTemp[ 0 ].access = NA;
             pxRegisterMapTemp[ 0 ].address = 0x0000;
             pxRegisterMapTemp[ 0 ].object = NULL;
@@ -1236,6 +1264,9 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
             pxRegisterMap[ xRegisterMapSize - 2 ].object = ( uint16_t * ) calloc( xNumber, sizeof( uint16_t ) );
             if( pxRegisterMap[ xRegisterMapSize - 2 ].object != NULL )
             {
+#if( configSERVER_MULTI_ID == 1 )
+                pxRegisterMap[ xRegisterMapSize - 2 ].id = ucServerId;
+#endif
                 pxRegisterMap[ xRegisterMapSize - 2 ].access = xAccess;
                 pxRegisterMap[ xRegisterMapSize - 2 ].address = usAddress;
                 pxRegisterMap[ xRegisterMapSize - 2 ].objectSize = xNumber;
