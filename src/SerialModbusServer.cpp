@@ -1084,19 +1084,8 @@ void SerialModbusServer::vHandlerFC08( void )
                 ( void ) xSetException( ILLEGAL_FUNCTION );
             }
             #endif
-
-            return;
         }
     }
-
-    #if( configEXTENDED_EXCEPTION_CODES == 1 )
-    {
-        if( xException == ILLEGAL_DATA_VALUE )
-        {
-            ( void ) xSetException( SERVER_ILLEGAL_DATA_VALUE );
-        }
-    }
-    #endif
 }
 /*-----------------------------------------------------------*/
 

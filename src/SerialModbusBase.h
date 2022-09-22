@@ -129,7 +129,6 @@ typedef enum MBException_e
     SERVER_ILLEGAL_COIL_VALUE               = 0x26,
     SERVER_ILLEGAL_INPUT_DELIMITER          = 0x27,
     SERVER_ILLEGAL_SUB_FUNCTION             = 0x28,
-    SERVER_ILLEGAL_DATA_VALUE               = 0x29,
 
     NOK = 0xFF
 }
