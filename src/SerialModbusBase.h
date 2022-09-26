@@ -174,7 +174,7 @@ protected:
     void vClearRequestFrame( void );
     void vClearReplyFrame( void );
     bool bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength );
-    void vSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
+    size_t xSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
     void (*vSerialCtrlTx)( void );
     void (*vSerialCtrlRx)( void );
     Serial_t * pxSerial;
@@ -201,7 +201,7 @@ protected:
     void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void ) const;
     bool bTimeoutInterCharacterTimeout( void ) const;
-    bool bCalculateTimeouts( uint32_t ulBaud );
+    bool bCalculateTimeouts( uint32_t ulBaudzz );
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
     uint8_t ucByteToAsciiHi( uint8_t ucByte );
     uint8_t ucByteToAsciiLo( uint8_t ucByte );

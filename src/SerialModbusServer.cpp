@@ -250,7 +250,8 @@ MBStatus_t SerialModbusServer::processModbus( void )
                     }
                     #endif
 
-                    vSendData( pucReplyFrame, xReplyLength );
+                    ( void ) xSendData( pucReplyFrame, xReplyLength );
+
                     vClearReplyFrame();
                 }
                 else

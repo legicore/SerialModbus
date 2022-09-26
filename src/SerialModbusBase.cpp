@@ -489,8 +489,10 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength )
+size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLength )
 {
+    size_t xDataSent = 0;
+
     if( pucSendBuffer != NULL )
     {
         if( vSerialCtrlTx != NULL )
@@ -500,20 +502,19 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
 
         if( pxSerial != NULL )
         {
-            pxSerial->write( pucSendBuffer, pxBufferLength );
+            xDataSent = pxSerial->write( pucSendBuffer, pxBufferLength );
             pxSerial->flush();
         }
 #if defined( COMPAT_SOFTWARE_SERIAL )
         else if( pxSerialSoftware != NULL )
         {
-            pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
+            xDataSent = pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
         }
 #endif
-
         #if( configMODE == configMODE_RTU )
         {
-            /* Wait the amount of microseconds for the Inter Frame Delay to let the
-            receiving device detect the end of the frame. */
+            /* Wait the amount of microseconds for the Inter Frame Delay to let
+            the receiving device detect the end of the frame. */
             vDelayUs( ulInterFrameDelayUs );
         }
         #endif
@@ -523,6 +524,8 @@ void SerialModbusBase::vSendData( uint8_t * pucSendBuffer, size_t pxBufferLength
             (*vSerialCtrlRx)();
         }
     }
+
+    return xDataSent;
 }
 /*-----------------------------------------------------------*/
 

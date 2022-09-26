@@ -362,7 +362,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 }
                 #endif
 
-                vSendData( pucRequestFrame, xRequestLength );
+                ( void ) xSendData( pucRequestFrame, xRequestLength );
 
                 /* Check if we have a broadcast or a normal reqest. */
 #if( configMODE == configMODE_RTU )
