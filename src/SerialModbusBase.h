@@ -181,7 +181,6 @@ protected:
 #if defined( COMPAT_SOFTWARE_SERIAL )
     SoftwareSerial * pxSerialSoftware;
 #endif
-    uint32_t ulSerialConfig;
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );
     uint32_t ulRequestDword( size_t xNbr, size_t xOffset = 4 );
@@ -201,7 +200,7 @@ protected:
     void vStartInterCharacterTimeout( void );
     bool bTimeoutInterFrameDelay( void ) const;
     bool bTimeoutInterCharacterTimeout( void ) const;
-    bool bCalculateTimeouts( uint32_t ulBaudzz );
+    bool bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig );
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
     uint8_t ucByteToAsciiHi( uint8_t ucByte );
     uint8_t ucByteToAsciiLo( uint8_t ucByte );

@@ -91,11 +91,9 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength = 0;
 
     pxSerial = NULL;
-    ulSerialConfig = 0;
     #if defined( COMPAT_SOFTWARE_SERIAL )
     {
         pxSerialSoftware = NULL;
-        ulSerialConfig = SERIAL_CONFIG_DEFAULT;
     }
     #endif
 
@@ -140,12 +138,11 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
     }
 
     pxSerial = serial;
-    ulSerialConfig = config;
     pxSerial->begin( baud, config );
 
     #if( configMODE == configMODE_RTU )
     {
-        if( bCalculateTimeouts( baud ) != true )
+        if( bCalculateTimeouts( baud, config ) != true )
         {
             return false;
         }
@@ -170,7 +167,7 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
 
         #if( configMODE == configMODE_RTU )
         {
-            if( bCalculateTimeouts( baud ) != true )
+            if( bCalculateTimeouts( baud, SERIAL_CONFIG_DEFAULT ) != true )
             {
                 return false;
             }
@@ -529,7 +526,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
+bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
 {
     uint8_t ucNbrOfBits = 0;
 
@@ -565,7 +562,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud )
 
             0.859375 ms * 1000 = 859.375 us */
 
-        switch( ulSerialConfig )
+        switch( ulConfig )
         {
             case SERIAL_5N1 :
             case SERIAL_5E1 :
