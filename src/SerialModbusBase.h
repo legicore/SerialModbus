@@ -154,12 +154,10 @@ public:
 #endif
     void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
     const char * getExceptionString( uint8_t exceptionCode );
-#if( configMODE == configMODE_RTU )
     uint32_t getInterCharacterTimeout( void ) const;
     uint32_t getInterFrameDelay( void ) const;
     int8_t setInterCharacterTimeout( uint32_t timeUs );
     int8_t setInterFrameDelay( uint32_t timeUs );
-#endif
 
 protected:
 

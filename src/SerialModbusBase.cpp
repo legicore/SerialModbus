@@ -102,14 +102,10 @@ SerialModbusBase::SerialModbusBase()
 
     xException = OK;
 
-    #if( configMODE == configMODE_RTU )
-    {
-        ulInterFrameDelayUs = 0;
-        ulTimerInterFrameDelayUs = 0;
-        ulInterCharacterTimeoutUs = 0;
-        ulTimerInterCharacterTimeoutUs = 0;
-    }
-    #endif
+    ulInterFrameDelayUs = 0;
+    ulTimerInterFrameDelayUs = 0;
+    ulInterCharacterTimeoutUs = 0;
+    ulTimerInterCharacterTimeoutUs = 0;
 
     #if( configPROCESS_LOOP_HOOK == 1 )
     {
@@ -674,53 +670,37 @@ const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
 }
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
-    {
-        return ulInterCharacterTimeoutUs;
-    }
-
-#endif
+uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
+{
+    return ulInterCharacterTimeoutUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    uint32_t SerialModbusBase::getInterFrameDelay( void ) const
-    {
-        return ulInterFrameDelayUs;
-    }
-
-#endif
+uint32_t SerialModbusBase::getInterFrameDelay( void ) const
+{
+    return ulInterFrameDelayUs;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
+int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
+{
+    if( timeUs != 0 )
     {
-        if( timeUs != 0 )
-        {
-            ulInterCharacterTimeoutUs = timeUs;
-            return 0;
-        }
-
-        return -1;
+        ulInterCharacterTimeoutUs = timeUs;
+        return 0;
     }
 
-#endif
+    return -1;
+}
 /*-----------------------------------------------------------*/
 
-#if( configMODE == configMODE_RTU )
-
-    int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
+int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
+{
+    if( timeUs != 0 )
     {
-        if( timeUs != 0 )
-        {
-            ulInterFrameDelayUs = timeUs;
-            return 0;
-        }
-
-        return -1;
+        ulInterFrameDelayUs = timeUs;
+        return 0;
     }
 
-#endif
+    return -1;
+}
