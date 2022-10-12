@@ -422,13 +422,13 @@ void SerialModbusBase::vStartInterCharacterTimeout( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::bTimeoutInterFrameDelay( void ) const
+bool SerialModbusBase::bTimeoutInterFrameDelay( void )
 {
     return ( micros() - ulTimerInterFrameDelayUs ) >= ulInterFrameDelayUs;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::bTimeoutInterCharacterTimeout( void ) const
+bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
 {
     return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
 }
@@ -670,13 +670,13 @@ const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
 }
 /*-----------------------------------------------------------*/
 
-uint32_t SerialModbusBase::getInterCharacterTimeout( void ) const
+uint32_t SerialModbusBase::getInterCharacterTimeout( void )
 {
     return ulInterCharacterTimeoutUs;
 }
 /*-----------------------------------------------------------*/
 
-uint32_t SerialModbusBase::getInterFrameDelay( void ) const
+uint32_t SerialModbusBase::getInterFrameDelay( void )
 {
     return ulInterFrameDelayUs;
 }

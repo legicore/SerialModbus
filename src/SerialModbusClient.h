@@ -76,7 +76,7 @@ public:
     int16_t readInputRegister( uint8_t id, uint16_t address );
     int16_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value );
     int16_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value );
-    MBStatus_t getLastException( void ) const;
+    MBStatus_t getLastException( void );
     const char * getLastExceptionString( void );
 
 private:
@@ -92,8 +92,8 @@ private:
     uint32_t ulTimerResponseTimeoutUs;
     uint32_t ulTurnaroundDelayUs;
     uint32_t ulResponseTimeoutUs;
-    bool bTimeoutTurnaroundDelay( void ) const;
-    bool bTimeoutResponseTimeout( void ) const;
+    bool bTimeoutTurnaroundDelay( void );
+    bool bTimeoutResponseTimeout( void );
     void vStartTurnaroundDelay( void );
     void vStartResponseTimeout( void );
     void vHandlerFC03_04( void );

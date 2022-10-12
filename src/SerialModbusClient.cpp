@@ -64,13 +64,13 @@ void SerialModbusClient::vStartResponseTimeout( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusClient::bTimeoutTurnaroundDelay( void ) const
+bool SerialModbusClient::bTimeoutTurnaroundDelay( void )
 {
     return ( micros() - ulTimerTurnaroundDelayUs ) >= ulTurnaroundDelayUs;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusClient::bTimeoutResponseTimeout( void ) const
+bool SerialModbusClient::bTimeoutResponseTimeout( void )
 {
     return ( micros() - ulTimerResponseTimeoutUs ) >= ulResponseTimeoutUs;
 }
@@ -890,7 +890,7 @@ int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, u
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::getLastException( void ) const
+MBStatus_t SerialModbusClient::getLastException( void )
 {
     return xStatusSimpleAPI;
 }

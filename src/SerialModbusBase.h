@@ -154,8 +154,8 @@ public:
 #endif
     void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
     const char * getExceptionString( uint8_t exceptionCode );
-    uint32_t getInterCharacterTimeout( void ) const;
-    uint32_t getInterFrameDelay( void ) const;
+    uint32_t getInterCharacterTimeout( void );
+    uint32_t getInterFrameDelay( void );
     int8_t setInterCharacterTimeout( uint32_t timeUs );
     int8_t setInterFrameDelay( uint32_t timeUs );
 
@@ -196,8 +196,8 @@ protected:
     uint32_t ulTimerInterCharacterTimeoutUs;
     void vStartInterFrameDelay( void );
     void vStartInterCharacterTimeout( void );
-    bool bTimeoutInterFrameDelay( void ) const;
-    bool bTimeoutInterCharacterTimeout( void ) const;
+    bool bTimeoutInterFrameDelay( void );
+    bool bTimeoutInterCharacterTimeout( void );
     bool bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig );
     uint8_t ucLRC( uint8_t * pucData, size_t xDataLength );
     uint8_t ucByteToAsciiHi( uint8_t ucByte );
