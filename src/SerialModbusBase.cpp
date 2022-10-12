@@ -524,7 +524,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 
 bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
 {
-    uint8_t ucNbrOfBits = 0;
+    uint32_t ulNbrOfBits = 0;
 
     if( ulBaud > 19200 )
     {
@@ -564,7 +564,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             case SERIAL_5E1 :
             case SERIAL_5O1 :
             {
-                ucNbrOfBits = 8;
+                ulNbrOfBits = 8;
                 break;
             }
             case SERIAL_6N1 :
@@ -574,7 +574,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             case SERIAL_6O1 :
             case SERIAL_5O2 :
             {
-                ucNbrOfBits = 9;
+                ulNbrOfBits = 9;
                 break;
             }
             case SERIAL_7N1 :
@@ -584,7 +584,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             case SERIAL_7O1 :
             case SERIAL_6O2 :
             {
-                ucNbrOfBits = 10;
+                ulNbrOfBits = 10;
                 break;
             }
             case SERIAL_8N1 :
@@ -594,14 +594,14 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             case SERIAL_8O1 :
             case SERIAL_7O2 :
             {
-                ucNbrOfBits = 11;
+                ulNbrOfBits = 11;
                 break;
             }
             case SERIAL_8N2 :
             case SERIAL_8E2 :
             case SERIAL_8O2 :
             {
-                ucNbrOfBits = 12;
+                ulNbrOfBits = 12;
                 break;
             }
             default :
@@ -610,7 +610,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             }
         }
 
-        /* General formula:
+        /* Basic formula:
 
                       1000
             timeout = ---- * nbrOfBits * characterTimes * 1000
@@ -626,8 +626,8 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             interFrameDelay = -------------------------
                                         baud */
 
-        ulInterCharacterTimeoutUs = ( ucNbrOfBits * 1500000 ) / ulBaud;
-        ulInterFrameDelayUs       = ( ucNbrOfBits * 3500000 ) / ulBaud;
+        ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
+        ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
     }
 
     return true;
