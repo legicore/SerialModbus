@@ -403,7 +403,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
             case WAITING_FOR_REPLY :
             {
-                if( xReplyLength < configMAX_FRAME_SIZE )
+                if( xReplyLength < configMAX_FRAME_LEN )
                 {
                     if( bReceiveByte( pucReplyFrame, &xReplyLength ) == true )
                     {

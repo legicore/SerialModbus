@@ -161,8 +161,8 @@ public:
 
 protected:
 
-    uint8_t pucRequestFrame[ configMAX_FRAME_SIZE ];
-    uint8_t pucReplyFrame[ configMAX_FRAME_SIZE ];
+    uint8_t pucRequestFrame[ configMAX_FRAME_LEN ];
+    uint8_t pucReplyFrame[ configMAX_FRAME_LEN ];
     size_t xRequestLength;
     size_t xReplyLength;
     MBException_t xException;

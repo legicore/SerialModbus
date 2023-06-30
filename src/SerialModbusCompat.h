@@ -25,7 +25,7 @@
 
 /* This value for the Arduino default serial configuration is taken from the
 source code (8 data bits, no parity, 1 stop bit). */
-#define SERIAL_CONFIG_DEFAULT SERIAL_8N1
+#define SERIAL_CONFIG_DEFAULT   SERIAL_8N1
 
 /* Check the architecture, based on the architecture of the tested boards. */
 #if defined( ARDUINO_ARCH_AVR ) || \
@@ -51,12 +51,12 @@ source code (8 data bits, no parity, 1 stop bit). */
         defined( ARDUINO_SAMD_MKRZERO ) || \
         defined( ARDUINO_SAMD_NANO_33_IOT )
 
-        #define Serial_t HardwareSerial
+        #define Serial_t    HardwareSerial
 
     #elif defined( ARDUINO_AVR_NANO_EVERY ) || \
           defined( ARDUINO_AVR_UNO_WIFI_REV2 )
 
-        #define Serial_t UartClass
+        #define Serial_t    UartClass
 
     #else
 
@@ -84,7 +84,7 @@ source code (8 data bits, no parity, 1 stop bit). */
 
     #define Serial_t HardwareSerial
     #if !defined( SERIAL_PORT_HARDWARE )
-        #define SERIAL_PORT_HARDWARE Serial
+        #define SERIAL_PORT_HARDWARE    Serial
     #endif
 
     #warning The selected board and its architecture have not yet been tested with this version of SerialModbus!

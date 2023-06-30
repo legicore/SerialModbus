@@ -256,7 +256,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                 }
                 else
                 {
-                    if( xRequestLength < configMAX_FRAME_SIZE )
+                    if( xRequestLength < configMAX_FRAME_LEN )
                     {
                         if( bReceiveByte( pucRequestFrame, &xRequestLength ) == true )
                         {

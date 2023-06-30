@@ -30,7 +30,7 @@
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
-#define configMAX_FRAME_SIZE            64
+#define configMAX_FRAME_LEN             64
 
 /*-----------------------------------------------------------*/
 
