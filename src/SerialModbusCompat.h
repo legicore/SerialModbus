@@ -30,7 +30,8 @@ source code (8 data bits, no parity, 1 stop bit). */
 /* Check the architecture, based on the architecture of the tested boards. */
 #if defined( ARDUINO_ARCH_AVR ) || \
     defined( ARDUINO_ARCH_MEGAAVR ) || \
-    defined( ARDUINO_ARCH_SAMD )
+    defined( ARDUINO_ARCH_SAMD ) || \
+    defined( ARDUINO_ARCH_RENESAS )
 
     /* Check for the known boards that are not (!) compatible with the Arduino
     SoftwareSerial library, and if none of them is selected, the compatibility
@@ -57,6 +58,12 @@ source code (8 data bits, no parity, 1 stop bit). */
           defined( ARDUINO_AVR_UNO_WIFI_REV2 )
 
         #define Serial_t    UartClass
+
+    #elif defined( ARDUINO_MINIMA ) || \
+          defined( ARDUINO_UNOWIFIR4 )
+
+        #define Serial_t                UART
+        #define SERIAL_PORT_HARDWARE    Serial1
 
     #else
 
