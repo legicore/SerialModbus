@@ -666,7 +666,7 @@ const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
         }
     }
 
-    return "__NO_STRING__";
+    return NULL;
 }
 /*-----------------------------------------------------------*/
 
