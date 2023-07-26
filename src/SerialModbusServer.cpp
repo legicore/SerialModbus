@@ -1072,6 +1072,14 @@ void SerialModbusServer::vHandlerFC08( void )
             #endif
         }
     }
+
+    if( xException == OK )
+    {
+        if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+        {
+            (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+        }
+    }
 }
 /*-----------------------------------------------------------*/
 
