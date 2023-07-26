@@ -33,29 +33,28 @@
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
-typedef enum MBServerState_e
+enum MBServerState_e
 {
     SERVER_IDLE,
     CHECKING_REQUEST,
     PROCESSING_REQUIRED_ACTION,
     FORMATTING_NORMAL_REPLY,
     FORMATTING_ERROR_REPLY
-}
-MBServerState_t;
+};
 
-/** TODO */
-typedef enum MBAccess_e
+typedef enum MBServerState_e MBServerState_t;
+
+enum MBAccess_e
 {
     NA = 0b00,  /** No Access */
     RD = 0b01,  /** Read only */
     WR = 0b10,  /** Write only */
     RW = 0b11   /** Read and write */
-}
-MBAccess_t;
+};
 
-/** TODO */
-typedef struct MBRegister_s
+typedef enum MBAccess_e MBAccess_t;
+
+struct MBRegister_s
 {
 #if( configSERVER_MULTI_ID == 1 )
     uint8_t id;
@@ -64,11 +63,11 @@ typedef struct MBRegister_s
     uint16_t address;
     uint16_t * object;
     size_t objectSize;
-    void (*action)( void );
-}
-MBRegister_t;
+    void (*callback)( void );
+};
 
-/** TODO */
+typedef struct MBRegister_s MBRegister_t;
+
 #if( configSERVER_MULTI_ID == 1 )
     #define REGISTER_MAP_END { 0x00, NA, 0x0000, NULL, 0, NULL }
 #else
@@ -77,7 +76,6 @@ MBRegister_t;
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
 class SerialModbusServer : public SerialModbusBase
 {
 public:

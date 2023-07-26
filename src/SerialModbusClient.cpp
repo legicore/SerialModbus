@@ -615,9 +615,9 @@ void SerialModbusClient::vHandlerFC03_04( void )
             }
         }
 
-        if( pxRequest->action != NULL )
+        if( pxRequest->callback != NULL )
         {
-            (*pxRequest->action)();
+            (*pxRequest->callback)();
         }
     }
     else
@@ -636,9 +636,9 @@ void SerialModbusClient::vHandlerFC05( void )
         /* Check the reply output value. */
         if( usREPLY_COIL_VALUE == usREQUEST_COIL_VALUE )
         {
-            if( pxRequest->action != NULL )
+            if( pxRequest->callback != NULL )
             {
-                (*pxRequest->action)();
+                (*pxRequest->callback)();
             }
         }
         else
@@ -663,9 +663,9 @@ void SerialModbusClient::vHandlerFC06( void )
         /* Check the reply output value. */
         if( usREPLY_OUTPUT_VALUE == usREQUEST_OUTPUT_VALUE )
         {
-            if( pxRequest->action != NULL )
+            if( pxRequest->callback != NULL )
             {
-                (*pxRequest->action)();
+                (*pxRequest->callback)();
             }
         }
         else
@@ -802,9 +802,9 @@ void SerialModbusClient::vHandlerFC08( void )
             }
         }
 
-        if( pxRequest->action != NULL )
+        if( pxRequest->callback != NULL )
         {
-            (*pxRequest->action)();
+            (*pxRequest->callback)();
         }
     }
     else
@@ -823,9 +823,9 @@ void SerialModbusClient::vHandlerFC16( void )
         /* Check the reply output quantity. */
         if( usREPLY_QUANTITY == usREQUEST_QUANTITY )
         {
-            if( pxRequest->action != NULL )
+            if( pxRequest->callback != NULL )
             {
-                (*pxRequest->action)();
+                (*pxRequest->callback)();
             }
         }
         else

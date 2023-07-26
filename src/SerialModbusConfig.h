@@ -34,15 +34,15 @@
 
 /*-----------------------------------------------------------*/
 
-#define configID_BROADCAST              ( ( uint8_t )   0 )
-#define configID_SERVER_MAX             ( ( uint8_t ) 247 )
+#define configID_BROADCAST              0
+#define configID_SERVER_MAX             247
 
-#define configASCII_INPUT_DELIMITER     ( ( char ) '\n' )
+#define configASCII_INPUT_DELIMITER     '\n'
 
-#define configTURNAROUND_DELAY_US       ( ( uint32_t )  200000 )
-#define configRESPONSE_TIMEOUT_US       ( ( uint32_t ) 1000000 )
+#define configTURNAROUND_DELAY_US       200000
+#define configRESPONSE_TIMEOUT_US       1000000
 
-#define configMIN_FRAME_LEN             ( ( size_t ) 3 )
+#define configMIN_FRAME_LEN             3
 
 /*-----------------------------------------------------------*/
 

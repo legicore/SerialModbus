@@ -29,35 +29,33 @@
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
-typedef enum MBClientState_e
+enum MBClientState_e
 {
     CLIENT_IDLE,
     WAITING_TURNAROUND_DELAY,
     WAITING_FOR_REPLY,
     PROCESSING_REPLY,
     PROCESSING_ERROR
-}
-MBClientState_t;
+};
 
-/** TODO */
-typedef struct MBRequest_s
+typedef enum MBClientState_e MBClientState_t;
+
+struct MBRequest_s
 {
     uint8_t id;
     uint8_t functionCode;
     uint16_t address;
     void * object;
     size_t objectSize;
-    void (*action)( void );
-}
-MBRequest_t;
+    void (*callback)( void );
+};
 
-/** TODO */
+typedef struct MBRequest_s MBRequest_t;
+
 #define REQUEST_MAP_END { configID_SERVER_MAX, 0x00, 0x0000, NULL, 0, NULL }
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
 class SerialModbusClient : public SerialModbusBase
 {
 public:

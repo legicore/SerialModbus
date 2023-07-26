@@ -29,12 +29,13 @@
 
 /*-----------------------------------------------------------*/
 
-typedef struct MBExceptionString_s
+struct MBExceptionString_s
 {
     uint8_t ucExceptionCode;
     const char * pcExceptionString;
-}
-MBExceptionString_t;
+};
+
+typedef struct MBExceptionString_s MBExceptionString_t;
 
 static const MBExceptionString_t pxExceptionStrings[] = {
 

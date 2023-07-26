@@ -31,12 +31,13 @@
 
 /*-----------------------------------------------------------*/
 
-typedef struct MBAccessRights_s
+struct MBAccessRights_s
 {
     unsigned uxAccess       : 2;
     unsigned uxFunctionCode : 6;
-}
-MBAccessRights_t;
+};
+
+typedef struct MBAccessRights_s MBAccessRights_t;
 
 static const MBAccessRights_t pxAccessRights[] = {
 
@@ -696,9 +697,9 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
             xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
 
-            if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+            if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
             {
-                (*pxRegisterMap[ xRegisterMapIndex ].action)();
+                (*pxRegisterMap[ xRegisterMapIndex ].callback)();
             }
 
             return;
@@ -735,9 +736,9 @@ void SerialModbusServer::vHandlerFC05( void )
 
         xReplyLength = 6;
 
-        if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+        if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
         {
-            (*pxRegisterMap[ xRegisterMapIndex ].action)();
+            (*pxRegisterMap[ xRegisterMapIndex ].callback)();
         }
 
         return;
@@ -769,9 +770,9 @@ void SerialModbusServer::vHandlerFC06( void )
 
     xReplyLength = 6;
 
-    if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+    if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
     {
-        (*pxRegisterMap[ xRegisterMapIndex ].action)();
+        (*pxRegisterMap[ xRegisterMapIndex ].callback)();
     }
 }
 /*-----------------------------------------------------------*/
@@ -1162,9 +1163,9 @@ void SerialModbusServer::vHandlerFC16( void )
 
                 xReplyLength = 6;
 
-                if( pxRegisterMap[ xRegisterMapIndex ].action != NULL )
+                if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
                 {
-                    (*pxRegisterMap[ xRegisterMapIndex ].action)();
+                    (*pxRegisterMap[ xRegisterMapIndex ].callback)();
                 }
 
                 return;
@@ -1207,7 +1208,7 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
             pxRegisterMapTemp[ 0 ].address = 0x0000;
             pxRegisterMapTemp[ 0 ].object = NULL;
             pxRegisterMapTemp[ 0 ].objectSize = 0;
-            pxRegisterMapTemp[ 0 ].action = NULL;
+            pxRegisterMapTemp[ 0 ].callback = NULL;
         }
         else
         {
@@ -1236,7 +1237,7 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
                 pxRegisterMap[ xRegisterMapSize - 2 ].access = xAccess;
                 pxRegisterMap[ xRegisterMapSize - 2 ].address = usAddress;
                 pxRegisterMap[ xRegisterMapSize - 2 ].objectSize = xNumber;
-                pxRegisterMap[ xRegisterMapSize - 2 ].action = NULL;
+                pxRegisterMap[ xRegisterMapSize - 2 ].callback = NULL;
 
                 return 0;
             }

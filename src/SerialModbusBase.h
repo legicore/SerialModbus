@@ -33,8 +33,7 @@
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
-typedef enum MBFunctionCode_e
+enum MBFunctionCode_e
 {
     /* Bit Data Access */
     READ_COILS                      = 1,
@@ -61,13 +60,13 @@ typedef enum MBFunctionCode_e
     GET_COM_EVENT_COUNTER           = 11,
     GET_COM_EVENT_LOG               = 12,
     REPORT_SERVER_ID                = 17
-}
-MBFunctionCode_t;
+};
+
+typedef enum MBFunctionCode_e MBFunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
-typedef enum MBSubFunctionCode_e
+enum MBSubFunctionCode_e
 {
     RETURN_QUERY_DATA                       = 0,
     RESTART_COMMUNICATIONS_OPTION           = 1,
@@ -84,13 +83,13 @@ typedef enum MBSubFunctionCode_e
     RETURN_SERVER_BUSY_COUNT                = 17,
     RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 18,
     CLEAR_OVERRUN_COUNTER_AND_FLAG          = 20
-}
-MBSubFunctionCode_t;
+};
+
+typedef enum MBSubFunctionCode_e MBSubFunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
-typedef enum MBException_e
+enum MBException_e
 {
     OK = 0x00,
 
@@ -130,15 +129,13 @@ typedef enum MBException_e
     SERVER_ILLEGAL_SUB_FUNCTION             = 0x27,
 
     NOK = 0xFF
-}
-MBException_t;
+};
 
-/** TODO */
-typedef MBException_t MBStatus_t;
+typedef enum MBException_e MBException_t;
+typedef enum MBException_e MBStatus_t;
 
 /*-----------------------------------------------------------*/
 
-/** TODO */
 class SerialModbusBase
 {
 public:
