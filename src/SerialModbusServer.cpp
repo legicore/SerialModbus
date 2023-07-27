@@ -265,20 +265,19 @@ MBStatus_t SerialModbusServer::processModbus( void )
                             {
                                 vStartInterFrameDelay();
                                 vStartInterCharacterTimeout();
-                                break;
                             }
                             #endif
 
                             #if( configMODE == configMODE_ASCII )
                             {
-                                if( pucRequestFrame[ 0 ] == ( uint8_t ) ':' )
+                                if( pucRequestFrame[ 0 ] != ( uint8_t ) ':' )
                                 {
-                                    break;
+                                    vClearRequestFrame();
                                 }
                             }
                             #endif
 
-                            vClearRequestFrame();
+                            break;
                         }
                     }
                     else
