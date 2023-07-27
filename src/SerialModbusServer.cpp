@@ -124,7 +124,7 @@ SerialModbusServer::SerialModbusServer()
     pxRegisterMap = NULL;
     xRegisterMapIndex = 0;
 
-    ucServerId = 0xFF;
+    ucServerId = configID_SERVER_MAX;
 
     #if( configSERVER_MULTI_ID == 1 )
     {

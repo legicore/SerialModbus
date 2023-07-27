@@ -19,17 +19,11 @@
 
 /*-----------------------------------------------------------*/
 
-#include <stdint.h>
-#include <stddef.h>
-
-#include <Arduino.h>
-
-/*-----------------------------------------------------------*/
-
 #define configMODE_RTU                  1
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
+#define configMIN_FRAME_LEN             3
 #define configMAX_FRAME_LEN             64
 
 /*-----------------------------------------------------------*/
@@ -41,8 +35,6 @@
 
 #define configTURNAROUND_DELAY_US       200000
 #define configRESPONSE_TIMEOUT_US       1000000
-
-#define configMIN_FRAME_LEN             3
 
 /*-----------------------------------------------------------*/
 
