@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2021 Martin Legleiter
+ * @copyright   (c) 2023 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -324,14 +324,14 @@ MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLe
 
 void SerialModbusBase::vClearReplyFrame( void )
 {
-//    ( void ) memset( pucReplyFrame, 0x00, xReplyLength );
+    // ( void ) memset( pucReplyFrame, 0x00, xReplyLength );
     xReplyLength = 0;
 }
 /*-----------------------------------------------------------*/
 
 void SerialModbusBase::vClearRequestFrame( void )
 {
-//    ( void ) memset( pucRequestFrame, 0x00, xRequestLength );
+    // ( void ) memset( pucRequestFrame, 0x00, xRequestLength );
     xRequestLength = 0;
 }
 /*-----------------------------------------------------------*/
