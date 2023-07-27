@@ -621,7 +621,7 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
         {
 #endif
             if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
-                ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].objectSize ) ) )
+                ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].dataSize ) ) )
             {
                 /* Scan the access rights map for the request function code. */
                 for( size_t i = 0; pxAccessRights[ i ].uxAccess != NA; i++ )
@@ -684,12 +684,12 @@ void SerialModbusServer::vHandlerFC03_04( void )
     {
         xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
-        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].dataSize )
         {
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
-                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] );
             }
 
             ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -726,7 +726,7 @@ void SerialModbusServer::vHandlerFC05( void )
 {
     if( ( usREQUEST_COIL_VALUE == COIL_ON ) || ( usREQUEST_COIL_VALUE == COIL_OFF ) )
     {
-        pxRegisterMap[ xRegisterMapIndex ].object[ 0 ] = usREQUEST_COIL_VALUE;
+        pxRegisterMap[ xRegisterMapIndex ].data[ 0 ] = usREQUEST_COIL_VALUE;
 
         ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
         ucREPLY_ADDRESS_HI    = ucREQUEST_ADDRESS_HI;
@@ -760,7 +760,7 @@ void SerialModbusServer::vHandlerFC06( void )
 {
     size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
-    pxRegisterMap[ xRegisterMapIndex ].object[ xOffset ] = usREQUEST_REGISTER_VALUE;
+    pxRegisterMap[ xRegisterMapIndex ].data[ xOffset ] = usREQUEST_REGISTER_VALUE;
 
     ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
     ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
@@ -1156,11 +1156,11 @@ void SerialModbusServer::vHandlerFC16( void )
         {
             xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
 
-            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].objectSize )
+            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].dataSize )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
-                    pxRegisterMap[ xRegisterMapIndex ].object[ i + xOffset ] = usRequestWord( i, 7 );
+                    pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] = usRequestWord( i, 7 );
                 }
 
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -1214,8 +1214,8 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
 #endif
             pxRegisterMapTemp[ 0 ].access = NA;
             pxRegisterMapTemp[ 0 ].address = 0x0000;
-            pxRegisterMapTemp[ 0 ].object = NULL;
-            pxRegisterMapTemp[ 0 ].objectSize = 0;
+            pxRegisterMapTemp[ 0 ].data = NULL;
+            pxRegisterMapTemp[ 0 ].dataSize = 0;
             pxRegisterMapTemp[ 0 ].callback = NULL;
         }
         else
@@ -1236,15 +1236,15 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
         if( memcpy( &pxRegisterMap[ xRegisterMapSize - 1 ], &pxRegisterMap[ xRegisterMapSize - 2 ],
             sizeof( MBRegister_t ) ) == &pxRegisterMap[ xRegisterMapSize - 1 ] )
         {
-            pxRegisterMap[ xRegisterMapSize - 2 ].object = ( uint16_t * ) calloc( xNumber, sizeof( uint16_t ) );
-            if( pxRegisterMap[ xRegisterMapSize - 2 ].object != NULL )
+            pxRegisterMap[ xRegisterMapSize - 2 ].data = ( uint16_t * ) calloc( xNumber, sizeof( uint16_t ) );
+            if( pxRegisterMap[ xRegisterMapSize - 2 ].data != NULL )
             {
 #if( configSERVER_MULTI_ID == 1 )
                 pxRegisterMap[ xRegisterMapSize - 2 ].id = ucServerId;
 #endif
                 pxRegisterMap[ xRegisterMapSize - 2 ].access = xAccess;
                 pxRegisterMap[ xRegisterMapSize - 2 ].address = usAddress;
-                pxRegisterMap[ xRegisterMapSize - 2 ].objectSize = xNumber;
+                pxRegisterMap[ xRegisterMapSize - 2 ].dataSize = xNumber;
                 pxRegisterMap[ xRegisterMapSize - 2 ].callback = NULL;
 
                 return 0;
@@ -1281,13 +1281,13 @@ uint16_t SerialModbusServer::sGetRegister( uint16_t address )
 {
     size_t xOffset = 0;
 
-    for( size_t i = 0; pxRegisterMap[ i ].object != NULL ; i++ )
+    for( size_t i = 0; pxRegisterMap[ i ].data != NULL ; i++ )
     {
         if( ( address >= pxRegisterMap[ i ].address ) &&
-            ( address <  pxRegisterMap[ i ].address + pxRegisterMap[ i ].objectSize ) )
+            ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
         {
             xOffset = address - pxRegisterMap[ i ].address;
-            return pxRegisterMap[ i ].object[ xOffset ];
+            return pxRegisterMap[ i ].data[ xOffset ];
         }
     }
 
@@ -1299,13 +1299,13 @@ int16_t SerialModbusServer::sSetRegister( uint16_t address, uint16_t value )
 {
     size_t xOffset = 0;
 
-    for( size_t i = 0; pxRegisterMap[ i ].object != NULL ; i++ )
+    for( size_t i = 0; pxRegisterMap[ i ].data != NULL ; i++ )
     {
         if( ( address >= pxRegisterMap[ i ].address ) &&
-            ( address <  pxRegisterMap[ i ].address + pxRegisterMap[ i ].objectSize ) )
+            ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
         {
             xOffset = address - pxRegisterMap[ i ].address;
-            pxRegisterMap[ i ].object[ xOffset ] = value;
+            pxRegisterMap[ i ].data[ xOffset ] = value;
             return 0;
         }
     }

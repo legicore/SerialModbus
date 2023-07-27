@@ -61,8 +61,8 @@ struct MBRegister_s
 #endif
     MBAccess_t access;
     uint16_t address;
-    uint16_t * object;
-    size_t objectSize;
+    uint16_t * data;
+    size_t dataSize;
     void (*callback)( void );
 };
 

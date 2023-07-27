@@ -129,9 +129,9 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 
     ( void ) xSetException( OK );
 
-    if( ( request->id           >  configID_SERVER_MAX ) ||
-        ( request->functionCode == 0x00                ) ||
-        ( request->objectSize   == 0                   ) )
+    if( ( request->id > configID_SERVER_MAX ) ||
+        ( request->functionCode == 0x00 ) ||
+        ( request->dataSize == 0 ) )
     {
         return xSetException( ILLEGAL_REQUEST );
     }
@@ -149,8 +149,8 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
         case READ_HOLDING_REGISTERS:
         case READ_INPUT_REGISTERS:
         {
-            pucRequestFrame[ 4 ] = highByte( request->objectSize );
-            pucRequestFrame[ 5 ] =  lowByte( request->objectSize );
+            pucRequestFrame[ 4 ] = highByte( request->dataSize );
+            pucRequestFrame[ 5 ] =  lowByte( request->dataSize );
             xRequestLength = 6;
 
             break;
@@ -160,10 +160,10 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
         case WRITE_SINGLE_COIL:
         case WRITE_SINGLE_REGISTER:
         {
-            if( request->object != NULL )
+            if( request->data != NULL )
             {
-                pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
-                pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                pucRequestFrame[ 4 ] = highByte( request->data[ 0 ] );
+                pucRequestFrame[ 5 ] =  lowByte( request->data[ 0 ] );
                 xRequestLength = 6;
             }
             else
@@ -184,13 +184,13 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 #if( configSFC00 == 1 )
                 case RETURN_QUERY_DATA:
                 {
-                    if( request->object != NULL )
+                    if( request->data != NULL )
                     {
                         xRequestLength = 4;
 
-                        for( size_t i = 0; i < request->objectSize; i++ )
+                        for( size_t i = 0; i < request->dataSize; i++ )
                         {
-                            pucRequestFrame[ 4 + i ] = ( uint8_t ) ( ( char * ) request->object )[ i ];
+                            pucRequestFrame[ 4 + i ] = ( uint8_t ) ( ( char * ) request->data )[ i ];
                             xRequestLength++;
                         }
                     }
@@ -205,10 +205,10 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 #if( configSFC01 == 1 )
                 case RESTART_COMMUNICATIONS_OPTION:
                 {
-                    if( request->object != NULL )
+                    if( request->data != NULL )
                     {
-                        pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->object )[ 0 ] );
-                        pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->object )[ 0 ] );
+                        pucRequestFrame[ 4 ] = highByte( request->data[ 0 ] );
+                        pucRequestFrame[ 5 ] =  lowByte( request->data[ 0 ] );
                     }
                     else
                     {
@@ -221,9 +221,9 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 #if( configSFC03 == 1 )
                 case CHANGE_ASCII_INPUT_DELIMITER:
                 {
-                    if( isAscii( *( ( char * ) request->object ) ) == true )
+                    if( isAscii( *( ( char * ) request->data ) ) == true )
                     {
-                        pucRequestFrame[ 4 ] = ( uint8_t ) *( ( char * ) request->object );
+                        pucRequestFrame[ 4 ] = ( uint8_t ) *( ( char * ) request->data );
                         pucRequestFrame[ 5 ] = 0x00;
                     }
                     else
@@ -294,19 +294,19 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
         case WRITE_MULTIPLE_REGISTERS:
         {
             /* Quantity */
-            pucRequestFrame[ 4 ] = highByte( request->objectSize );
-            pucRequestFrame[ 5 ] =  lowByte( request->objectSize );
+            pucRequestFrame[ 4 ] = highByte( request->dataSize );
+            pucRequestFrame[ 5 ] =  lowByte( request->dataSize );
             /* Byte-Count */
-            pucRequestFrame[ 6 ] = ( uint8_t ) request->objectSize * 2;
+            pucRequestFrame[ 6 ] = ( uint8_t ) request->dataSize * 2;
 
             xRequestLength = 7;
 
-            if( request->object != NULL )
+            if( request->data != NULL )
             {
-                for( size_t i = 0; i < request->objectSize; i++ )
+                for( size_t i = 0; i < request->dataSize; i++ )
                 {
-                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( ( ( uint16_t * ) request->object )[ i ] );
-                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( ( ( uint16_t * ) request->object )[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( request->data[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( request->data[ i ] );
                     xRequestLength += 2;
                 }
             }
@@ -605,13 +605,13 @@ void SerialModbusClient::vHandlerFC03_04( void )
     /* Check the reply byte count. */
     if( ucREPLY_BYTE_COUNT == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
     {
-        if( pxRequest->object != NULL )
+        if( pxRequest->data != NULL )
         {
             xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
             
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                ( ( uint16_t * ) pxRequest->object )[ i + xOffset ] = usReplyWord( i );
+                pxRequest->data[ i + xOffset ] = usReplyWord( i );
             }
         }
 
@@ -786,9 +786,9 @@ void SerialModbusClient::vHandlerFC08( void )
      ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
      ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) )
             {
-                if( pxRequest->object != NULL )
+                if( pxRequest->data != NULL )
                 {
-                    *( ( uint16_t * ) pxRequest->object ) = usREPLY_DATA;
+                    pxRequest->data[ 0 ] = usREPLY_DATA;
                 }
 
                 break;
@@ -844,13 +844,13 @@ void SerialModbusClient::vHandlerFC16( void )
 
 int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
 {
-    uint16_t usObject = 0x0000;
-    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usObject, 1, NULL };
+    uint16_t usData = 0x0000;
+    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usData, 1, NULL };
 
     xRequest.id = id;
     xRequest.functionCode = functionCode;
     xRequest.address = address;
-    usObject = value;
+    usData = value;
 
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == OK )
@@ -858,7 +858,7 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
         xStatusSimpleAPI = processModbus();
         if( xStatusSimpleAPI == OK )
         {
-            return ( int16_t ) usObject;
+            return ( int16_t ) usData;
         }
     }
 

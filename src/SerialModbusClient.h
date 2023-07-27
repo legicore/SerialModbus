@@ -45,8 +45,8 @@ struct MBRequest_s
     uint8_t id;
     uint8_t functionCode;
     uint16_t address;
-    void * object;
-    size_t objectSize;
+    uint16_t * data;
+    size_t dataSize;
     void (*callback)( void );
 };
 
