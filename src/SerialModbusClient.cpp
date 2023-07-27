@@ -411,20 +411,18 @@ MBStatus_t SerialModbusClient::processModbus( void )
                         {
                             vStartInterFrameDelay();
                             vStartInterCharacterTimeout();
-                            break;
                         }
                         #endif
 
                         #if( configMODE == configMODE_ASCII )
                         {
-                            if( pucReplyFrame[ 0 ] == ( uint8_t ) ':' )
+                            if( pucReplyFrame[ 0 ] != ( uint8_t ) ':' )
                             {
-                                break;
+                                vClearReplyFrame();
                             }
                         }
                         #endif
 
-                        vClearReplyFrame();
                         break;
                     }
                 }
@@ -487,8 +485,11 @@ MBStatus_t SerialModbusClient::processModbus( void )
                                         break;
                                     }
                                 }
-
-                                vClearReplyFrame();
+                                else
+                                {
+                                    ( void ) xSetException( ILLEGAL_CHECKSUM );
+                                    vSetState( PROCESSING_ERROR );
+                                }
                             }
                         }
                     }
