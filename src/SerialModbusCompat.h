@@ -37,6 +37,7 @@ source code (8 data bits, no parity, 1 stop bit). */
     SoftwareSerial library - if none of them is currently selected, the code
     will be integrated. */
     #if !defined( ARDUINO_SAMD_MKRZERO ) && \
+        !defined( ARDUINO_SAMD_MKRWIFI1010 ) && \
         !defined( ARDUINO_SAMD_NANO_33_IOT )
 
         #define COMPAT_SOFTWARE_SERIAL
@@ -58,6 +59,7 @@ source code (8 data bits, no parity, 1 stop bit). */
         #define Serial_t    UartClass
 
     #elif defined( ARDUINO_SAMD_MKRZERO ) || \
+          defined( ARDUINO_SAMD_MKRWIFI1010 ) || \
           defined( ARDUINO_SAMD_NANO_33_IOT )
 
         #define Serial_t    Uart
