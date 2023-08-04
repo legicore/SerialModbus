@@ -127,7 +127,6 @@ enum MBException_e
     SERVER_ILLEGAL_COIL_VALUE               = 0x25,
     SERVER_ILLEGAL_INPUT_DELIMITER          = 0x26,
     SERVER_ILLEGAL_SUB_FUNCTION             = 0x27,
-    SERVER_ILLEGAL_REGISTER_MAP             = 0x28,
 
     NOK = 0xFF
 };

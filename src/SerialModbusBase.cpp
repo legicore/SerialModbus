@@ -75,7 +75,6 @@ static const MBExceptionString_t pxExceptionStrings[] = {
     { SERVER_ILLEGAL_COIL_VALUE,                "SERVER_ILLEGAL_COIL_VALUE" },
     { SERVER_ILLEGAL_INPUT_DELIMITER,           "SERVER_ILLEGAL_INPUT_DELIMITER" },
     { SERVER_ILLEGAL_SUB_FUNCTION,              "SERVER_ILLEGAL_SUB_FUNCTION" },
-    { SERVER_ILLEGAL_REGISTER_MAP,              "SERVER_ILLEGAL_REGISTER_MAP" },
 
 #endif
 

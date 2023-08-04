@@ -205,7 +205,7 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
                     if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
                            ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
                     {
-                        return SERVER_ILLEGAL_REGISTER_MAP;
+                        return NOK;
                     }
                 }
             }
@@ -214,7 +214,7 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
         return OK;
     }
 
-    return SERVER_ILLEGAL_REGISTER_MAP;
+    return NOK;
 }
 /*-----------------------------------------------------------*/
 
