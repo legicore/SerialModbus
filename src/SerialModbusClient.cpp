@@ -466,10 +466,11 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
                     #if( configMODE == configMODE_ASCII )
                     {
-                        /* Check for the currently set ASCII input delimiter. */
+                        /* Check for the end of the ASCII frame which is marked
+                        by a carriage-return ('\r') followed by a variable input
+                        delimiter (default: line-feed/'\n'). */
                         if( pucReplyFrame[ xReplyLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
-                            /* Check for a Carriage Return (frame end). */
                             if( pucReplyFrame[ xReplyLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* From this point we handle the request and
@@ -609,7 +610,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
         if( pxRequest->data != NULL )
         {
             xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
-            
+
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
                 pxRequest->data[ i + xOffset ] = usReplyWord( i );

@@ -280,6 +280,24 @@ uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 }
 /*-----------------------------------------------------------*/
 
+uint8_t SerialModbusBase::ucByteToAsciiHi( uint8_t ucByte )
+{
+    return ( ucByte >> 4 ) + ( ( ( ucByte >> 4 ) < 10 ) ? 48 : 55 );
+}
+/*-----------------------------------------------------------*/
+
+uint8_t SerialModbusBase::ucByteToAsciiLo( uint8_t ucByte )
+{
+    return ( ucByte & 0x0F ) + ( ( ( ucByte & 0x0F ) < 10 ) ? 48 : 55 );
+}
+/*-----------------------------------------------------------*/
+
+uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
+{
+    return ( ( ucAsciiHi - ( ( ucAsciiHi < 64 ) ? 48 : 55 ) ) << 4 ) | ( ucAsciiLo - ( ( ucAsciiLo < 64 ) ? 48 : 55 ) );
+}
+/*-----------------------------------------------------------*/
+
 MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
     if( ( pucFrame == NULL ) || ( *pxFrameLength < configMIN_FRAME_LEN ) )
@@ -432,24 +450,6 @@ bool SerialModbusBase::bTimeoutInterFrameDelay( void )
 bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
 {
     return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
-}
-/*-----------------------------------------------------------*/
-
-uint8_t SerialModbusBase::ucByteToAsciiHi( uint8_t ucByte )
-{
-    return ( ucByte >> 4 ) + ( ( ( ucByte >> 4 ) < 10 ) ? 48 : 55 );
-}
-/*-----------------------------------------------------------*/
-
-uint8_t SerialModbusBase::ucByteToAsciiLo( uint8_t ucByte )
-{
-    return ( ucByte & 0x0F ) + ( ( ( ucByte & 0x0F ) < 10 ) ? 48 : 55 );
-}
-/*-----------------------------------------------------------*/
-
-uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
-{
-    return ( ( ucAsciiHi - ( ( ucAsciiHi < 64 ) ? 48 : 55 ) ) << 4 ) | ( ucAsciiLo - ( ( ucAsciiLo < 64 ) ? 48 : 55 ) );
 }
 /*-----------------------------------------------------------*/
 

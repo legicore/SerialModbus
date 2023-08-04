@@ -311,9 +311,9 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                 vIncCPT1();
 
 #if( configSERVER_MULTI_ID == 1 )
-                                if( ( bCheckId( ucREQUEST_ID ) != true   ) &&
+                                if( ( bCheckId( ucREQUEST_ID ) != true ) &&
 #else
-                                if( ( ucREQUEST_ID != ucServerId         ) &&
+                                if( ( ucREQUEST_ID != ucServerId ) &&
 #endif
                                     ( ucREQUEST_ID != configID_BROADCAST ) )
                                 {
@@ -350,9 +350,9 @@ MBStatus_t SerialModbusServer::processModbus( void )
 
                     #if( configMODE == configMODE_ASCII )
                     {
-                        /* Check for the end of the frame which is in the
-                        default configuration marked by a carriage return (0x3A)
-                        followed by a line feed (0x0A - which is variable). */
+                        /* Check for the end of the ASCII frame which is marked
+                        by a carriage-return ('\r') followed by a variable input
+                        delimiter (default: line-feed/'\n'). */
                         if( pucRequestFrame[ xRequestLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
                             if( pucRequestFrame[ xRequestLength - 2 ] == ( uint8_t ) '\r' )
@@ -370,13 +370,12 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                     /* Check if the received request is
                                     dedicated to us or if it is a broadcast. */
 #if( configSERVER_MULTI_ID == 1 )
-                                    if( ( bCheckId( ucREQUEST_ID ) == true   ) ||
+                                    if( ( bCheckId( ucREQUEST_ID ) == true ) ||
 #else
-                                    if( ( ucREQUEST_ID == ucServerId         ) ||
+                                    if( ( ucREQUEST_ID == ucServerId ) ||
 #endif
                                         ( ucREQUEST_ID == configID_BROADCAST ) )
                                     {
-
                                         #if( configSERVER_MULTI_ID == 1 )
                                         {
                                             ucServerId = ucREQUEST_ID;

@@ -34,8 +34,8 @@ source code (8 data bits, no parity, 1 stop bit). */
     defined( ARDUINO_ARCH_RENESAS )
 
     /* Check for the known boards that are not (!) compatible with the Arduino
-    SoftwareSerial library - and if none of them is selected, the compatibility
-    gets activated. */
+    SoftwareSerial library - if none of them is currently selected, the code
+    will be integrated. */
     #if !defined( ARDUINO_SAMD_MKRZERO ) && \
         !defined( ARDUINO_SAMD_NANO_33_IOT )
 
