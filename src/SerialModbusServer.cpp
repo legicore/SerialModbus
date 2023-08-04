@@ -184,6 +184,40 @@ void SerialModbusServer::setRegisterMap( MBRegister_t * registerMap )
 }
 /*-----------------------------------------------------------*/
 
+MBStatus_t SerialModbusServer::checkRegisterMap( void )
+{
+    size_t a = 0;
+    size_t b = 0;
+
+    if( pxRegisterMap != NULL )
+    {
+        /* Count the number of entries in the register map. */
+        while( pxRegisterMap[ ++a ].address != 0x0000 );
+
+        for( --a; a > 0; a-- )
+        {
+            for( b = 0; b < a; b++ )
+            {
+                if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
+                {
+                    /* Simplified algorithm :
+                    if( ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) ) */
+                    if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
+                           ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
+                    {
+                        return SERVER_ILLEGAL_REGISTER_MAP;
+                    }
+                }
+            }
+        }
+
+        return OK;
+    }
+
+    return SERVER_ILLEGAL_REGISTER_MAP;
+}
+/*-----------------------------------------------------------*/
+
 #if( configSERVER_MULTI_ID == 1 )
     
     void SerialModbusServer::vSetIdMap( void )

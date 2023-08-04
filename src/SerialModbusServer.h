@@ -87,6 +87,7 @@ public:
 #endif
     MBStatus_t processModbus( void );
     void setRegisterMap( MBRegister_t * registerMap );
+    MBStatus_t checkRegisterMap( void );
 
     /* Only for function code 8 (DIAGNOSTIC). */
 
