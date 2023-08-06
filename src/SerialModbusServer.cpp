@@ -193,25 +193,33 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
     {
         /* Count the number of entries in the register map. */
         while( pxRegisterMap[ ++a ].address != 0x0000 );
-
-        for( --a; a > 0; a-- )
+        if( a == 1 )
         {
-            for( b = 0; b < a; b++ )
+            /* If there is only one entry in the register map, there is no need
+            to perform a check. */
+            return OK;
+        }
+        else if( a > 1 )
+        {
+            for( --a; a > 0; a-- )
             {
-                if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
+                for( b = 0; b < a; b++ )
                 {
-                    /* Simplified algorithm :
-                    if( ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) ) */
-                    if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
-                           ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
+                    if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
                     {
-                        return NOK;
+                        /* Simplified representation of the algorithm :
+                        if( ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) ) */
+                        if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
+                            ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
+                        {
+                            return NOK;
+                        }
                     }
                 }
             }
-        }
 
-        return OK;
+            return OK;
+        }
     }
 
     return NOK;
