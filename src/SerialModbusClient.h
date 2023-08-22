@@ -69,7 +69,7 @@ public:
 
     /* Simplified API functions. */
 
-    int16_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value = 0 );
+    int16_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data = 0x0000 );
     int16_t readHoldingRegister( uint8_t id, uint16_t address );
     int16_t readInputRegister( uint8_t id, uint16_t address );
     int16_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value );

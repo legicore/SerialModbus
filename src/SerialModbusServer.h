@@ -134,7 +134,7 @@ private:
     uint16_t usDiagnosticRegister;
     bool bListenOnlyMode;
 #if( configSERVER_MULTI_ID == 1 )
-    uint8_t ucIdMap[ configMAX_ID_COUNT ];
+    uint8_t ucIdMap[ configID_COUNT_MAX ];
     size_t xIdCount;
     void vSetIdMap( void );
     bool bCheckId( uint8_t ucId );

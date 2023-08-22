@@ -23,8 +23,8 @@
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
-#define configMIN_FRAME_LEN             3
-#define configMAX_FRAME_LEN             64
+#define configFRAME_LEN_MIN             3
+#define configFRAME_LEN_MAX             64
 
 /*-----------------------------------------------------------*/
 
@@ -43,7 +43,7 @@
 #define configEXTENDED_EXCEPTION_CODES  0
 
 #define configSERVER_MULTI_ID           0
-#define configMAX_ID_COUNT              8
+#define configID_COUNT_MAX              8
 
 /*-----------------------------------------------------------*/
 

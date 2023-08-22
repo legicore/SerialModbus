@@ -283,7 +283,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
         {
             case SERVER_IDLE :
             {
-                if( xReplyLength > ( configMIN_FRAME_LEN + 2 ) )
+                if( xReplyLength > ( configFRAME_LEN_MIN + 2 ) )
                 {
                     #if( configMODE == configMODE_ASCII )
                     {
@@ -299,7 +299,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                 }
                 else
                 {
-                    if( xRequestLength < configMAX_FRAME_LEN )
+                    if( xRequestLength < configFRAME_LEN_MAX )
                     {
                         if( bReceiveByte( pucRequestFrame, &xRequestLength ) == true )
                         {
@@ -340,7 +340,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xRequestLength > configMIN_FRAME_LEN )
+                if( xRequestLength > configFRAME_LEN_MIN )
                 {
                     #if( configMODE == configMODE_RTU )
                     {

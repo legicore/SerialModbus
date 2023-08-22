@@ -403,7 +403,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
 
             case WAITING_FOR_REPLY :
             {
-                if( xReplyLength < configMAX_FRAME_LEN )
+                if( xReplyLength < configFRAME_LEN_MAX )
                 {
                     if( bReceiveByte( pucReplyFrame, &xReplyLength ) == true )
                     {
@@ -441,7 +441,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xReplyLength >= configMIN_FRAME_LEN )
+                if( xReplyLength >= configFRAME_LEN_MIN )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
@@ -844,7 +844,7 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
 {
     uint16_t usData = 0x0000;
     MBRequest_t xRequest = { 0, 0x00, 0x0000, &usData, 1, NULL };
@@ -852,7 +852,7 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
     xRequest.id = id;
     xRequest.functionCode = functionCode;
     xRequest.address = address;
-    usData = value;
+    usData = data;
 
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == OK )
@@ -870,25 +870,25 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
 
 int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0 );
+    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
 int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, READ_INPUT_REGISTERS, address, 0 );
+    return sendRequest( id, READ_INPUT_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
 {
-    return sendRequest( id, WRITE_SINGLE_COIL, address, value );
+    return sendRequest( id, WRITE_SINGLE_COIL, address, data );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
 {
-    return sendRequest( id, WRITE_SINGLE_REGISTER, address, value );
+    return sendRequest( id, WRITE_SINGLE_REGISTER, address, data );
 }
 /*-----------------------------------------------------------*/
 

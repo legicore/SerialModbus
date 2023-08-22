@@ -181,7 +181,7 @@ MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameL
 {
     uint16_t usTempChecksum = 0;
 
-    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configMIN_FRAME_LEN ) )
+    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configFRAME_LEN_MIN ) )
     {
         #if( configMODE == configMODE_RTU )
         {
@@ -211,7 +211,7 @@ MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLe
 {
     uint16_t usTempChecksum = 0;
 
-    if( ( pucFrame != NULL ) && ( xFrameLength >= configMIN_FRAME_LEN ) )
+    if( ( pucFrame != NULL ) && ( xFrameLength >= configFRAME_LEN_MIN ) )
     {
         #if( configMODE == configMODE_RTU )
         {
@@ -300,7 +300,7 @@ uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
 
 MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( *pxFrameLength < configMIN_FRAME_LEN ) )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < configFRAME_LEN_MIN ) )
     {
         return NOK;
     }
@@ -324,7 +324,7 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
 
 MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( *pxFrameLength < ( configMIN_FRAME_LEN * 2 ) ) )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < ( configFRAME_LEN_MIN * 2 ) ) )
     {
         return NOK;
     }
@@ -627,8 +627,8 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
             interFrameDelay = -------------------------
                                         baud */
 
-        ulInterCharacterTimeoutUs = ( ulNbrOfBits * 1500000 ) / ulBaud;
-        ulInterFrameDelayUs       = ( ulNbrOfBits * 3500000 ) / ulBaud;
+        ulInterCharacterTimeoutUs = ulNbrOfBits * ( 1500000 / ulBaud );
+        ulInterFrameDelayUs       = ulNbrOfBits * ( 3500000 / ulBaud );
     }
 
     return true;
