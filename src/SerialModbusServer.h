@@ -137,8 +137,8 @@ private:
     uint8_t ucIdMap[ configID_COUNT_MAX ];
     size_t xIdCount;
     void vSetIdMap( void );
-    bool bCheckId( uint8_t ucId );
 #endif
+    bool bCheckId( uint8_t ucId );
     size_t xRegisterMapSize;
     int16_t sCreateRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber );
     uint16_t sGetRegister( uint16_t address );

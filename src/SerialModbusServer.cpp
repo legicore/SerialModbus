@@ -254,22 +254,29 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
 #endif
 /*-----------------------------------------------------------*/
 
-#if( configSERVER_MULTI_ID == 1 )
-    
-    bool SerialModbusServer::bCheckId( uint8_t ucId )
+bool SerialModbusServer::bCheckId( uint8_t ucId )
+{
+    #if( configSERVER_MULTI_ID == 1 )
     {
         for( size_t i = 0; i < xIdCount; i++ )
         {
-            if( ucIdMap[ i ] == ucId )
+            if( ucId == ucIdMap[ i ] )
             {
                 return true;
             }
         }
-
-        return false;
     }
+    #else
+    {
+        if( ucId == ucServerId )
+        {
+            return true;
+        }
+    }
+    #endif
 
-#endif
+    return false;
+}
 /*-----------------------------------------------------------*/
 
 MBStatus_t SerialModbusServer::processModbus( void )
@@ -352,11 +359,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                 bus message counter. */
                                 vIncCPT1();
 
-#if( configSERVER_MULTI_ID == 1 )
                                 if( ( bCheckId( ucREQUEST_ID ) != true ) &&
-#else
-                                if( ( ucREQUEST_ID != ucServerId ) &&
-#endif
                                     ( ucREQUEST_ID != configID_BROADCAST ) )
                                 {
                                     vClearRequestFrame();
@@ -411,11 +414,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
 
                                     /* Check if the received request is
                                     dedicated to us or if it is a broadcast. */
-#if( configSERVER_MULTI_ID == 1 )
                                     if( ( bCheckId( ucREQUEST_ID ) == true ) ||
-#else
-                                    if( ( ucREQUEST_ID == ucServerId ) ||
-#endif
                                         ( ucREQUEST_ID == configID_BROADCAST ) )
                                     {
                                         #if( configSERVER_MULTI_ID == 1 )
