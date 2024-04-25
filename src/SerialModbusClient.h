@@ -63,7 +63,7 @@ public:
     SerialModbusClient();
     void setRequestMap( const MBRequest_t * requestMap );
     MBStatus_t setRequest( const MBRequest_t * request, bool requestMap = false );
-    MBStatus_t processModbus( void );
+    MBStatus_t process( void );
     void setResponseTimeout( uint32_t timeMs );
     void setTurnaroundDelay( uint32_t timeMs );
 

@@ -330,7 +330,7 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::processModbus( void )
+MBStatus_t SerialModbusClient::process( void )
 {
     if( bSkipRequestMap == false )
     {
@@ -586,7 +586,7 @@ MBStatus_t SerialModbusClient::processModbus( void )
         {
             /* The process loop hook will only be executed when the state
             mashine is not in the idle state. Otherwise the loop hook would be
-            execetued with every run through processModbus(). */
+            execetued with every run through process(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != CLIENT_IDLE ) )
             {
                 (*vProcessLoopHook)();
@@ -857,7 +857,7 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == OK )
     {
-        xStatusSimpleAPI = processModbus();
+        xStatusSimpleAPI = process();
         if( xStatusSimpleAPI == OK )
         {
             return ( int16_t ) usData;

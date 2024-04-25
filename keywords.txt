@@ -25,7 +25,7 @@ setSerialCtrl	KEYWORD2
 setRequestMap	KEYWORD2
 setRegisterMap	KEYWORD2
 setRequest	KEYWORD2
-processModbus	KEYWORD2
+process	KEYWORD2
 getReplyDataSize	KEYWORD2
 getReplyData	KEYWORD2
 setInterFrameDelay	KEYWORD2

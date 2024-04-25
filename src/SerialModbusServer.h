@@ -85,7 +85,7 @@ public:
 #if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial );
 #endif
-    MBStatus_t processModbus( void );
+    MBStatus_t process( void );
     void setRegisterMap( MBRegister_t * registerMap );
     MBStatus_t checkRegisterMap( void );
 

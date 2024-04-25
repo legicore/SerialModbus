@@ -280,7 +280,7 @@ bool SerialModbusServer::bCheckId( uint8_t ucId )
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusServer::processModbus( void )
+MBStatus_t SerialModbusServer::process( void )
 {
     ( void ) xSetException( OK );
 
@@ -600,7 +600,7 @@ MBStatus_t SerialModbusServer::processModbus( void )
         {
             /* The process loop hook will only be executed when the state
             mashine is not in the idle state. Otherwise the loop hook would be
-            execetued with every run through processModbus(). */
+            execetued with every run through process(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != SERVER_IDLE ) )
             {
                 (*vProcessLoopHook)();
