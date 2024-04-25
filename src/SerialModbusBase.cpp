@@ -82,7 +82,7 @@ static const MBExceptionString_t pxExceptionStrings[] = {
     { NOK, "NOK" },
 
     /* Marks the end of the list. */
-    { 0x00, NULL }
+    { 0xFF, NULL }
 };
 /*-----------------------------------------------------------*/
 
