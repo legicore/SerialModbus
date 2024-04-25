@@ -262,6 +262,7 @@ bool SerialModbusServer::bCheckId( uint8_t ucId )
         {
             if( ucId == ucIdMap[ i ] )
             {
+                ucServerId = ucId;
                 return true;
             }
         }
@@ -359,30 +360,23 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                 bus message counter. */
                                 vIncCPT1();
 
-                                if( ( bCheckId( ucREQUEST_ID ) != true ) &&
-                                    ( ucREQUEST_ID != configID_BROADCAST ) )
+                                /* Check if the received request is dedicated to
+                                us or if it is a broadcast. */
+                                if( ( bCheckId( ucREQUEST_ID ) == true ) ||
+                                    ( ucREQUEST_ID == configID_BROADCAST ) )
                                 {
-                                    vClearRequestFrame();
-                                    vSetState( SERVER_IDLE );
+                                    while( bTimeoutInterFrameDelay() != true );
+
+                                    vSetState( CHECKING_REQUEST );
                                     break;
                                 }
-
-                                while( bTimeoutInterFrameDelay() != true );
-
-                                #if( configSERVER_MULTI_ID == 1 )
-                                {
-                                    ucServerId = ucREQUEST_ID;
-                                }
-                                #endif
-
-                                vSetState( CHECKING_REQUEST );
-                                break;
                             }
-
-                            /* Got an checksum error or received a frame that
-                            consists of <= 3 characters -> Increment the bus
-                            communication error counter. */
-                            vIncCPT2();
+                            else
+                            {
+                                /* Checksum error -> Increment the bus
+                                communication error counter. */
+                                vIncCPT2();
+                            }
 
                             /* We go directly back to the idle state and don't
                             send any reply because it would cause bus collisions
@@ -417,12 +411,6 @@ MBStatus_t SerialModbusServer::processModbus( void )
                                     if( ( bCheckId( ucREQUEST_ID ) == true ) ||
                                         ( ucREQUEST_ID == configID_BROADCAST ) )
                                     {
-                                        #if( configSERVER_MULTI_ID == 1 )
-                                        {
-                                            ucServerId = ucREQUEST_ID;
-                                        }
-                                        #endif
-
                                         vSetState( CHECKING_REQUEST );
                                         break;
                                     }
