@@ -23,10 +23,6 @@
 
 /*-----------------------------------------------------------*/
 
-/* This value for the Arduino default serial configuration is taken from the
-source code (8 data bits, no parity, 1 stop bit). */
-#define SERIAL_CONFIG_DEFAULT   SERIAL_8N1
-
 /* Check if the architecture of the currently selected borad is supported. */
 #if defined( ARDUINO_ARCH_AVR ) || \
     defined( ARDUINO_ARCH_MEGAAVR ) || \
@@ -34,8 +30,8 @@ source code (8 data bits, no parity, 1 stop bit). */
     defined( ARDUINO_ARCH_RENESAS )
 
     /* Check for the known boards that are not (!) compatible with the Arduino
-    SoftwareSerial library - if none of them is currently selected, the code
-    will be integrated. */
+    SoftwareSerial library - if none of them is currently selected, the library
+    can be integrated. */
     #if !defined( ARDUINO_SAMD_MKRZERO ) && \
         !defined( ARDUINO_SAMD_MKRWIFI1010 ) && \
         !defined( ARDUINO_SAMD_NANO_33_IOT )

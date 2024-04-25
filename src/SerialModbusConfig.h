@@ -19,12 +19,20 @@
 
 /*-----------------------------------------------------------*/
 
+#include <Arduino.h>
+
+/*-----------------------------------------------------------*/
+
 #define configMODE_RTU                  1
 #define configMODE_ASCII                2
 #define configMODE                      configMODE_RTU
 
 #define configFRAME_LEN_MIN             3
 #define configFRAME_LEN_MAX             64
+
+/* This value for the Arduino default serial configuration is taken from the 
+source code (8 data bits, no parity, 1 stop bit). */ 
+#define configSERIAL_CONF_DEFAULT       SERIAL_8N1
 
 /*-----------------------------------------------------------*/
 

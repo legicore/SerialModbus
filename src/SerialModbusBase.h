@@ -141,7 +141,7 @@ class SerialModbusBase
 public:
 
     SerialModbusBase();
-    bool begin( uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = SERIAL_CONFIG_DEFAULT );
+    bool begin( uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
 #if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint32_t baud, SoftwareSerial * serial );
 #endif

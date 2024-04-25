@@ -164,7 +164,7 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
 
         #if( configMODE == configMODE_RTU )
         {
-            if( bCalculateTimeouts( baud, SERIAL_CONFIG_DEFAULT ) != true )
+            if( bCalculateTimeouts( baud, configSERIAL_CONF_DEFAULT ) != true )
             {
                 return false;
             }
