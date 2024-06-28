@@ -145,11 +145,11 @@ public:
 #if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint32_t baud, SoftwareSerial * serial );
 #endif
-    bool setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
+    bool setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) );
 #if( configPROCESS_LOOP_HOOK == 1 )
-    void setProcessLoopHook( void (*loopHookFunction)( void ) );
+    void setProcessLoopHook( void (* loopHookFunction)( void ) );
 #endif
-    void setCustomDelay( void (*customDelay)( uint32_t delayUs ) );
+    void setCustomDelay( void (* customDelay)( uint32_t delayUs ) );
     const char * getExceptionString( uint8_t exceptionCode );
     uint32_t getInterCharacterTimeout( void );
     uint32_t getInterFrameDelay( void );
@@ -170,8 +170,8 @@ protected:
     void vClearReplyFrame( void );
     bool bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength );
     size_t xSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
-    void (*vSerialCtrlTx)( void );
-    void (*vSerialCtrlRx)( void );
+    void (* vSerialCtrlTx)( void );
+    void (* vSerialCtrlRx)( void );
     Serial_t * pxSerial;
 #if defined( COMPAT_SOFTWARE_SERIAL )
     SoftwareSerial * pxSerialSoftware;
@@ -185,7 +185,7 @@ protected:
     uint32_t ulReplyDword( size_t xNbr, size_t xOffset = 3 );
     uint64_t uxReplyQword( size_t xNbr, size_t xOffset = 3 );
     void vDelayUs( uint32_t ulDelayUs );
-    void (*vCustomDelayUs)( uint32_t ulDelayUs );
+    void (* vCustomDelayUs)( uint32_t ulDelayUs );
     uint16_t usCRC16( uint8_t * pucData, size_t xDataLength );
     uint32_t ulInterFrameDelayUs;
     uint32_t ulInterCharacterTimeoutUs;
@@ -203,7 +203,7 @@ protected:
     MBStatus_t xRtuToAscii( uint8_t * pucRtuFrame, size_t * pxFrameLength );
     MBStatus_t xAsciiToRtu( uint8_t * pucAsciiFrame, size_t * pxFrameLength );
 #if( configPROCESS_LOOP_HOOK == 1 )
-    void (*vProcessLoopHook)( void );
+    void (* vProcessLoopHook)( void );
 #endif
     char cAsciiInputDelimiter;
     size_t xChecksumLength;

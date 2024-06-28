@@ -354,7 +354,7 @@ void SerialModbusBase::vClearRequestFrame( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) )
+bool SerialModbusBase::setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) )
 {
     if( ( serialCtrlTx != NULL ) && ( serialCtrlRx != NULL ) )
     {
@@ -362,7 +362,7 @@ bool SerialModbusBase::setSerialCtrl( void (*serialCtrlTx)( void ), void (*seria
         vSerialCtrlRx = serialCtrlRx;
 
         /* Set Rx mode to have an defined initialization status. */
-        (*vSerialCtrlRx)();
+        ( vSerialCtrlRx )();
 
         return true;
     }
@@ -421,7 +421,7 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 
 #if( configPROCESS_LOOP_HOOK == 1 )
 
-    void SerialModbusBase::setProcessLoopHook( void (*loopHookFunction)( void ) )
+    void SerialModbusBase::setProcessLoopHook( void (* loopHookFunction)( void ) )
     {
         /* INFO: No NULL check to provide the ability to turn the loop hook 
         function mechanism on and off. */
@@ -536,7 +536,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
     {
         if( vSerialCtrlTx != NULL )
         {
-            (*vSerialCtrlTx)();
+            ( vSerialCtrlTx )();
         }
 
         if( pxSerial != NULL )
@@ -560,7 +560,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 
         if( vSerialCtrlRx != NULL )
         {
-            (*vSerialCtrlRx)();
+            ( vSerialCtrlRx )();
         }
     }
 
@@ -688,12 +688,12 @@ void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
     }
     else
     {
-        (*vCustomDelayUs)( ulDelayUs );
+        ( vCustomDelayUs )( ulDelayUs );
     }
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusBase::setCustomDelay( void (*customDelay)( uint32_t delayUs ) )
+void SerialModbusBase::setCustomDelay( void (* customDelay)( uint32_t delayUs ) )
 {
     if( customDelay != NULL )
     {

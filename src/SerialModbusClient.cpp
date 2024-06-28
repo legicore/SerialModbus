@@ -613,7 +613,7 @@ MBStatus_t SerialModbusClient::process( void )
             execetued with every run through process(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != CLIENT_IDLE ) )
             {
-                (*vProcessLoopHook)();
+                ( vProcessLoopHook )();
             }
         }
         #endif
@@ -643,7 +643,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
 
         if( pxRequest->callback != NULL )
         {
-            (*pxRequest->callback)();
+            ( pxRequest->callback )();
         }
     }
     else
@@ -664,7 +664,7 @@ void SerialModbusClient::vHandlerFC05( void )
         {
             if( pxRequest->callback != NULL )
             {
-                (*pxRequest->callback)();
+                ( pxRequest->callback )();
             }
         }
         else
@@ -691,7 +691,7 @@ void SerialModbusClient::vHandlerFC06( void )
         {
             if( pxRequest->callback != NULL )
             {
-                (*pxRequest->callback)();
+                ( pxRequest->callback )();
             }
         }
         else
@@ -830,7 +830,7 @@ void SerialModbusClient::vHandlerFC08( void )
 
         if( pxRequest->callback != NULL )
         {
-            (*pxRequest->callback)();
+            ( pxRequest->callback )();
         }
     }
     else
@@ -851,7 +851,7 @@ void SerialModbusClient::vHandlerFC16( void )
         {
             if( pxRequest->callback != NULL )
             {
-                (*pxRequest->callback)();
+                ( pxRequest->callback )();
             }
         }
         else

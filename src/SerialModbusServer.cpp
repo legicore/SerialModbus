@@ -603,7 +603,7 @@ MBStatus_t SerialModbusServer::process( void )
             execetued with every run through process(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != SERVER_IDLE ) )
             {
-                (*vProcessLoopHook)();
+                ( vProcessLoopHook )();
             }
         }
         #endif
@@ -726,7 +726,7 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
             if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
             {
-                (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+                ( pxRegisterMap[ xRegisterMapIndex ].callback )();
             }
 
             return;
@@ -765,7 +765,7 @@ void SerialModbusServer::vHandlerFC05( void )
 
         if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
         {
-            (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+            ( pxRegisterMap[ xRegisterMapIndex ].callback )();
         }
 
         return;
@@ -799,7 +799,7 @@ void SerialModbusServer::vHandlerFC06( void )
 
     if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
     {
-        (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+        ( pxRegisterMap[ xRegisterMapIndex ].callback )();
     }
 }
 /*-----------------------------------------------------------*/
@@ -1104,7 +1104,7 @@ void SerialModbusServer::vHandlerFC08( void )
     {
         if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
         {
-            (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+            ( pxRegisterMap[ xRegisterMapIndex ].callback )();
         }
     }
 }
@@ -1200,7 +1200,7 @@ void SerialModbusServer::vHandlerFC16( void )
 
                 if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
                 {
-                    (*pxRegisterMap[ xRegisterMapIndex ].callback)();
+                    ( pxRegisterMap[ xRegisterMapIndex ].callback )();
                 }
 
                 return;
