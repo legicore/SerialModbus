@@ -145,7 +145,7 @@ public:
 #if defined( COMPAT_SOFTWARE_SERIAL )
     bool begin( uint32_t baud, SoftwareSerial * serial );
 #endif
-    void setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
+    bool setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) );
 #if( configPROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (*loopHookFunction)( void ) );
 #endif

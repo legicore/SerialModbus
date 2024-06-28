@@ -354,13 +354,20 @@ void SerialModbusBase::vClearRequestFrame( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusBase::setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) )
+bool SerialModbusBase::setSerialCtrl( void (*serialCtrlTx)( void ), void (*serialCtrlRx)( void ) )
 {
     if( ( serialCtrlTx != NULL ) && ( serialCtrlRx != NULL ) )
     {
         vSerialCtrlTx = serialCtrlTx;
         vSerialCtrlRx = serialCtrlRx;
+
+        /* Set Rx mode to have an defined initialization status. */
+        (*vSerialCtrlRx)();
+
+        return true;
     }
+
+    return false;
 }
 /*-----------------------------------------------------------*/
 
