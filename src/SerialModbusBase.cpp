@@ -416,6 +416,8 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 
     void SerialModbusBase::setProcessLoopHook( void (*loopHookFunction)( void ) )
     {
+        /* INFO: No NULL check to provide the ability to turn the loop hook 
+        function mechanism on and off. */
         vProcessLoopHook = loopHookFunction;
     }
 
@@ -450,6 +452,42 @@ bool SerialModbusBase::bTimeoutInterFrameDelay( void )
 bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
 {
     return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
+}
+/*-----------------------------------------------------------*/
+
+uint32_t SerialModbusBase::getInterCharacterTimeout( void )
+{
+    return ulInterCharacterTimeoutUs;
+}
+/*-----------------------------------------------------------*/
+
+uint32_t SerialModbusBase::getInterFrameDelay( void )
+{
+    return ulInterFrameDelayUs;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
+{
+    if( timeUs != 0 )
+    {
+        ulInterCharacterTimeoutUs = timeUs;
+        return true;
+    }
+
+    return false;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
+{
+    if( timeUs != 0 )
+    {
+        ulInterFrameDelayUs = timeUs;
+        return true;
+    }
+
+    return false;
 }
 /*-----------------------------------------------------------*/
 
@@ -668,40 +706,4 @@ const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
     }
 
     return NULL;
-}
-/*-----------------------------------------------------------*/
-
-uint32_t SerialModbusBase::getInterCharacterTimeout( void )
-{
-    return ulInterCharacterTimeoutUs;
-}
-/*-----------------------------------------------------------*/
-
-uint32_t SerialModbusBase::getInterFrameDelay( void )
-{
-    return ulInterFrameDelayUs;
-}
-/*-----------------------------------------------------------*/
-
-int8_t SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
-{
-    if( timeUs != 0 )
-    {
-        ulInterCharacterTimeoutUs = timeUs;
-        return 0;
-    }
-
-    return -1;
-}
-/*-----------------------------------------------------------*/
-
-int8_t SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
-{
-    if( timeUs != 0 )
-    {
-        ulInterFrameDelayUs = timeUs;
-        return 0;
-    }
-
-    return -1;
 }

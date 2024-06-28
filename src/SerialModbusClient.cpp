@@ -36,11 +36,11 @@ SerialModbusClient::SerialModbusClient()
     pxRequest = NULL;
     bSkipRequestMap = false;
 
-    ulTurnaroundDelayUs = configTURNAROUND_DELAY_US;
-    ulResponseTimeoutUs = configRESPONSE_TIMEOUT_US;
+    ulTurnaroundDelayMs = configTURNAROUND_DELAY_MS;
+    ulResponseTimeoutMs = configRESPONSE_TIMEOUT_MS;
 
-    ulTimerResponseTimeoutUs = 0;
-    ulTimerTurnaroundDelayUs = 0;
+    ulTimerResponseTimeoutMs = 0;
+    ulTimerTurnaroundDelayMs = 0;
 
     xStatusSimpleAPI = OK;
 }
@@ -54,37 +54,61 @@ void SerialModbusClient::vSetState( MBClientState_t xStatePar )
 
 void SerialModbusClient::vStartTurnaroundDelay( void )
 {
-    ulTimerTurnaroundDelayUs = micros();
+    ulTimerTurnaroundDelayMs = millis();
 }
 /*-----------------------------------------------------------*/
 
 void SerialModbusClient::vStartResponseTimeout( void )
 {
-    ulTimerResponseTimeoutUs = micros();
+    ulTimerResponseTimeoutMs = millis();
 }
 /*-----------------------------------------------------------*/
 
 bool SerialModbusClient::bTimeoutTurnaroundDelay( void )
 {
-    return ( micros() - ulTimerTurnaroundDelayUs ) >= ulTurnaroundDelayUs;
+    return ( millis() - ulTimerTurnaroundDelayMs ) >= ulTurnaroundDelayMs;
 }
 /*-----------------------------------------------------------*/
 
 bool SerialModbusClient::bTimeoutResponseTimeout( void )
 {
-    return ( micros() - ulTimerResponseTimeoutUs ) >= ulResponseTimeoutUs;
+    return ( millis() - ulTimerResponseTimeoutMs ) >= ulResponseTimeoutMs;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusClient::setResponseTimeout( uint32_t timeMs )
+uint32_t SerialModbusClient::getResponseTimeout( void )
 {
-    ulResponseTimeoutUs = timeMs * 1000;
+    return ulResponseTimeoutMs;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
+uint32_t SerialModbusClient::getTurnaroundDelay( void )
 {
-    ulTurnaroundDelayUs = timeMs * 1000;
+    return ulTurnaroundDelayMs;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusClient::setResponseTimeout( uint32_t timeMs )
+{
+    if( timeMs != 0 )
+    {
+        ulResponseTimeoutMs = timeMs;
+        return true;
+    }
+
+    return false;
+}
+/*-----------------------------------------------------------*/
+
+bool SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
+{
+    if( timeMs != 0 )
+    {
+        ulTurnaroundDelayMs = timeMs;
+        return true;
+    }
+
+    return false;
 }
 /*-----------------------------------------------------------*/
 

@@ -41,8 +41,8 @@ source code (8 data bits, no parity, 1 stop bit). */
 
 #define configASCII_INPUT_DELIMITER     '\n'
 
-#define configTURNAROUND_DELAY_US       200000
-#define configRESPONSE_TIMEOUT_US       1000000
+#define configTURNAROUND_DELAY_MS       200
+#define configRESPONSE_TIMEOUT_MS       1000
 
 /*-----------------------------------------------------------*/
 

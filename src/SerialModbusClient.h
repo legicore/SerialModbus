@@ -64,8 +64,10 @@ public:
     void setRequestMap( const MBRequest_t * requestMap );
     MBStatus_t setRequest( const MBRequest_t * request, bool requestMap = false );
     MBStatus_t process( void );
-    void setResponseTimeout( uint32_t timeMs );
-    void setTurnaroundDelay( uint32_t timeMs );
+    uint32_t getResponseTimeout( void );
+    uint32_t getTurnaroundDelay( void );
+    bool setResponseTimeout( uint32_t timeMs );
+    bool setTurnaroundDelay( uint32_t timeMs );
 
     /* Simplified API functions. */
 
@@ -86,10 +88,10 @@ private:
     const MBRequest_t * pxRequestMap;
     size_t xRequestMapIndex;
     bool bSkipRequestMap;
-    uint32_t ulTimerTurnaroundDelayUs;
-    uint32_t ulTimerResponseTimeoutUs;
-    uint32_t ulTurnaroundDelayUs;
-    uint32_t ulResponseTimeoutUs;
+    uint32_t ulTimerTurnaroundDelayMs;
+    uint32_t ulTimerResponseTimeoutMs;
+    uint32_t ulTurnaroundDelayMs;
+    uint32_t ulResponseTimeoutMs;
     bool bTimeoutTurnaroundDelay( void );
     bool bTimeoutResponseTimeout( void );
     void vStartTurnaroundDelay( void );

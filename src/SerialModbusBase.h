@@ -153,8 +153,8 @@ public:
     const char * getExceptionString( uint8_t exceptionCode );
     uint32_t getInterCharacterTimeout( void );
     uint32_t getInterFrameDelay( void );
-    int8_t setInterCharacterTimeout( uint32_t timeUs );
-    int8_t setInterFrameDelay( uint32_t timeUs );
+    bool setInterCharacterTimeout( uint32_t timeUs );
+    bool setInterFrameDelay( uint32_t timeUs );
 
 protected:
 
