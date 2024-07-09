@@ -69,9 +69,9 @@ struct MBRegister_s
 typedef struct MBRegister_s MBRegister_t;
 
 #if( configSERVER_MULTI_ID == 1 )
-    #define REGISTER_MAP_END { 0x00, NA, 0x0000, NULL, 0, NULL }
+    #define REGISTER_MAP_END { 0xFF, NA, 0xFFFF, NULL, 0, NULL }
 #else
-    #define REGISTER_MAP_END { NA, 0x0000, NULL, 0, NULL }
+    #define REGISTER_MAP_END { NA, 0xFFFF, NULL, 0, NULL }
 #endif
 
 /*-----------------------------------------------------------*/

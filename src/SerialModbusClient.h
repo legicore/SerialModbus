@@ -52,7 +52,7 @@ struct MBRequest_s
 
 typedef struct MBRequest_s MBRequest_t;
 
-#define REQUEST_MAP_END { configID_SERVER_MAX, 0x00, 0x0000, NULL, 0, NULL }
+#define REQUEST_MAP_END { 0xFF, 0x00, 0xFFFF, NULL, 0, NULL }
 
 /*-----------------------------------------------------------*/
 
