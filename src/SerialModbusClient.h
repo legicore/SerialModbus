@@ -71,11 +71,11 @@ public:
 
     /* Simplified API functions. */
 
-    int16_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data = 0x0000 );
-    int16_t readHoldingRegister( uint8_t id, uint16_t address );
-    int16_t readInputRegister( uint8_t id, uint16_t address );
-    int16_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value );
-    int16_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value );
+    int32_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data = 0x0000 );
+    int32_t readHoldingRegister( uint8_t id, uint16_t address );
+    int32_t readInputRegister( uint8_t id, uint16_t address );
+    int32_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value );
+    int32_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value );
     MBStatus_t getLastException( void );
     const char * getLastExceptionString( void );
 

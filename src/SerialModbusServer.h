@@ -99,15 +99,16 @@ public:
 
     /* Simplified API functions. */
 
-    int16_t createCoils( uint16_t address, size_t number );
-    int16_t createInputResgisters( uint16_t address, size_t number );
-    int16_t createHoldingRegisters( uint16_t address, size_t number );
-    uint16_t getCoil( uint16_t address );
-    int16_t setCoil( uint16_t address, uint16_t value );
-    uint16_t getInputResgister( uint16_t address );
-    int16_t setInputResgister( uint16_t address, uint16_t value );
-    uint16_t getHoldingRegister( uint16_t address );
-    int16_t setHoldingRegister( uint16_t address, uint16_t value );
+    bool createRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber );
+    bool createCoils( uint16_t address, size_t number );
+    bool createInputResgisters( uint16_t address, size_t number );
+    bool createHoldingRegisters( uint16_t address, size_t number );
+    int32_t getCoil( uint16_t address );
+    int32_t getInputResgister( uint16_t address );
+    int32_t getHoldingRegister( uint16_t address );
+    bool setCoil( uint16_t address, uint16_t value );
+    bool setInputResgister( uint16_t address, uint16_t value );
+    bool setHoldingRegister( uint16_t address, uint16_t value );
 
 private:
 
@@ -140,9 +141,8 @@ private:
 #endif
     bool bCheckId( uint8_t ucId );
     size_t xRegisterMapSize;
-    int16_t sCreateRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber );
-    uint16_t sGetRegister( uint16_t address );
-    int16_t sSetRegister( uint16_t address, uint16_t value );
+    int32_t lGetRegister( uint16_t address );
+    bool bSetRegister( uint16_t address, uint16_t value );
 };
 /*-----------------------------------------------------------*/
 

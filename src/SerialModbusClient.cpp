@@ -868,15 +868,13 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
+int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
 {
-    uint16_t usData = 0x0000;
-    MBRequest_t xRequest = { 0, 0x00, 0x0000, &usData, 1, NULL };
+    MBRequest_t xRequest = { 0xFF, 0x00, 0xFFFF, &data, 1, NULL };
 
     xRequest.id = id;
     xRequest.functionCode = functionCode;
     xRequest.address = address;
-    usData = data;
 
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == OK )
@@ -884,7 +882,7 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
         xStatusSimpleAPI = process();
         if( xStatusSimpleAPI == OK )
         {
-            return ( int16_t ) usData;
+            return ( int32_t ) data;
         }
     }
 
@@ -892,25 +890,25 @@ int16_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
+int32_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
     return sendRequest( id, READ_HOLDING_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
+int32_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
     return sendRequest( id, READ_INPUT_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
+int32_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
 {
     return sendRequest( id, WRITE_SINGLE_COIL, address, data );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
+int32_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
 {
     return sendRequest( id, WRITE_SINGLE_REGISTER, address, data );
 }

@@ -1224,7 +1224,7 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber )
+bool SerialModbusServer::createRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber )
 {
     MBRegister_t * pxRegisterMapTemp = NULL;
 
@@ -1233,7 +1233,7 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
         xRegisterMapSize = 2;
 
         pxRegisterMapTemp = ( MBRegister_t * ) malloc( sizeof( MBRegister_t ) * xRegisterMapSize );
-        if(pxRegisterMapTemp != NULL  )
+        if( pxRegisterMapTemp != NULL )
         {
 
 #if( configSERVER_MULTI_ID == 1 )
@@ -1274,7 +1274,7 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
                 pxRegisterMap[ xRegisterMapSize - 2 ].dataSize = xNumber;
                 pxRegisterMap[ xRegisterMapSize - 2 ].callback = NULL;
 
-                return 0;
+                return true;
             }
         }
     }
@@ -1282,29 +1282,29 @@ int16_t SerialModbusServer::sCreateRegister( MBAccess_t xAccess, uint16_t usAddr
     free( &pxRegisterMap[ xRegisterMapSize - 1 ] );
     xRegisterMapSize--;
 
-    return -1;
+    return false;
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::createCoils( uint16_t address, size_t number )
+bool SerialModbusServer::createCoils( uint16_t address, size_t number )
 {
-    return sCreateRegister( RW, address, number );
+    return createRegister( RW, address, number );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::createInputResgisters( uint16_t address, size_t number )
+bool SerialModbusServer::createInputResgisters( uint16_t address, size_t number )
 {
-    return sCreateRegister( RD, address, number );
+    return createRegister( RD, address, number );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::createHoldingRegisters( uint16_t address, size_t number )
+bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t number )
 {
-    return sCreateRegister( RW, address, number );
+    return createRegister( RW, address, number );
 }
 /*-----------------------------------------------------------*/
 
-uint16_t SerialModbusServer::sGetRegister( uint16_t address )
+int32_t SerialModbusServer::lGetRegister( uint16_t address )
 {
     size_t xOffset = 0;
 
@@ -1314,15 +1314,15 @@ uint16_t SerialModbusServer::sGetRegister( uint16_t address )
             ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
         {
             xOffset = address - pxRegisterMap[ i ].address;
-            return pxRegisterMap[ i ].data[ xOffset ];
+            return ( int32_t ) pxRegisterMap[ i ].data[ xOffset ];
         }
     }
 
-    return ( uint16_t ) -1;
+    return ( int32_t ) -1;
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::sSetRegister( uint16_t address, uint16_t value )
+bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value )
 {
     size_t xOffset = 0;
 
@@ -1333,45 +1333,45 @@ int16_t SerialModbusServer::sSetRegister( uint16_t address, uint16_t value )
         {
             xOffset = address - pxRegisterMap[ i ].address;
             pxRegisterMap[ i ].data[ xOffset ] = value;
-            return 0;
+            return true;
         }
     }
 
-    return -1;
+    return false;
 }
 /*-----------------------------------------------------------*/
 
-uint16_t SerialModbusServer::getCoil( uint16_t address )
+int32_t SerialModbusServer::getCoil( uint16_t address )
 {
-    return sGetRegister( address );
+    return lGetRegister( address );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::setCoil( uint16_t address, uint16_t value )
+int32_t SerialModbusServer::getInputResgister( uint16_t address )
 {
-    return sSetRegister( address, value );
+    return lGetRegister( address );
 }
 /*-----------------------------------------------------------*/
 
-uint16_t SerialModbusServer::getInputResgister( uint16_t address )
+int32_t SerialModbusServer::getHoldingRegister( uint16_t address )
 {
-    return sGetRegister( address );
+    return lGetRegister( address );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::setInputResgister( uint16_t address, uint16_t value )
+bool SerialModbusServer::setCoil( uint16_t address, uint16_t value )
 {
-    return sSetRegister( address, value );
+    return bSetRegister( address, value );
 }
 /*-----------------------------------------------------------*/
 
-uint16_t SerialModbusServer::getHoldingRegister( uint16_t address )
+bool SerialModbusServer::setInputResgister( uint16_t address, uint16_t value )
 {
-    return sGetRegister( address );
+    return bSetRegister( address, value );
 }
 /*-----------------------------------------------------------*/
 
-int16_t SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value )
+bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value )
 {
-    return sSetRegister( address, value );
+    return bSetRegister( address, value );
 }
