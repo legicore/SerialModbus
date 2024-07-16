@@ -291,7 +291,7 @@ MBStatus_t SerialModbusServer::process( void )
         {
             case SERVER_IDLE :
             {
-                if( xReplyLength > ( configFRAME_LEN_MIN + 2 ) )
+                if( xReplyLength > configFRAME_LEN_MIN )
                 {
                     #if( configMODE == configMODE_ASCII )
                     {
@@ -672,11 +672,11 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
                         }
                         #else
                         {
-                            ( void ) xSetException( SERVER_DEVICE_FAILURE );
+                            ( void ) xSetException( ILLEGAL_FUNCTION );
                         }
                         #endif
 
-                        break;
+                        return NOK;
                     }
                 }
 
