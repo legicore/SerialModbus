@@ -566,9 +566,9 @@ MBStatus_t SerialModbusServer::process( void )
             {
                 vIncCPT3();
 
-                ucREPLY_ID = ucServerId;
+                ucREPLY_ID            = ucServerId;
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE | 0x80;
-                ucREPLY_ERROR_CODE = ( uint8_t ) xException;
+                ucREPLY_ERROR_CODE    = ( uint8_t ) xException;
 
                 xReplyLength = 3;
 
@@ -807,7 +807,7 @@ void SerialModbusServer::vHandlerFC06( void )
 void SerialModbusServer::vHandlerFC08( void )
 {
     /* Set the common reply data for all diagnostic sub functions. */
-    ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
+    ucREPLY_FUNCTION_CODE        = ucREQUEST_FUNCTION_CODE;
     ucREPLY_SUB_FUNCTION_CODE_HI = ucREQUEST_SUB_FUNCTION_CODE_HI;
     ucREPLY_SUB_FUNCTION_CODE_LO = ucREQUEST_SUB_FUNCTION_CODE_LO;
 
@@ -1237,11 +1237,11 @@ bool SerialModbusServer::createRegister( MBAccess_t xAccess, uint16_t usAddress,
         {
 
 #if( configSERVER_MULTI_ID == 1 )
-            pxRegisterMapTemp[ 0 ].id = 0xFF;
+            pxRegisterMapTemp[ 0 ].id       = 0xFF;
 #endif
-            pxRegisterMapTemp[ 0 ].access = NA;
-            pxRegisterMapTemp[ 0 ].address = 0xFFFF;
-            pxRegisterMapTemp[ 0 ].data = NULL;
+            pxRegisterMapTemp[ 0 ].access   = NA;
+            pxRegisterMapTemp[ 0 ].address  = 0xFFFF;
+            pxRegisterMapTemp[ 0 ].data     = NULL;
             pxRegisterMapTemp[ 0 ].dataSize = 0;
             pxRegisterMapTemp[ 0 ].callback = NULL;
         }
@@ -1269,8 +1269,8 @@ bool SerialModbusServer::createRegister( MBAccess_t xAccess, uint16_t usAddress,
 #if( configSERVER_MULTI_ID == 1 )
                 pxRegisterMap[ xRegisterMapSize - 2 ].id = ucServerId;
 #endif
-                pxRegisterMap[ xRegisterMapSize - 2 ].access = xAccess;
-                pxRegisterMap[ xRegisterMapSize - 2 ].address = usAddress;
+                pxRegisterMap[ xRegisterMapSize - 2 ].access   = xAccess;
+                pxRegisterMap[ xRegisterMapSize - 2 ].address  = usAddress;
                 pxRegisterMap[ xRegisterMapSize - 2 ].dataSize = xNumber;
                 pxRegisterMap[ xRegisterMapSize - 2 ].callback = NULL;
 
