@@ -291,7 +291,7 @@ MBStatus_t SerialModbusServer::process( void )
         {
             case SERVER_IDLE :
             {
-                if( xReplyLength > configFRAME_LEN_MIN )
+                if( xReplyLength >= configFRAME_LEN_MIN )
                 {
                     #if( configMODE == configMODE_ASCII )
                     {
@@ -348,7 +348,7 @@ MBStatus_t SerialModbusServer::process( void )
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xRequestLength > configFRAME_LEN_MIN )
+                if( xRequestLength >= configFRAME_LEN_MIN )
                 {
                     #if( configMODE == configMODE_RTU )
                     {
