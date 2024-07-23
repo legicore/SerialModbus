@@ -236,7 +236,7 @@ protected:
 #define ucREQUEST_OUTPUT_VALUE_LO       pucRequestFrame[ 5 ]
 #define usREQUEST_OUTPUT_VALUE          ( ( ( uint16_t ) ucREQUEST_OUTPUT_VALUE_HI << 8 ) | ucREQUEST_OUTPUT_VALUE_LO )
 
-#define ucREQUEST_BYTE_COUNT_2          pucRequestFrame[ 6 ]
+#define ucREQUEST_BYTE_COUNT_FC16       pucRequestFrame[ 6 ]
 
 #define CLEAR_COM_EVENT_LOG             0xFF00
 #define ucREQUEST_SUB_FUNCTION_CODE_HI  pucRequestFrame[ 2 ]
@@ -250,6 +250,16 @@ protected:
 #define ucREQUEST_INPUT_DELIMITER_HI    pucRequestFrame[ 4 ]
 #define ucREQUEST_INPUT_DELIMITER_LO    pucRequestFrame[ 5 ]
 #define usREQUEST_INPUT_DELIMITER       ( ( ( uint16_t ) ucREQUEST_INPUT_DELIMITER_HI << 8 ) | ucREQUEST_INPUT_DELIMITER_LO )
+
+#define ucREQUEST_ADDRESS_WRITE_HI      pucRequestFrame[ 6 ]
+#define ucREQUEST_ADDRESS_WRITE_LO      pucRequestFrame[ 7 ]
+#define usREQUEST_ADDRESS_WRITE         ( ( ( uint16_t ) ucREQUEST_ADDRESS_WRITE_HI << 8 ) | ucREQUEST_ADDRESS_WRITE_LO )
+
+#define ucREQUEST_QUANTITY_WRITE_HI     pucRequestFrame[ 8 ]
+#define ucREQUEST_QUANTITY_WRITE_LO     pucRequestFrame[ 9 ]
+#define usREQUEST_QUANTITY_WRITE        ( ( ( uint16_t ) ucREQUEST_QUANTITY_WRITE_HI << 8 ) | ucREQUEST_QUANTITY_WRITE_LO )
+
+#define ucREQUEST_BYTE_COUNT_FC23       pucRequestFrame[ 10 ]
 
 /*-----------------------------------------------------------*/
 

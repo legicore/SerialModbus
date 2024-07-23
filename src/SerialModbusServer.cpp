@@ -1179,7 +1179,7 @@ void SerialModbusServer::vHandlerFC16( void )
 
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007B ) )
     {
-        if( ucREQUEST_BYTE_COUNT_2 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
+        if( ucREQUEST_BYTE_COUNT_FC16 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
         {
             xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
 
@@ -1267,7 +1267,7 @@ bool SerialModbusServer::createRegister( MBAccess_t xAccess, uint16_t usAddress,
             if( pxRegisterMap[ xRegisterMapSize - 2 ].data != NULL )
             {
 #if( configSERVER_MULTI_ID == 1 )
-                pxRegisterMap[ xRegisterMapSize - 2 ].id = ucServerId;
+                pxRegisterMap[ xRegisterMapSize - 2 ].id       = ucServerId;
 #endif
                 pxRegisterMap[ xRegisterMapSize - 2 ].access   = xAccess;
                 pxRegisterMap[ xRegisterMapSize - 2 ].address  = usAddress;
