@@ -192,7 +192,7 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
     if( pxRegisterMap != NULL )
     {
         /* Count the number of entries in the register map. */
-        while( pxRegisterMap[ ++a ].address != 0xFFFF );
+        while( pxRegisterMap[ ++a ].data != NULL );
         if( a == 1 )
         {
             /* If there is only one entry in the register map, there is no need
@@ -232,7 +232,7 @@ MBStatus_t SerialModbusServer::checkRegisterMap( void )
     {
         bool bIdFound = false;
 
-        for( size_t i = 0; pxRegisterMap[ i ].id != 0xFF; i++ )
+        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
         {
             for( size_t j = 0; j < xIdCount; j++ )
             {
@@ -641,7 +641,7 @@ MBStatus_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucR
 
     /* Scan the register map and check if the request address value lies in the
     range of one of the mapped register entries. */
-    for( ; pxRegisterMap[ xRegisterMapIndex ].address != 0xFFFF; xRegisterMapIndex++ )
+    for( ; pxRegisterMap[ xRegisterMapIndex ].data != NULL; xRegisterMapIndex++ )
     {
 #if( configSERVER_MULTI_ID == 1 )
         if( pxRegisterMap[ xRegisterMapIndex ].id == ucServerId )
@@ -1304,7 +1304,7 @@ int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 
     if( ( id != 0 ) && ( id <= configID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
+        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
         {
 #if( configSERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )
@@ -1332,7 +1332,7 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
 
     if( ( id != 0 ) && ( id <= configID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
+        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
         {
 #if( configSERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )
