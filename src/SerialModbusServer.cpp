@@ -1224,11 +1224,14 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::createRegister( MBAccess_t access, uint16_t address, size_t dataSize, int8_t id )
+bool SerialModbusServer::createRegister( MBAccess_t access, uint16_t address, size_t dataSize, uint8_t id )
 {
     MBRegister_t * pxRegisterMapTmp = NULL;
 
-    ( void ) id;
+    if( ( access == NA ) || ( dataSize == 0 ) || ( id == 0 ) || ( id > configID_SERVER_MAX ) )
+    {
+        return false;
+    }
 
     if( pxRegisterMap == NULL )
     {
@@ -1277,110 +1280,112 @@ bool SerialModbusServer::createRegister( MBAccess_t access, uint16_t address, si
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, int8_t id )
+bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( RW, address, dataSize, id );
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::createInputResgisters( uint16_t address, size_t dataSize, int8_t id )
+bool SerialModbusServer::createInputResgisters( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( RD, address, dataSize, id );
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, int8_t id )
+bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( RW, address, dataSize, id );
 }
 /*-----------------------------------------------------------*/
 
-int32_t SerialModbusServer::lGetRegister( uint16_t address, int8_t id )
+int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 {
     size_t xOffset = 0;
 
-    ( void ) id;
-
-    for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
+    if( ( id != 0 ) && ( id <= configID_SERVER_MAX ) )
     {
-#if( configSERVER_MULTI_ID == 1 )
-        if( id == pxRegisterMap[ i ].id )
+        for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
         {
-#endif
-            if( ( address >= pxRegisterMap[ i ].address ) &&
-                ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
-            {
-                xOffset = address - pxRegisterMap[ i ].address;
-                return ( int32_t ) pxRegisterMap[ i ].data[ xOffset ];
-            }
 #if( configSERVER_MULTI_ID == 1 )
-        }
+            if( id == pxRegisterMap[ i ].id )
+            {
 #endif
+                if( ( address >= pxRegisterMap[ i ].address ) &&
+                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
+                {
+                    xOffset = address - pxRegisterMap[ i ].address;
+                    return ( int32_t ) pxRegisterMap[ i ].data[ xOffset ];
+                }
+#if( configSERVER_MULTI_ID == 1 )
+            }
+#endif
+        }
     }
 
     return ( int32_t ) -1;
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, int8_t id )
+bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t id )
 {
     size_t xOffset = 0;
 
-    ( void ) id;
-
-    for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
+    if( ( id != 0 ) && ( id <= configID_SERVER_MAX ) )
     {
-#if( configSERVER_MULTI_ID == 1 )
-        if( id == pxRegisterMap[ i ].id )
+        for( size_t i = 0; pxRegisterMap[ i ].address != 0xFFFF ; i++ )
         {
-#endif
-            if( ( address >= pxRegisterMap[ i ].address ) &&
-                ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
-            {
-                xOffset = address - pxRegisterMap[ i ].address;
-                pxRegisterMap[ i ].data[ xOffset ] = value;
-                return true;
-            }
 #if( configSERVER_MULTI_ID == 1 )
-        }
+            if( id == pxRegisterMap[ i ].id )
+            {
 #endif
+                if( ( address >= pxRegisterMap[ i ].address ) &&
+                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
+                {
+                    xOffset = address - pxRegisterMap[ i ].address;
+                    pxRegisterMap[ i ].data[ xOffset ] = value;
+                    return true;
+                }
+#if( configSERVER_MULTI_ID == 1 )
+            }
+#endif
+        }
     }
 
     return false;
 }
 /*-----------------------------------------------------------*/
 
-int32_t SerialModbusServer::getCoil( uint16_t address, int8_t id )
+int32_t SerialModbusServer::getCoil( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
 /*-----------------------------------------------------------*/
 
-int32_t SerialModbusServer::getInputResgister( uint16_t address, int8_t id )
+int32_t SerialModbusServer::getInputResgister( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
 /*-----------------------------------------------------------*/
 
-int32_t SerialModbusServer::getHoldingRegister( uint16_t address, int8_t id )
+int32_t SerialModbusServer::getHoldingRegister( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::setCoil( uint16_t address, uint16_t value, int8_t id )
+bool SerialModbusServer::setCoil( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::setInputResgister( uint16_t address, uint16_t value, int8_t id )
+bool SerialModbusServer::setInputResgister( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value, int8_t id )
+bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }

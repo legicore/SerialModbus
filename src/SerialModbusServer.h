@@ -99,16 +99,16 @@ public:
 
     /* Simplified API functions. */
 
-    bool createRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber, int8_t id = 0xFF );
-    bool createCoils( uint16_t address, size_t number, int8_t id = 0xFF );
-    bool createInputResgisters( uint16_t address, size_t number, int8_t id = 0xFF );
-    bool createHoldingRegisters( uint16_t address, size_t number, int8_t id = 0xFF );
-    int32_t getCoil( uint16_t address, int8_t id = 0xFF );
-    int32_t getInputResgister( uint16_t address, int8_t id = 0xFF );
-    int32_t getHoldingRegister( uint16_t address, int8_t id = 0xFF );
-    bool setCoil( uint16_t address, uint16_t value, int8_t id = 0xFF );
-    bool setInputResgister( uint16_t address, uint16_t value, int8_t id = 0xFF );
-    bool setHoldingRegister( uint16_t address, uint16_t value, int8_t id = 0xFF );
+    bool createRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber, uint8_t id = configID_SERVER_MAX );
+    bool createCoils( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
+    bool createInputResgisters( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
+    bool createHoldingRegisters( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
+    int32_t getCoil( uint16_t address, uint8_t id = configID_SERVER_MAX );
+    int32_t getInputResgister( uint16_t address, uint8_t id = configID_SERVER_MAX );
+    int32_t getHoldingRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
+    bool setCoil( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
+    bool setInputResgister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
+    bool setHoldingRegister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
 
 private:
 
@@ -141,8 +141,8 @@ private:
 #endif
     bool bCheckId( uint8_t ucId );
     size_t xRegisterMapSize;
-    int32_t lGetRegister( uint16_t address, int8_t id = 0xFF );
-    bool bSetRegister( uint16_t address, uint16_t value, int8_t id = 0xFF );
+    int32_t lGetRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
+    bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
     bool bClearRegisterMapEntry( MBRegister_t * pxRegisterMapEntry );
 };
 /*-----------------------------------------------------------*/
