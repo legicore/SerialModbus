@@ -500,7 +500,7 @@ bool SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
 
 bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength )
 {
-    if( pucReceiveBuffer != NULL )
+    if( ( pucReceiveBuffer != NULL ) && ( pxBufferLength != NULL ) )
     {
         if( pxSerial != NULL )
         {
@@ -532,7 +532,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 {
     size_t xDataSent = 0;
 
-    if( pucSendBuffer != NULL )
+    if( ( pucSendBuffer != NULL ) && ( pxBufferLength > 0 ) )
     {
         if( vSerialCtrlTx != NULL )
         {
