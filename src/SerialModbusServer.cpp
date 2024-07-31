@@ -133,6 +133,9 @@ SerialModbusServer::SerialModbusServer()
     #endif
 
     xRegisterMapSize = 0;
+
+    bRegisterMapLock_sAPI = false;
+    bRegisterMapLock = false;
 }
 /*-----------------------------------------------------------*/
 
@@ -178,9 +181,18 @@ void SerialModbusServer::vSetState( MBServerState_t xStatePar )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusServer::setRegisterMap( MBRegister_t * registerMap )
+bool SerialModbusServer::setRegisterMap( MBRegister_t * registerMap )
 {
-    pxRegisterMap = registerMap;
+    if( ( registerMap != NULL ) && ( bRegisterMapLock != true ) )
+    {
+        pxRegisterMap = registerMap;
+        bRegisterMapLock_sAPI = true;
+        bRegisterMapLock = true;
+
+        return true;
+    }
+
+    return false;
 }
 /*-----------------------------------------------------------*/
 
@@ -1230,7 +1242,8 @@ bool SerialModbusServer::createRegister( MBAccess_t access, uint16_t address, si
 {
     MBRegister_t * pxRegisterMapTmp = NULL;
 
-    if( ( access == NA ) || ( dataSize == 0 ) || ( id == 0 ) || ( id > configID_SERVER_MAX ) )
+    if( ( access == NA ) || ( dataSize == 0 ) || ( id == 0 ) || ( id > configID_SERVER_MAX ) ||
+        ( bRegisterMapLock_sAPI == true ) )
     {
         return false;
     }
@@ -1264,6 +1277,7 @@ bool SerialModbusServer::createRegister( MBAccess_t access, uint16_t address, si
 
             ( void ) bClearRegisterMapEntry( &pxRegisterMapTmp[ xRegisterMapSize ] );
             pxRegisterMap = pxRegisterMapTmp;
+            bRegisterMapLock = true;
             xRegisterMapSize += 1;
 
             #if( configSERVER_MULTI_ID == 1 )

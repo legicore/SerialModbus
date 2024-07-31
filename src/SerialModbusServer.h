@@ -86,7 +86,7 @@ public:
     bool begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial );
 #endif
     MBStatus_t process( void );
-    void setRegisterMap( MBRegister_t * registerMap );
+    bool setRegisterMap( MBRegister_t * registerMap );
     MBStatus_t checkRegisterMap( void );
 
     /* Only for function code 8 (DIAGNOSTIC). */
@@ -144,6 +144,8 @@ private:
     int32_t lGetRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
     bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
     bool bClearRegisterMapEntry( MBRegister_t * pxRegisterMapEntry );
+    bool bRegisterMapLock_sAPI;
+    bool bRegisterMapLock;
 };
 /*-----------------------------------------------------------*/
 
