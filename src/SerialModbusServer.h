@@ -148,58 +148,60 @@ private:
 /*-----------------------------------------------------------*/
 
 #if( configFC08 == 1 )
-    #define vIncCPT( counter ) if( counter < 0xFFFF ) counter++
-#if( configSFC11 == 1 )
-    #define vIncCPT1()  vIncCPT( usBusMessageCount )
-#else
-    #define vIncCPT1()
-#endif
-#if( configSFC12 == 1 )
-    #define vIncCPT2()  vIncCPT( usBusCommunicationErrorCount )
-#else
-    #define vIncCPT2()
-#endif
-#if( configSFC13 == 1 )
-    #define vIncCPT3()  vIncCPT( usServerExceptionErrorCount )
-#else
-    #define vIncCPT3()
-#endif
-#if( configSFC14 == 1 )
-    #define vIncCPT4()  vIncCPT( usServerMessageCount )
-#else
-    #define vIncCPT4()
-#endif
-#if( configSFC15 == 1 )
-    #define vIncCPT5()  vIncCPT( usServerNoResponseCount )
-#else
-    #define vIncCPT5()
-#endif
-#if( configSFC16 == 1 )
-    #define vIncCPT6()  vIncCPT( usServerNAKCount )
-#else
-    #define vIncCPT6()
-#endif
-#if( configSFC17 == 1 )
-    #define vIncCPT7()  vIncCPT( usServerBusyCount )
-#else
-    #define vIncCPT7()
-#endif
-#if( configSFC18 == 1 )
-    #define vIncCPT8()  vIncCPT( usBusCharacterOverrunCount )
-#else
-    #define vIncCPT8()
-#endif
-#else
-    #define vIncCPT1()
-    #define vIncCPT2()
-    #define vIncCPT3()
-    #define vIncCPT4()
-    #define vIncCPT5()
-    #define vIncCPT6()
-    #define vIncCPT7()
-    #define vIncCPT8()
-#endif
 
+    #if( configSFC11 == 1 )
+        #define vIncCPT1()  usBusMessageCount++
+    #else
+        #define vIncCPT1()
+    #endif
+    #if( configSFC12 == 1 )
+        #define vIncCPT2()  usBusCommunicationErrorCount++
+    #else
+        #define vIncCPT2()
+    #endif
+    #if( configSFC13 == 1 )
+        #define vIncCPT3()  usServerExceptionErrorCount++
+    #else
+        #define vIncCPT3()
+    #endif
+    #if( configSFC14 == 1 )
+        #define vIncCPT4()  usServerMessageCount++
+    #else
+        #define vIncCPT4()
+    #endif
+    #if( configSFC15 == 1 )
+        #define vIncCPT5()  usServerNoResponseCount++
+    #else
+        #define vIncCPT5()
+    #endif
+    #if( configSFC16 == 1 )
+        #define vIncCPT6()  usServerNAKCount++
+    #else
+        #define vIncCPT6()
+    #endif
+    #if( configSFC17 == 1 )
+        #define vIncCPT7()  usServerBusyCount++
+    #else
+        #define vIncCPT7()
+    #endif
+    #if( configSFC18 == 1 )
+        #define vIncCPT8()  usBusCharacterOverrunCount++
+    #else
+        #define vIncCPT8()
+    #endif
+
+#else
+
+    #define vIncCPT1()
+    #define vIncCPT2()
+    #define vIncCPT3()
+    #define vIncCPT4()
+    #define vIncCPT5()
+    #define vIncCPT6()
+    #define vIncCPT7()
+    #define vIncCPT8()
+
+#endif
 /*-----------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_SERVER_H__ */
