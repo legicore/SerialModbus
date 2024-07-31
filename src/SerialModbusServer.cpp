@@ -839,8 +839,10 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == CLEAR_COM_EVENT_LOG ) )
             {
-                /* INFO: The Modbus spec prescribes here to set an specific
-                error flag, but this flag is nowhere specified. */
+                /* INFO: The Modbus spec prescribes here that the serial port
+                must be initialized and restarted, but we don't do that. */
+
+                vClearDiagnosticCounters();
 
                 /* Reset the Only Listen Mode. */
                 bListenOnlyMode = false;
