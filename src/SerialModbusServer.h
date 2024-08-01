@@ -83,7 +83,7 @@ public:
     SerialModbusServer();
     bool begin( uint8_t id, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
 #if defined( COMPAT_SOFTWARE_SERIAL )
-    bool begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial );
+    bool begin( uint8_t id, uint32_t baud, SoftwareSerial * serial );
 #endif
     MBStatus_t process( void );
     bool setRegisterMap( MBRegister_t * registerMap );

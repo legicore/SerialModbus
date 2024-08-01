@@ -160,14 +160,20 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, Serial_t * serial, ui
 
 #if defined( COMPAT_SOFTWARE_SERIAL )
 
-    bool SerialModbusServer::begin( uint8_t serverId, uint32_t baud, SoftwareSerial * serial )
+    bool SerialModbusServer::begin( uint8_t id, uint32_t baud, SoftwareSerial * serial )
     {
-        if( ( serverId == 0 ) || ( serverId > configID_SERVER_MAX ) )
+        if( ( id == 0 ) || ( id > configID_SERVER_MAX ) )
         {
             return false;
         }
 
-        ucServerId = serverId;
+        ucServerId = id;
+
+        #if( configSERVER_MULTI_ID == 1 )
+        {
+            vSetIdMap();
+        }
+        #endif
 
         return SerialModbusBase::begin( baud, serial );
     }
