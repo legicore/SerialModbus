@@ -39,6 +39,8 @@ typedef struct MBExceptionString_s MBExceptionString_t;
 
 static const MBExceptionString_t pxExceptionStrings[] = {
 
+    { OK, "OK" },
+
     /* Standard exception codes. */
     { ILLEGAL_FUNCTION,                         "ILLEGAL_FUNCTION" },
     { ILLEGAL_DATA_ADDRESS,                     "ILLEGAL_DATA_ADDRESS" },
@@ -78,7 +80,6 @@ static const MBExceptionString_t pxExceptionStrings[] = {
 
 #endif
 
-    { OK,  "OK" },
     { NOK, "NOK" },
 
     /* Marks the end of the list. */
@@ -702,11 +703,11 @@ void SerialModbusBase::setCustomDelay( void (* customDelay)( uint32_t delayUs ) 
 }
 /*-----------------------------------------------------------*/
 
-const char * SerialModbusBase::getExceptionString( uint8_t exceptionCode )
+const char * SerialModbusBase::getExceptionString( MBException_t exception )
 {
     for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
     {
-        if( pxExceptionStrings[ i ].ucExceptionCode == exceptionCode )
+        if( pxExceptionStrings[ i ].ucExceptionCode == ( uint8_t ) exception )
         {
             return pxExceptionStrings[ i ].pcExceptionString;
         }

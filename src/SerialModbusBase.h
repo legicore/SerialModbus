@@ -150,7 +150,7 @@ public:
     void setProcessLoopHook( void (* loopHookFunction)( void ) );
 #endif
     void setCustomDelay( void (* customDelay)( uint32_t delayUs ) );
-    const char * getExceptionString( uint8_t exceptionCode );
+    const char * getExceptionString( MBException_t exception );
     uint32_t getInterCharacterTimeout( void );
     uint32_t getInterFrameDelay( void );
     bool setInterCharacterTimeout( uint32_t timeUs );

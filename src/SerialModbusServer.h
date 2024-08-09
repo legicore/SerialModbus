@@ -99,10 +99,10 @@ public:
 
     /* Simplified API functions. */
 
-    bool createRegister( MBAccess_t xAccess, uint16_t usAddress, size_t xNumber, uint8_t id = configID_SERVER_MAX );
-    bool createCoils( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
-    bool createInputResgisters( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
-    bool createHoldingRegisters( uint16_t address, size_t number, uint8_t id = configID_SERVER_MAX );
+    bool createRegister( MBAccess_t access, uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
+    bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
+    bool createInputResgisters( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
+    bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
     int32_t getCoil( uint16_t address, uint8_t id = configID_SERVER_MAX );
     int32_t getInputResgister( uint16_t address, uint8_t id = configID_SERVER_MAX );
     int32_t getHoldingRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
