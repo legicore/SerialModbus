@@ -31,7 +31,7 @@
 
 struct MBExceptionString_s
 {
-    uint8_t ucExceptionCode;
+    MBException_t xException;
     const char * pcExceptionString;
 };
 
@@ -83,7 +83,7 @@ static const MBExceptionString_t pxExceptionStrings[] = {
     { NOK, "NOK" },
 
     /* Marks the end of the list. */
-    { 0xFF, NULL }
+    { ( MBException_t ) 0xFF, NULL }
 };
 /*-----------------------------------------------------------*/
 
@@ -707,7 +707,7 @@ const char * SerialModbusBase::getExceptionString( MBException_t exception )
 {
     for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
     {
-        if( pxExceptionStrings[ i ].ucExceptionCode == ( uint8_t ) exception )
+        if( pxExceptionStrings[ i ].xException == exception )
         {
             return pxExceptionStrings[ i ].pcExceptionString;
         }
