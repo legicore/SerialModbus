@@ -25,7 +25,7 @@
 #include "SerialModbusServer.h"
 
 #include <Arduino.h>
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
@@ -139,7 +139,7 @@ SerialModbusServer::SerialModbusServer()
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusServer::begin( uint8_t id, uint32_t baud, Serial_t * serial, uint32_t config )
+bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial, uint32_t config )
 {
     if( ( id == 0 ) || ( id > configID_SERVER_MAX ) )
     {
@@ -158,9 +158,9 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, Serial_t * serial, ui
 }
 /*-----------------------------------------------------------*/
 
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
 
-    bool SerialModbusServer::begin( uint8_t id, uint32_t baud, SoftwareSerial * serial )
+    bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_SWSerial_t * serial )
     {
         if( ( id == 0 ) || ( id > configID_SERVER_MAX ) )
         {

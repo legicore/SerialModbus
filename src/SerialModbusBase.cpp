@@ -23,7 +23,7 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
@@ -93,9 +93,9 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength = 0;
 
     pxSerial = NULL;
-    #if defined( COMPAT_SOFTWARE_SERIAL )
+    #if defined( configMB_TYPE_SERIAL_SW )
     {
-        pxSerialSoftware = NULL;
+        pxSWSerial = NULL;
     }
     #endif
 
@@ -128,7 +128,7 @@ SerialModbusBase::SerialModbusBase()
 }
 /*-----------------------------------------------------------*/
 
-bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config )
+bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t config )
 {
     if( ( baud == 0 ) || ( serial == NULL ) )
     {
@@ -151,17 +151,17 @@ bool SerialModbusBase::begin( uint32_t baud, Serial_t * serial, uint32_t config 
 }
 /*-----------------------------------------------------------*/
 
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
 
-    bool SerialModbusBase::begin( uint32_t baud, SoftwareSerial * serial )
+    bool SerialModbusBase::begin( uint32_t baud, MB_SWSerial_t * serial )
     {
         if( ( baud == 0 ) || ( serial == NULL ) )
         {
             return false;
         }
 
-        pxSerialSoftware = serial;
-        pxSerialSoftware->begin( baud );
+        pxSWSerial = serial;
+        pxSWSerial->begin( baud );
 
         #if( configMODE == configMODE_RTU )
         {
@@ -512,12 +512,12 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
                 return true;
             }
         }
-#if defined( COMPAT_SOFTWARE_SERIAL )
-        else if( pxSerialSoftware != NULL )
+#if defined( configMB_TYPE_SERIAL_SW )
+        else if( pxSWSerial != NULL )
         {
-            if( pxSerialSoftware->available() > 0 )
+            if( pxSWSerial->available() > 0 )
             {
-                pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSerialSoftware->read();
+                pucReceiveBuffer[ (*pxBufferLength)++ ] = pxSWSerial->read();
 
                 return true;
             }
@@ -545,10 +545,10 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
             xDataSent = pxSerial->write( pucSendBuffer, pxBufferLength );
             pxSerial->flush();
         }
-#if defined( COMPAT_SOFTWARE_SERIAL )
-        else if( pxSerialSoftware != NULL )
+#if defined( configMB_TYPE_SERIAL_SW )
+        else if( pxSWSerial != NULL )
         {
-            xDataSent = pxSerialSoftware->write( pucSendBuffer, pxBufferLength );
+            xDataSent = pxSWSerial->write( pucSendBuffer, pxBufferLength );
         }
 #endif
         #if( configMODE == configMODE_RTU )

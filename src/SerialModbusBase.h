@@ -27,10 +27,16 @@
 #include "SerialModbusCompat.h"
 
 #include <Arduino.h>
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
+/*-----------------------------------------------------------*/
+
+typedef configMB_TYPE_SERIAL MB_Serial_t;
+#if defined( configMB_TYPE_SERIAL_SW )
+    typedef configMB_TYPE_SERIAL_SW MB_SWSerial_t;
+#endif
 /*-----------------------------------------------------------*/
 
 enum MBFunctionCode_e
@@ -141,9 +147,9 @@ class SerialModbusBase
 public:
 
     SerialModbusBase();
-    bool begin( uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
-#if defined( COMPAT_SOFTWARE_SERIAL )
-    bool begin( uint32_t baud, SoftwareSerial * serial );
+    bool begin( uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
+#if defined( configMB_TYPE_SERIAL_SW )
+    bool begin( uint32_t baud, MB_SWSerial_t * serial );
 #endif
     bool setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) );
 #if( configPROCESS_LOOP_HOOK == 1 )
@@ -172,9 +178,9 @@ protected:
     size_t xSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
     void (* vSerialCtrlTx)( void );
     void (* vSerialCtrlRx)( void );
-    Serial_t * pxSerial;
-#if defined( COMPAT_SOFTWARE_SERIAL )
-    SoftwareSerial * pxSerialSoftware;
+    MB_Serial_t * pxSerial;
+#if defined( configMB_TYPE_SERIAL_SW )
+    MB_SWSerial_t * pxSWSerial;
 #endif
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
     uint16_t usRequestWord( size_t xNbr, size_t xOffset = 4 );

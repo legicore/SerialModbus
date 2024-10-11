@@ -27,7 +27,7 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if defined( COMPAT_SOFTWARE_SERIAL )
+#if defined( configMB_TYPE_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
@@ -81,9 +81,9 @@ class SerialModbusServer : public SerialModbusBase
 public:
 
     SerialModbusServer();
-    bool begin( uint8_t id, uint32_t baud, Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
-#if defined( COMPAT_SOFTWARE_SERIAL )
-    bool begin( uint8_t id, uint32_t baud, SoftwareSerial * serial );
+    bool begin( uint8_t id, uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
+#if defined( configMB_TYPE_SERIAL_SW )
+    bool begin( uint8_t id, uint32_t baud, MB_SWSerial_t * serial );
 #endif
     MBStatus_t process( void );
     bool setRegisterMap( MBRegister_t * registerMap );
