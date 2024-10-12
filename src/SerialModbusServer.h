@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -27,13 +27,13 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
 /*-----------------------------------------------------------*/
 
-enum MBServerState_e
+enum MB_ServerState_e
 {
     SERVER_IDLE,
     CHECKING_REQUEST,
@@ -42,36 +42,36 @@ enum MBServerState_e
     FORMATTING_ERROR_REPLY
 };
 
-typedef enum MBServerState_e MBServerState_t;
+typedef enum MB_ServerState_e MB_ServerState_t;
 
-enum MBAccess_e
+enum MB_Access_e
 {
-    NA = 0b00,  /** No Access */
-    RD = 0b01,  /** Read only */
-    WR = 0b10,  /** Write only */
-    RW = 0b11   /** Read and write */
+    MB_NA = 0b00,   /* No Access */
+    MB_RD = 0b01,   /* Read only */
+    MB_WR = 0b10,   /* Write only */
+    MB_RW = 0b11    /* Read and Write */
 };
 
-typedef enum MBAccess_e MBAccess_t;
+typedef enum MB_Access_e MB_Access_t;
 
-struct MBRegister_s
+struct MB_Register_s
 {
-#if( configSERVER_MULTI_ID == 1 )
+#if( configMB_SERVER_MULTI_ID == 1 )
     uint8_t id;
 #endif
-    MBAccess_t access;
+    MB_Access_t access;
     uint16_t address;
     uint16_t * data;
     size_t dataSize;
     void (* callback)( void );
 };
 
-typedef struct MBRegister_s MBRegister_t;
+typedef struct MB_Register_s MB_Register_t;
 
-#if( configSERVER_MULTI_ID == 1 )
-    #define REGISTER_MAP_END { 0xFF, NA, 0xFFFF, NULL, 0, NULL }
+#if( configMB_SERVER_MULTI_ID == 1 )
+    #define MB_REGISTER_MAP_END { 0xFF, MB_NA, 0xFFFF, NULL, 0, NULL }
 #else
-    #define REGISTER_MAP_END { NA, 0xFFFF, NULL, 0, NULL }
+    #define MB_REGISTER_MAP_END { MB_NA, 0xFFFF, NULL, 0, NULL }
 #endif
 
 /*-----------------------------------------------------------*/
@@ -81,15 +81,15 @@ class SerialModbusServer : public SerialModbusBase
 public:
 
     SerialModbusServer();
-    bool begin( uint8_t id, uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
-#if defined( configMB_TYPE_SERIAL_SW )
+    bool begin( uint8_t id, uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configMB_SERIAL_CONF_DEFAULT );
+#if defined( configMB_SERIAL_SW )
     bool begin( uint8_t id, uint32_t baud, MB_SWSerial_t * serial );
 #endif
-    MBStatus_t process( void );
-    bool setRegisterMap( MBRegister_t * registerMap );
-    MBStatus_t checkRegisterMap( void );
+    MB_Status_t process( void );
+    bool setRegisterMap( MB_Register_t * registerMap );
+    MB_Status_t checkRegisterMap( void );
 
-    /* Only for function code 8 (DIAGNOSTIC). */
+    /* Only for function code 8 (MB_DIAGNOSTIC). */
 
     uint16_t diagRegGet( void );
     bool diagRegGet( size_t bit );
@@ -99,31 +99,31 @@ public:
 
     /* Simplified API functions. */
 
-    bool createRegister( MBAccess_t access, uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
-    bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
-    bool createInputResgisters( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
-    bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configID_SERVER_MAX );
-    int32_t getCoil( uint16_t address, uint8_t id = configID_SERVER_MAX );
-    int32_t getInputResgister( uint16_t address, uint8_t id = configID_SERVER_MAX );
-    int32_t getHoldingRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
-    bool setCoil( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
-    bool setInputResgister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
-    bool setHoldingRegister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
+    bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createInputResgisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    int32_t getCoil( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
+    int32_t getInputResgister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
+    int32_t getHoldingRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
+    bool setCoil( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
+    bool setInputResgister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
+    bool setHoldingRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
 
 private:
 
     uint8_t ucServerId;
-    MBServerState_t xState;
-    void vSetState( MBServerState_t xStatePar );
-    MBRegister_t * pxRegisterMap;
+    MB_ServerState_t xState;
+    void vSetState( MB_ServerState_t xStatePar );
+    MB_Register_t * pxRegisterMap;
     size_t xRegisterMapIndex;
-    MBStatus_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
+    MB_Status_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
     void vHandlerFC03_04( void );
     void vHandlerFC05( void );
     void vHandlerFC06( void );
     void vHandlerFC16( void );
     void vHandlerFC08( void );
-    void vClearDiagnosticCounters( void );
+    void vClearMB_DIAGNOSTICCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
     uint16_t usServerExceptionErrorCount;
@@ -132,61 +132,61 @@ private:
     uint16_t usServerNAKCount;
     uint16_t usServerBusyCount;
     uint16_t usBusCharacterOverrunCount;
-    uint16_t usDiagnosticRegister;
+    uint16_t usMB_DIAGNOSTICRegister;
     bool bListenOnlyMode;
-#if( configSERVER_MULTI_ID == 1 )
-    uint8_t ucIdMap[ configID_COUNT_MAX ];
+#if( configMB_SERVER_MULTI_ID == 1 )
+    uint8_t ucIdMap[ configMB_ID_COUNT_MAX ];
     size_t xIdCount;
     void vSetIdMap( void );
 #endif
     bool bCheckId( uint8_t ucId );
     size_t xRegisterMapSize;
-    int32_t lGetRegister( uint16_t address, uint8_t id = configID_SERVER_MAX );
-    bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configID_SERVER_MAX );
-    bool bClearRegisterMapEntry( MBRegister_t * pxRegisterMapEntry );
+    int32_t lGetRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
+    bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
+    bool bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry );
     bool bRegisterMapLock_sAPI;
     bool bRegisterMapLock;
 };
 /*-----------------------------------------------------------*/
 
-#if( configFC08 == 1 )
+#if( configMB_FC08 == 1 )
 
-    #if( configSFC11 == 1 )
+    #if( configMB_SFC11 == 1 )
         #define vIncCPT1()  usBusMessageCount++
     #else
         #define vIncCPT1()
     #endif
-    #if( configSFC12 == 1 )
+    #if( configMB_SFC12 == 1 )
         #define vIncCPT2()  usBusCommunicationErrorCount++
     #else
         #define vIncCPT2()
     #endif
-    #if( configSFC13 == 1 )
+    #if( configMB_SFC13 == 1 )
         #define vIncCPT3()  usServerExceptionErrorCount++
     #else
         #define vIncCPT3()
     #endif
-    #if( configSFC14 == 1 )
+    #if( configMB_SFC14 == 1 )
         #define vIncCPT4()  usServerMessageCount++
     #else
         #define vIncCPT4()
     #endif
-    #if( configSFC15 == 1 )
+    #if( configMB_SFC15 == 1 )
         #define vIncCPT5()  usServerNoResponseCount++
     #else
         #define vIncCPT5()
     #endif
-    #if( configSFC16 == 1 )
+    #if( configMB_SFC16 == 1 )
         #define vIncCPT6()  usServerNAKCount++
     #else
         #define vIncCPT6()
     #endif
-    #if( configSFC17 == 1 )
+    #if( configMB_SFC17 == 1 )
         #define vIncCPT7()  usServerBusyCount++
     #else
         #define vIncCPT7()
     #endif
-    #if( configSFC18 == 1 )
+    #if( configMB_SFC18 == 1 )
         #define vIncCPT8()  usBusCharacterOverrunCount++
     #else
         #define vIncCPT8()

@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -36,17 +36,17 @@ SerialModbusClient::SerialModbusClient()
     pxRequest = NULL;
     bSkipRequestMap = false;
 
-    ulTurnaroundDelayMs = configTURNAROUND_DELAY_MS;
-    ulResponseTimeoutMs = configRESPONSE_TIMEOUT_MS;
+    ulTurnaroundDelayMs = configMB_TURNAROUND_DELAY_MS;
+    ulResponseTimeoutMs = configMB_RESPONSE_TIMEOUT_MS;
 
     ulTimerResponseTimeoutMs = 0;
     ulTimerTurnaroundDelayMs = 0;
 
-    xStatusSimpleAPI = OK;
+    xStatusSimpleAPI = MB_OK;
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusClient::vSetState( MBClientState_t xStatePar )
+void SerialModbusClient::vSetState( MB_ClientState_t xStatePar )
 {
     xState = xStatePar;
 }
@@ -112,14 +112,14 @@ bool SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusClient::setRequestMap( const MBRequest_t * requestMap )
+void SerialModbusClient::setRequestMap( const MB_Request_t * requestMap )
 {
     pxRequestMap = requestMap;
     xRequestMapIndex = 0;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::xProcessRequestMap( void )
+MB_Status_t SerialModbusClient::xProcessRequestMap( void )
 {
     if( pxRequestMap != NULL )
     {
@@ -135,15 +135,15 @@ MBStatus_t SerialModbusClient::xProcessRequestMap( void )
         xRequestMapIndex = 0;
     }
 
-    return OK;
+    return MB_OK;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool requestMap )
+MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool requestMap )
 {
     if( request == NULL )
     {
-        return xSetException( ILLEGAL_REQUEST );
+        return xSetException( MB_ILLEGAL_REQUEST );
     }
 
     if( requestMap == false )
@@ -151,13 +151,13 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
         bSkipRequestMap = true;
     }
 
-    ( void ) xSetException( OK );
+    ( void ) xSetException( MB_OK );
 
-    if( ( request->id > configID_SERVER_MAX ) ||
+    if( ( request->id > configMB_ID_SERVER_MAX ) ||
         ( request->functionCode == 0x00 ) ||
         ( request->dataSize == 0 ) )
     {
-        return xSetException( ILLEGAL_REQUEST );
+        return xSetException( MB_ILLEGAL_REQUEST );
     }
 
     vClearRequestFrame();
@@ -169,9 +169,9 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 
     switch( request->functionCode )
     {
-#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-        case READ_HOLDING_REGISTERS:
-        case READ_INPUT_REGISTERS:
+#if( ( configMB_FC03 == 1 ) || ( configMB_FC04 == 1 ) )
+        case FC_READ_HOLDING_REGISTERS:
+        case FC_READ_INPUT_REGISTERS:
         {
             pucRequestFrame[ 4 ] = highByte( request->dataSize );
             pucRequestFrame[ 5 ] =  lowByte( request->dataSize );
@@ -180,9 +180,9 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
             break;
         }
 #endif
-#if( ( configFC05 == 1 ) || ( configFC06 == 1 ) )
-        case WRITE_SINGLE_COIL:
-        case WRITE_SINGLE_REGISTER:
+#if( ( configMB_FC05 == 1 ) || ( configMB_FC06 == 1 ) )
+        case FC_WRITE_SINGLE_COIL:
+        case FC_WRITE_SINGLE_REGISTER:
         {
             if( request->data != NULL )
             {
@@ -192,21 +192,21 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
             }
             else
             {
-                return xSetException( ILLEGAL_REQUEST );
+                return xSetException( MB_ILLEGAL_REQUEST );
             }
 
             break;
         }
 #endif
-#if( configFC08 == 1 )
-        case DIAGNOSTIC:
+#if( configMB_FC08 == 1 )
+        case FC_DIAGNOSTIC:
         {
             xRequestLength = 6;
 
             switch( request->address )
             {
-#if( configSFC00 == 1 )
-                case RETURN_QUERY_DATA:
+#if( configMB_SFC00 == 1 )
+                case SFC_RETURN_QUERY_DATA:
                 {
                     if( request->data != NULL )
                     {
@@ -220,14 +220,14 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
                     }
                     else
                     {
-                        return xSetException( ILLEGAL_REQUEST );
+                        return xSetException( MB_ILLEGAL_REQUEST );
                     }
 
                     break;
                 }
 #endif
-#if( configSFC01 == 1 )
-                case RESTART_COMMUNICATIONS_OPTION:
+#if( configMB_SFC01 == 1 )
+                case SFC_RESTART_COMMUNICATIONS_OPTION:
                 {
                     if( request->data != NULL )
                     {
@@ -236,14 +236,14 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
                     }
                     else
                     {
-                        return xSetException( ILLEGAL_REQUEST );
+                        return xSetException( MB_ILLEGAL_REQUEST );
                     }
 
                     break;
                 }
 #endif
-#if( configSFC03 == 1 )
-                case CHANGE_ASCII_INPUT_DELIMITER:
+#if( configMB_SFC03 == 1 )
+                case SFC_CHANGE_ASCII_INPUT_DELIMITER:
                 {
                     if( isAscii( *( ( char * ) request->data ) ) == true )
                     {
@@ -252,52 +252,52 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
                     }
                     else
                     {
-                        return xSetException( ILLEGAL_REQUEST );
+                        return xSetException( MB_ILLEGAL_REQUEST );
                     }
 
                     break;
                 }
 #endif
-#if( configSFC02 == 1 )
-                case RETURN_DIAGNOSTIC_REGISTER:
+#if( configMB_SFC02 == 1 )
+                case SFC_RETURN_DIAGNOSTIC_REGISTER:
 #endif
-#if( configSFC04 == 1 )
-                case FORCE_LISTEN_ONLY_MODE:
+#if( configMB_SFC04 == 1 )
+                case SFC_FORCE_LISTEN_ONLY_MODE:
 #endif
-#if( configSFC10 == 1 )
-                case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+#if( configMB_SFC10 == 1 )
+                case SFC_CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
 #endif
-#if( configSFC11 == 1 )
-                case RETURN_BUS_MESSAGE_COUNT:
+#if( configMB_SFC11 == 1 )
+                case SFC_RETURN_BUS_MESSAGE_COUNT:
 #endif
-#if( configSFC12 == 1 )
-                case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+#if( configMB_SFC12 == 1 )
+                case SFC_RETURN_BUS_COMMUNICATION_ERROR_COUNT:
 #endif
-#if( configSFC13 == 1 )
-                case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+#if( configMB_SFC13 == 1 )
+                case SFC_RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
-#if( configSFC14 == 1 )
-                case RETURN_SERVER_MESSAGE_COUNT:
+#if( configMB_SFC14 == 1 )
+                case SFC_RETURN_SERVER_MESSAGE_COUNT:
 #endif
-#if( configSFC15 == 1 )
-                case RETURN_SERVER_NO_RESPONSE_COUNT:
+#if( configMB_SFC15 == 1 )
+                case SFC_RETURN_SERVER_NO_RESPONSE_COUNT:
 #endif
-#if( configSFC16 == 1 )
-                case RETURN_SERVER_NAK_COUNT:
+#if( configMB_SFC16 == 1 )
+                case SFC_RETURN_SERVER_NAK_COUNT:
 #endif
-#if( configSFC17 == 1 )
-                case RETURN_SERVER_BUSY_COUNT:
+#if( configMB_SFC17 == 1 )
+                case SFC_RETURN_SERVER_BUSY_COUNT:
 #endif
-#if( configSFC18 == 1 )
-                case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+#if( configMB_SFC18 == 1 )
+                case SFC_RETURN_BUS_CHARACTER_OVERRUN_COUNT:
 #endif
-#if( configSFC20 == 1 )
-                case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+#if( configMB_SFC20 == 1 )
+                case SFC_CLEAR_OVERRUN_COUNTER_AND_FLAG:
 #endif
-#if( ( configSFC02 == 1 ) || ( configSFC04 == 1 ) || ( configSFC10 == 1 ) || \
-     ( configSFC11 == 1 ) || ( configSFC12 == 1 ) || ( configSFC13 == 1 ) || \
-     ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || ( configSFC16 == 1 ) || \
-     ( configSFC17 == 1 ) || ( configSFC18 == 1 ) || ( configSFC20 == 1 ) )
+#if( ( configMB_SFC02 == 1 ) || ( configMB_SFC04 == 1 ) || ( configMB_SFC10 == 1 ) || \
+     ( configMB_SFC11 == 1 ) || ( configMB_SFC12 == 1 ) || ( configMB_SFC13 == 1 ) || \
+     ( configMB_SFC14 == 1 ) || ( configMB_SFC15 == 1 ) || ( configMB_SFC16 == 1 ) || \
+     ( configMB_SFC17 == 1 ) || ( configMB_SFC18 == 1 ) || ( configMB_SFC20 == 1 ) )
                 {
                     pucRequestFrame[ 4 ] = 0x00;
                     pucRequestFrame[ 5 ] = 0x00;
@@ -307,15 +307,15 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 #endif
                 default:
                 {
-                    return xSetException( ILLEGAL_SUB_FUNCTION );
+                    return xSetException( MB_ILLEGAL_SUB_FUNCTION );
                 }
             }
 
             break;
         }
 #endif
-#if( configFC16 == 1 )
-        case WRITE_MULTIPLE_REGISTERS:
+#if( configMB_FC16 == 1 )
+        case FC_WRITE_MULTIPLE_REGISTERS:
         {
             /* Quantity */
             pucRequestFrame[ 4 ] = highByte( request->dataSize );
@@ -336,7 +336,7 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
             }
             else
             {
-                return xSetException( ILLEGAL_REQUEST );
+                return xSetException( MB_ILLEGAL_REQUEST );
             }
 
             break;
@@ -344,7 +344,7 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 #endif
         default:
         {
-            return xSetException( ILLEGAL_FUNCTION );
+            return xSetException( MB_ILLEGAL_FUNCTION );
         }
     }
 
@@ -354,13 +354,13 @@ MBStatus_t SerialModbusClient::setRequest( const MBRequest_t * request, bool req
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::process( void )
+MB_Status_t SerialModbusClient::process( void )
 {
     if( bSkipRequestMap == false )
     {
-        if( xProcessRequestMap() != OK )
+        if( xProcessRequestMap() != MB_OK )
         {
-            ( void ) xSetException( ILLEGAL_REQUEST );
+            ( void ) xSetException( MB_ILLEGAL_REQUEST );
             vSetState( PROCESSING_ERROR );
         }
     }
@@ -378,7 +378,7 @@ MBStatus_t SerialModbusClient::process( void )
             {
                 vClearReplyFrame();
 
-                #if( configMODE == configMODE_ASCII )
+                #if( configMB_MODE == configMB_MODE_ASCII )
                 {
                     /* We are in ASCII mode, so we convert the frame to the
                     ASCII format (this also updates the pdu length). */
@@ -389,11 +389,11 @@ MBStatus_t SerialModbusClient::process( void )
                 ( void ) xSendData( pucRequestFrame, xRequestLength );
 
                 /* Check if we have a broadcast or a normal reqest. */
-#if( configMODE == configMODE_RTU )
-                if( ucREQUEST_ID == configID_BROADCAST )
+#if( configMB_MODE == configMB_MODE_RTU )
+                if( ucREQUEST_ID == configMB_ID_BROADCAST )
 #endif
-#if( configMODE == configMODE_ASCII )
-                if( ucAsciiToByte( pucRequestFrame[ 1 ], pucRequestFrame[ 2 ] ) == configID_BROADCAST )
+#if( configMB_MODE == configMB_MODE_ASCII )
+                if( ucAsciiToByte( pucRequestFrame[ 1 ], pucRequestFrame[ 2 ] ) == configMB_ID_BROADCAST )
 #endif
                 {
                     /* Broadcast */
@@ -427,18 +427,18 @@ MBStatus_t SerialModbusClient::process( void )
 
             case WAITING_FOR_REPLY :
             {
-                if( xReplyLength < configFRAME_LEN_MAX )
+                if( xReplyLength < configMB_FRAME_LEN_MAX )
                 {
                     if( bReceiveByte( pucReplyFrame, &xReplyLength ) == true )
                     {
-                        #if( configMODE == configMODE_RTU )
+                        #if( configMB_MODE == configMB_MODE_RTU )
                         {
                             vStartInterFrameDelay();
                             vStartInterCharacterTimeout();
                         }
                         #endif
 
-                        #if( configMODE == configMODE_ASCII )
+                        #if( configMB_MODE == configMB_MODE_ASCII )
                         {
                             if( pucReplyFrame[ 0 ] != ( uint8_t ) ':' )
                             {
@@ -452,26 +452,26 @@ MBStatus_t SerialModbusClient::process( void )
                 }
                 else
                 {
-                    ( void ) xSetException( CHARACTER_OVERRUN );
+                    ( void ) xSetException( MB_CHARACTER_OVERRUN );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 if( bTimeoutResponseTimeout() == true )
                 {
-                    ( void ) xSetException( NO_REPLY );
+                    ( void ) xSetException( MB_NO_REPLY );
                     vSetState( PROCESSING_ERROR );
                     break;
                 }
 
                 /* Check if the start of a frame has been received. */
-                if( xReplyLength >= configFRAME_LEN_MIN )
+                if( xReplyLength >= configMB_FRAME_LEN_MIN )
                 {
-                    #if( configMODE == configMODE_RTU )
+                    #if( configMB_MODE == configMB_MODE_RTU )
                     {
                         if( bTimeoutInterCharacterTimeout() == true )
                         {
-                            if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
+                            if( xCheckChecksum( pucReplyFrame, xReplyLength ) == MB_OK )
                             {
                                 if( ucREPLY_ID == ucREQUEST_ID )
                                 {
@@ -481,14 +481,14 @@ MBStatus_t SerialModbusClient::process( void )
                             }
                             else
                             {
-                                ( void ) xSetException( ILLEGAL_CHECKSUM );
+                                ( void ) xSetException( MB_ILLEGAL_CHECKSUM );
                                 vSetState( PROCESSING_ERROR );
                             }
                         }
                     }
                     #endif
 
-                    #if( configMODE == configMODE_ASCII )
+                    #if( configMB_MODE == configMB_MODE_ASCII )
                     {
                         /* Check for the end of the ASCII frame which is marked
                         by a carriage-return ('\r') followed by a variable input
@@ -502,7 +502,7 @@ MBStatus_t SerialModbusClient::process( void )
                                 ( void ) xAsciiToRtu( pucReplyFrame, &xReplyLength );
                                 ( void ) xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
-                                if( xCheckChecksum( pucReplyFrame, xReplyLength ) == OK )
+                                if( xCheckChecksum( pucReplyFrame, xReplyLength ) == MB_OK )
                                 {
                                     if( ucREPLY_ID == ucREQUEST_ID )
                                     {
@@ -512,7 +512,7 @@ MBStatus_t SerialModbusClient::process( void )
                                 }
                                 else
                                 {
-                                    ( void ) xSetException( ILLEGAL_CHECKSUM );
+                                    ( void ) xSetException( MB_ILLEGAL_CHECKSUM );
                                     vSetState( PROCESSING_ERROR );
                                 }
                             }
@@ -528,37 +528,37 @@ MBStatus_t SerialModbusClient::process( void )
             {
                 switch( ucREPLY_FUNCTION_CODE )
                 {
-#if( ( configFC03 == 1 ) || ( configFC04 == 1 ) )
-                    case READ_HOLDING_REGISTERS :
-                    case READ_INPUT_REGISTERS :
+#if( ( configMB_FC03 == 1 ) || ( configMB_FC04 == 1 ) )
+                    case FC_READ_HOLDING_REGISTERS :
+                    case FC_READ_INPUT_REGISTERS :
                     {
                         vHandlerFC03_04();
                         break;
                     }
 #endif
-#if( configFC05 == 1 )
-                    case WRITE_SINGLE_COIL :
+#if( configMB_FC05 == 1 )
+                    case FC_WRITE_SINGLE_COIL :
                     {
                         vHandlerFC05();
                         break;
                     }
 #endif
-#if( configFC06 == 1 )
-                    case WRITE_SINGLE_REGISTER :
+#if( configMB_FC06 == 1 )
+                    case FC_WRITE_SINGLE_REGISTER :
                     {
                         vHandlerFC06();
                         break;
                     }
 #endif
-#if( configFC08 == 1 )
-                    case DIAGNOSTIC :
+#if( configMB_FC08 == 1 )
+                    case FC_DIAGNOSTIC :
                     {
                         vHandlerFC08();
                         break;
                     }
 #endif
-#if( configFC16 == 1 )
-                    case WRITE_MULTIPLE_REGISTERS :
+#if( configMB_FC16 == 1 )
+                    case FC_WRITE_MULTIPLE_REGISTERS :
                     {
                         vHandlerFC16();
                         break;
@@ -570,11 +570,11 @@ MBStatus_t SerialModbusClient::process( void )
                         check if it was illegal or an error reply. */
                         if( ucREPLY_FUNCTION_CODE == ( ucREQUEST_FUNCTION_CODE | 0x80 ) )
                         {
-                            ( void ) xSetException( ( MBException_t ) ucREPLY_ERROR_CODE );
+                            ( void ) xSetException( ( MB_Exception_t ) ucREPLY_ERROR_CODE );
                         }
                         else
                         {
-                            ( void ) xSetException( ILLEGAL_FUNCTION );
+                            ( void ) xSetException( MB_ILLEGAL_FUNCTION );
                         }
 
                         vSetState( PROCESSING_ERROR );
@@ -601,12 +601,12 @@ MBStatus_t SerialModbusClient::process( void )
 
             default :
             {
-                ( void ) xSetException( ILLEGAL_STATE );
+                ( void ) xSetException( MB_ILLEGAL_STATE );
                 vSetState( CLIENT_IDLE );
             }
         }
 
-        #if( configPROCESS_LOOP_HOOK == 1 )
+        #if( configMB_PROCESS_LOOP_HOOK == 1 )
         {
             /* The process loop hook will only be executed when the state
             mashine is not in the idle state. Otherwise the loop hook would be
@@ -620,7 +620,7 @@ MBStatus_t SerialModbusClient::process( void )
     }
     while( xState != CLIENT_IDLE );
 
-    return xException;
+    return xStatus;
 }
 /*-----------------------------------------------------------*/
 
@@ -648,7 +648,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
     }
     else
     {
-        ( void ) xSetException( ILLEGAL_BYTE_COUNT );
+        ( void ) xSetException( MB_ILLEGAL_BYTE_COUNT );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -669,13 +669,13 @@ void SerialModbusClient::vHandlerFC05( void )
         }
         else
         {
-            ( void ) xSetException( ILLEGAL_COIL_VALUE );
+            ( void ) xSetException( MB_ILLEGAL_COIL_VALUE );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( MB_ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -696,13 +696,13 @@ void SerialModbusClient::vHandlerFC06( void )
         }
         else
         {
-            ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
+            ( void ) xSetException( MB_ILLEGAL_OUTPUT_VALUE );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( MB_ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -714,8 +714,8 @@ void SerialModbusClient::vHandlerFC08( void )
     {
         switch( usREPLY_SUB_FUNCTION_CODE )
         {
-#if( configSFC00 == 1 )
-            case RETURN_QUERY_DATA:
+#if( configMB_SFC00 == 1 )
+            case SFC_RETURN_QUERY_DATA:
             {
                 if( xReplyLength == xRequestLength )
                 {
@@ -723,7 +723,7 @@ void SerialModbusClient::vHandlerFC08( void )
                     {
                         if( pucReplyFrame[ i ] != pucRequestFrame[ i ] )
                         {
-                            ( void ) xSetException( ILLEGAL_QUERY_DATA );
+                            ( void ) xSetException( MB_ILLEGAL_QUERY_DATA );
                             vSetState( PROCESSING_ERROR );
                             return;
                         }
@@ -731,7 +731,7 @@ void SerialModbusClient::vHandlerFC08( void )
                 }
                 else
                 {
-                    ( void ) xSetException( ILLEGAL_QUERY_DATA );
+                    ( void ) xSetException( MB_ILLEGAL_QUERY_DATA );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -739,8 +739,8 @@ void SerialModbusClient::vHandlerFC08( void )
                 break;
             }
 #endif
-#if( configSFC03 == 1 )
-            case CHANGE_ASCII_INPUT_DELIMITER:
+#if( configMB_SFC03 == 1 )
+            case SFC_CHANGE_ASCII_INPUT_DELIMITER:
             {
                 if( usREPLY_INPUT_DELIMITER == usREQUEST_INPUT_DELIMITER )
                 {
@@ -748,7 +748,7 @@ void SerialModbusClient::vHandlerFC08( void )
                 }
                 else
                 {
-                    ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
+                    ( void ) xSetException( MB_ILLEGAL_OUTPUT_VALUE );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -756,24 +756,24 @@ void SerialModbusClient::vHandlerFC08( void )
                 break;
             }
 #endif
-#if( configSFC01 == 1 )
-            case RESTART_COMMUNICATIONS_OPTION:
+#if( configMB_SFC01 == 1 )
+            case SFC_RESTART_COMMUNICATIONS_OPTION:
 #endif
-#if( configSFC04 == 1 )
-            case FORCE_LISTEN_ONLY_MODE:
+#if( configMB_SFC04 == 1 )
+            case SFC_FORCE_LISTEN_ONLY_MODE:
 #endif
-#if( configSFC10 == 1 )
-            case CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
+#if( configMB_SFC10 == 1 )
+            case SFC_CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
 #endif
-#if( configSFC20 == 1 )
-            case CLEAR_OVERRUN_COUNTER_AND_FLAG:
+#if( configMB_SFC20 == 1 )
+            case SFC_CLEAR_OVERRUN_COUNTER_AND_FLAG:
 #endif
-#if( ( configSFC01 == 1 ) || ( configSFC04 == 1 ) || \
-     ( configSFC10 == 1 ) || ( configSFC20 == 1 ) )
+#if( ( configMB_SFC01 == 1 ) || ( configMB_SFC04 == 1 ) || \
+     ( configMB_SFC10 == 1 ) || ( configMB_SFC20 == 1 ) )
             {
                 if( usREPLY_DATA != usREQUEST_DATA )
                 {
-                    ( void ) xSetException( ILLEGAL_OUTPUT_VALUE );
+                    ( void ) xSetException( MB_ILLEGAL_OUTPUT_VALUE );
                     vSetState( PROCESSING_ERROR );
                     return;
                 }
@@ -781,36 +781,36 @@ void SerialModbusClient::vHandlerFC08( void )
                 break;
             }
 #endif
-#if( configSFC02 == 1 )
-            case RETURN_DIAGNOSTIC_REGISTER:
+#if( configMB_SFC02 == 1 )
+            case SFC_RETURN_DIAGNOSTIC_REGISTER:
 #endif
-#if( configSFC11 == 1 )
-            case RETURN_BUS_MESSAGE_COUNT:
+#if( configMB_SFC11 == 1 )
+            case SFC_RETURN_BUS_MESSAGE_COUNT:
 #endif
-#if( configSFC12 == 1 )
-            case RETURN_BUS_COMMUNICATION_ERROR_COUNT:
+#if( configMB_SFC12 == 1 )
+            case SFC_RETURN_BUS_COMMUNICATION_ERROR_COUNT:
 #endif
-#if( configSFC13 == 1 )
-            case RETURN_BUS_EXCEPTION_ERROR_COUNT:
+#if( configMB_SFC13 == 1 )
+            case SFC_RETURN_BUS_EXCEPTION_ERROR_COUNT:
 #endif
-#if( configSFC14 == 1 )
-            case RETURN_SERVER_MESSAGE_COUNT:
+#if( configMB_SFC14 == 1 )
+            case SFC_RETURN_SERVER_MESSAGE_COUNT:
 #endif
-#if( configSFC15 == 1 )
-            case RETURN_SERVER_NO_RESPONSE_COUNT:
+#if( configMB_SFC15 == 1 )
+            case SFC_RETURN_SERVER_NO_RESPONSE_COUNT:
 #endif
-#if( configSFC16 == 1 )
-            case RETURN_SERVER_NAK_COUNT:
+#if( configMB_SFC16 == 1 )
+            case SFC_RETURN_SERVER_NAK_COUNT:
 #endif
-#if( configSFC17 == 1 )
-            case RETURN_SERVER_BUSY_COUNT:
+#if( configMB_SFC17 == 1 )
+            case SFC_RETURN_SERVER_BUSY_COUNT:
 #endif
-#if( configSFC18 == 1 )
-            case RETURN_BUS_CHARACTER_OVERRUN_COUNT:
+#if( configMB_SFC18 == 1 )
+            case SFC_RETURN_BUS_CHARACTER_OVERRUN_COUNT:
 #endif
-#if( ( configSFC02 == 1 ) || ( configSFC11 == 1 ) || ( configSFC12 == 1 ) || \
-     ( configSFC13 == 1 ) || ( configSFC14 == 1 ) || ( configSFC15 == 1 ) || \
-     ( configSFC16 == 1 ) || ( configSFC17 == 1 ) || ( configSFC18 == 1 ) )
+#if( ( configMB_SFC02 == 1 ) || ( configMB_SFC11 == 1 ) || ( configMB_SFC12 == 1 ) || \
+     ( configMB_SFC13 == 1 ) || ( configMB_SFC14 == 1 ) || ( configMB_SFC15 == 1 ) || \
+     ( configMB_SFC16 == 1 ) || ( configMB_SFC17 == 1 ) || ( configMB_SFC18 == 1 ) )
             {
                 if( pxRequest->data != NULL )
                 {
@@ -822,7 +822,7 @@ void SerialModbusClient::vHandlerFC08( void )
 #endif
             default:
             {
-                ( void ) xSetException( ILLEGAL_SUB_FUNCTION );
+                ( void ) xSetException( MB_ILLEGAL_SUB_FUNCTION );
                 vSetState( PROCESSING_ERROR );
                 return;
             }
@@ -835,7 +835,7 @@ void SerialModbusClient::vHandlerFC08( void )
     }
     else
     {
-        ( void ) xSetException( ILLEGAL_REPLY_SUB_FUNCTION );
+        ( void ) xSetException( MB_ILLEGAL_REPLY_SUB_FUNCTION );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -856,13 +856,13 @@ void SerialModbusClient::vHandlerFC16( void )
         }
         else
         {
-            ( void ) xSetException( ILLEGAL_QUANTITY );
+            ( void ) xSetException( MB_ILLEGAL_QUANTITY );
             vSetState( PROCESSING_ERROR );
         }
     }
     else
     {
-        ( void ) xSetException( ILLEGAL_OUTPUT_ADDRESS );
+        ( void ) xSetException( MB_ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
     }
 }
@@ -870,17 +870,17 @@ void SerialModbusClient::vHandlerFC16( void )
 
 int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
 {
-    MBRequest_t xRequest = { 0xFF, 0x00, 0xFFFF, &data, 1, NULL };
+    MB_Request_t xRequest = { 0xFF, 0x00, 0xFFFF, &data, 1, NULL };
 
     xRequest.id = id;
     xRequest.functionCode = functionCode;
     xRequest.address = address;
 
     xStatusSimpleAPI = setRequest( &xRequest );
-    if( xStatusSimpleAPI == OK )
+    if( xStatusSimpleAPI == MB_OK )
     {
         xStatusSimpleAPI = process();
-        if( xStatusSimpleAPI == OK )
+        if( xStatusSimpleAPI == MB_OK )
         {
             return ( int32_t ) data;
         }
@@ -892,29 +892,29 @@ int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
 
 int32_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, READ_HOLDING_REGISTERS, address, 0x0000 );
+    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
 int32_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, READ_INPUT_REGISTERS, address, 0x0000 );
+    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, 0x0000 );
 }
 /*-----------------------------------------------------------*/
 
 int32_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
 {
-    return sendRequest( id, WRITE_SINGLE_COIL, address, data );
+    return sendRequest( id, FC_WRITE_SINGLE_COIL, address, data );
 }
 /*-----------------------------------------------------------*/
 
 int32_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
 {
-    return sendRequest( id, WRITE_SINGLE_REGISTER, address, data );
+    return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, data );
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusClient::getLastException( void )
+MB_Status_t SerialModbusClient::getLastException( void )
 {
     return xStatusSimpleAPI;
 }

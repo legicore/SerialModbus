@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -27,119 +27,119 @@
 #include "SerialModbusCompat.h"
 
 #include <Arduino.h>
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
 /*-----------------------------------------------------------*/
 
-typedef configMB_TYPE_SERIAL MB_Serial_t;
-#if defined( configMB_TYPE_SERIAL_SW )
-    typedef configMB_TYPE_SERIAL_SW MB_SWSerial_t;
-#endif
-/*-----------------------------------------------------------*/
-
-enum MBFunctionCode_e
+enum MB_FunctionCode_e
 {
     /* Bit Data Access */
-    READ_COILS                      = 1,
-    READ_DISCRETE_INPUTS            = 2,
-    WRITE_SINGLE_COIL               = 5,
-    WRITE_MULTIPLE_COILS            = 15,
+    FC_READ_COILS                       = 1,
+    FC_READ_DISCRETE_INPUTS             = 2,
+    FC_WRITE_SINGLE_COIL                = 5,
+    FC_WRITE_MULTIPLE_COILS             = 15,
 
     /* Word Data Access */
-    READ_HOLDING_REGISTERS          = 3,
-    READ_INPUT_REGISTERS            = 4,
-    WRITE_SINGLE_REGISTER           = 6,
-    WRITE_MULTIPLE_REGISTERS        = 16,
-    MASK_WRITE_REGISTER             = 22,
-    READ_WRITE_MULTIPLE_REGISTERS   = 23,
-    READ_FIFO_QUEUE                 = 24,
+    FC_READ_HOLDING_REGISTERS           = 3,
+    FC_READ_INPUT_REGISTERS             = 4,
+    FC_WRITE_SINGLE_REGISTER            = 6,
+    FC_WRITE_MULTIPLE_REGISTERS         = 16,
+    FC_MASK_WRITE_REGISTER              = 22,
+    FC_READ_WRITE_MULTIPLE_REGISTERS    = 23,
+    FC_READ_FIFO_QUEUE                  = 24,
 
     /* File Record Data Access */
-    READ_FILE_RECORD                = 20,
-    WRITE_FILE_RECORD               = 21,
+    FC_READ_FILE_RECORD                 = 20,
+    FC_WRITE_FILE_RECORD                = 21,
 
     /* Diagnostics */
-    READ_EXCEPTION_STATUS           = 7,
-    DIAGNOSTIC                      = 8,
-    GET_COM_EVENT_COUNTER           = 11,
-    GET_COM_EVENT_LOG               = 12,
-    REPORT_SERVER_ID                = 17
+    FC_READ_EXCEPTION_STATUS            = 7,
+    FC_DIAGNOSTIC                       = 8,
+    FC_GET_COM_EVENT_COUNTER            = 11,
+    FC_GET_COM_EVENT_LOG                = 12,
+    FC_REPORT_SERVER_ID                 = 17
 };
 
-typedef enum MBFunctionCode_e MBFunctionCode_t;
+typedef enum MB_FunctionCode_e MB_FunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-enum MBSubFunctionCode_e
+enum MB_SubFunctionCode_e
 {
-    RETURN_QUERY_DATA                       = 0,
-    RESTART_COMMUNICATIONS_OPTION           = 1,
-    RETURN_DIAGNOSTIC_REGISTER              = 2,
-    CHANGE_ASCII_INPUT_DELIMITER            = 3,
-    FORCE_LISTEN_ONLY_MODE                  = 4,
-    CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER  = 10,
-    RETURN_BUS_MESSAGE_COUNT                = 11,
-    RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 12,
-    RETURN_BUS_EXCEPTION_ERROR_COUNT        = 13,
-    RETURN_SERVER_MESSAGE_COUNT             = 14,
-    RETURN_SERVER_NO_RESPONSE_COUNT         = 15,
-    RETURN_SERVER_NAK_COUNT                 = 16,
-    RETURN_SERVER_BUSY_COUNT                = 17,
-    RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 18,
-    CLEAR_OVERRUN_COUNTER_AND_FLAG          = 20
+    SFC_RETURN_QUERY_DATA                       = 0,
+    SFC_RESTART_COMMUNICATIONS_OPTION           = 1,
+    SFC_RETURN_DIAGNOSTIC_REGISTER              = 2,
+    SFC_CHANGE_ASCII_INPUT_DELIMITER            = 3,
+    SFC_FORCE_LISTEN_ONLY_MODE                  = 4,
+    SFC_CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER  = 10,
+    SFC_RETURN_BUS_MESSAGE_COUNT                = 11,
+    SFC_RETURN_BUS_COMMUNICATION_ERROR_COUNT    = 12,
+    SFC_RETURN_BUS_EXCEPTION_ERROR_COUNT        = 13,
+    SFC_RETURN_SERVER_MESSAGE_COUNT             = 14,
+    SFC_RETURN_SERVER_NO_RESPONSE_COUNT         = 15,
+    SFC_RETURN_SERVER_NAK_COUNT                 = 16,
+    SFC_RETURN_SERVER_BUSY_COUNT                = 17,
+    SFC_RETURN_BUS_CHARACTER_OVERRUN_COUNT      = 18,
+    SFC_CLEAR_OVERRUN_COUNTER_AND_FLAG          = 20
 };
 
-typedef enum MBSubFunctionCode_e MBSubFunctionCode_t;
+typedef enum MB_SubFunctionCode_e MB_SubFunctionCode_t;
 
 /*-----------------------------------------------------------*/
 
-enum MBException_e
+enum MB_Status_e
 {
-    OK = 0x00,
+    MB_OK = 0x00,
 
     /* Standard exception codes. */
-    ILLEGAL_FUNCTION                        = 0x01,
-    ILLEGAL_DATA_ADDRESS                    = 0x02,
-    ILLEGAL_DATA_VALUE                      = 0x03,
-    SERVER_DEVICE_FAILURE                   = 0x04,
-    ACKNOWLEDGE                             = 0x05,
-    SERVER_DEVICE_BUSY                      = 0x06,
-    MEMORY_PARITY_ERROR                     = 0x08,
-    GATEWAY_PATH_UNAVAILABLE                = 0x0A,
-    GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B,
+    MB_ILLEGAL_FUNCTION                         = 0x01,
+    MB_ILLEGAL_DATA_ADDRESS                     = 0x02,
+    MB_ILLEGAL_DATA_VALUE                       = 0x03,
+    MB_SERVER_DEVICE_FAILURE                    = 0x04,
+    MB_ACKNOWLEDGE                              = 0x05,
+    MB_SERVER_DEVICE_BUSY                       = 0x06,
+    MB_MEMORY_PARITY_ERROR                      = 0x08,
+    MB_GATEWAY_PATH_UNAVAILABLE                 = 0x0A,
+    MB_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND  = 0x0B,
 
     /* Non-standard exception codes. */
-    ILLEGAL_REQUEST                         = 0x11,
-    CHARACTER_OVERRUN                       = 0x12,
-    NO_REPLY                                = 0x13,
-    ILLEGAL_CHECKSUM                        = 0x14,
-    ILLEGAL_STATE                           = 0x15,
-    ILLEGAL_BYTE_COUNT                      = 0x16,
-    ILLEGAL_COIL_VALUE                      = 0x17,
-    ILLEGAL_OUTPUT_ADDRESS                  = 0x18,
-    ILLEGAL_OUTPUT_VALUE                    = 0x19,
-    ILLEGAL_QUANTITY                        = 0x1A,
-    ILLEGAL_QUERY_DATA                      = 0x1B,
-    ILLEGAL_SUB_FUNCTION                    = 0x1C,
-    ILLEGAL_REPLY_SUB_FUNCTION              = 0x1D,
+    MB_ILLEGAL_REQUEST                          = 0x11,
+    MB_CHARACTER_OVERRUN                        = 0x12,
+    MB_NO_REPLY                                 = 0x13,
+    MB_ILLEGAL_CHECKSUM                         = 0x14,
+    MB_ILLEGAL_STATE                            = 0x15,
+    MB_ILLEGAL_BYTE_COUNT                       = 0x16,
+    MB_ILLEGAL_COIL_VALUE                       = 0x17,
+    MB_ILLEGAL_OUTPUT_ADDRESS                   = 0x18,
+    MB_ILLEGAL_OUTPUT_VALUE                     = 0x19,
+    MB_ILLEGAL_QUANTITY                         = 0x1A,
+    MB_ILLEGAL_QUERY_DATA                       = 0x1B,
+    MB_ILLEGAL_SUB_FUNCTION                     = 0x1C,
+    MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x1D,
 
     /* Extended exception codes for server replies. */
-    SERVER_ILLEGAL_FUNCTION                 = 0x21,
-    SERVER_ILLEGAL_STATE                    = 0x22,
-    SERVER_ILLEGAL_ACCESS                   = 0x23,
-    SERVER_ILLEGAL_QUANTITY                 = 0x24,
-    SERVER_ILLEGAL_COIL_VALUE               = 0x25,
-    SERVER_ILLEGAL_INPUT_DELIMITER          = 0x26,
-    SERVER_ILLEGAL_SUB_FUNCTION             = 0x27,
+    MB_SERVER_ILLEGAL_FUNCTION                  = 0x21,
+    MB_SERVER_ILLEGAL_STATE                     = 0x22,
+    MB_SERVER_ILLEGAL_ACCESS                    = 0x23,
+    MB_SERVER_ILLEGAL_QUANTITY                  = 0x24,
+    MB_SERVER_ILLEGAL_COIL_VALUE                = 0x25,
+    MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x26,
+    MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x27,
 
-    NOK = 0xFE
+    MB_NOK = 0xFE
 };
 
-typedef enum MBException_e MBException_t;
-typedef enum MBException_e MBStatus_t;
+typedef enum MB_Status_e MB_Status_t;
+typedef enum MB_Status_e MB_Exception_t;
 
+/*-----------------------------------------------------------*/
+
+typedef configMB_SERIAL MB_Serial_t;
+#if defined( configMB_SERIAL_SW )
+    typedef configMB_SERIAL_SW MB_SWSerial_t;
+#endif
 /*-----------------------------------------------------------*/
 
 class SerialModbusBase
@@ -147,16 +147,16 @@ class SerialModbusBase
 public:
 
     SerialModbusBase();
-    bool begin( uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configSERIAL_CONF_DEFAULT );
-#if defined( configMB_TYPE_SERIAL_SW )
+    bool begin( uint32_t baud, MB_Serial_t * serial = &SERIAL_PORT_HARDWARE, uint32_t config = configMB_SERIAL_CONF_DEFAULT );
+#if defined( configMB_SERIAL_SW )
     bool begin( uint32_t baud, MB_SWSerial_t * serial );
 #endif
     bool setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) );
-#if( configPROCESS_LOOP_HOOK == 1 )
+#if( configMB_PROCESS_LOOP_HOOK == 1 )
     void setProcessLoopHook( void (* loopHookFunction)( void ) );
 #endif
     void setCustomDelay( void (* customDelay)( uint32_t delayUs ) );
-    const char * getExceptionString( MBException_t exception );
+    const char * getExceptionString( MB_Exception_t exception );
     uint32_t getInterCharacterTimeout( void );
     uint32_t getInterFrameDelay( void );
     bool setInterCharacterTimeout( uint32_t timeUs );
@@ -164,14 +164,14 @@ public:
 
 protected:
 
-    uint8_t pucRequestFrame[ configFRAME_LEN_MAX ];
-    uint8_t pucReplyFrame[ configFRAME_LEN_MAX ];
+    uint8_t pucRequestFrame[ configMB_FRAME_LEN_MAX ];
+    uint8_t pucReplyFrame[ configMB_FRAME_LEN_MAX ];
     size_t xRequestLength;
     size_t xReplyLength;
-    MBException_t xException;
-    MBException_t xSetException( MBException_t xExceptionPar );
-    MBStatus_t xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLen );
-    MBStatus_t xCheckChecksum( uint8_t * pucFrame, size_t xFrameLen );
+    MB_Status_t xStatus;
+    MB_Status_t xSetException( MB_Exception_t xExceptionPar );
+    MB_Status_t xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLen );
+    MB_Status_t xCheckChecksum( uint8_t * pucFrame, size_t xFrameLen );
     void vClearRequestFrame( void );
     void vClearReplyFrame( void );
     bool bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength );
@@ -179,7 +179,7 @@ protected:
     void (* vSerialCtrlTx)( void );
     void (* vSerialCtrlRx)( void );
     MB_Serial_t * pxSerial;
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
     MB_SWSerial_t * pxSWSerial;
 #endif
     uint8_t ucRequestByte( size_t xNbr, size_t xOffset = 4 );
@@ -206,9 +206,9 @@ protected:
     uint8_t ucByteToAsciiHi( uint8_t ucByte );
     uint8_t ucByteToAsciiLo( uint8_t ucByte );
     uint8_t ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo );
-    MBStatus_t xRtuToAscii( uint8_t * pucRtuFrame, size_t * pxFrameLength );
-    MBStatus_t xAsciiToRtu( uint8_t * pucAsciiFrame, size_t * pxFrameLength );
-#if( configPROCESS_LOOP_HOOK == 1 )
+    MB_Status_t xRtuToAscii( uint8_t * pucRtuFrame, size_t * pxFrameLength );
+    MB_Status_t xAsciiToRtu( uint8_t * pucAsciiFrame, size_t * pxFrameLength );
+#if( configMB_PROCESS_LOOP_HOOK == 1 )
     void (* vProcessLoopHook)( void );
 #endif
     char cAsciiInputDelimiter;
@@ -228,8 +228,8 @@ protected:
 #define ucREQUEST_QUANTITY_LO           pucRequestFrame[ 5 ]
 #define usREQUEST_QUANTITY              ( ( ( uint16_t ) ucREQUEST_QUANTITY_HI << 8 ) | ucREQUEST_QUANTITY_LO )
 
-#define COIL_ON                         0xFF00
-#define COIL_OFF                        0x0000
+#define MB_COIL_ON                      0xFF00
+#define MB_COIL_OFF                     0x0000
 #define ucREQUEST_COIL_VALUE_HI         pucRequestFrame[ 4 ]
 #define ucREQUEST_COIL_VALUE_LO         pucRequestFrame[ 5 ]
 #define usREQUEST_COIL_VALUE            ( ( ( uint16_t ) ucREQUEST_COIL_VALUE_HI << 8 ) | ucREQUEST_COIL_VALUE_LO )
@@ -244,7 +244,7 @@ protected:
 
 #define ucREQUEST_BYTE_COUNT_FC16       pucRequestFrame[ 6 ]
 
-#define CLEAR_COM_EVENT_LOG             0xFF00
+#define MB_CLEAR_COM_EVENT_LOG          0xFF00
 #define ucREQUEST_SUB_FUNCTION_CODE_HI  pucRequestFrame[ 2 ]
 #define ucREQUEST_SUB_FUNCTION_CODE_LO  pucRequestFrame[ 3 ]
 #define usREQUEST_SUB_FUNCTION_CODE     ( ( ( uint16_t ) ucREQUEST_SUB_FUNCTION_CODE_HI << 8 ) | ucREQUEST_SUB_FUNCTION_CODE_LO )

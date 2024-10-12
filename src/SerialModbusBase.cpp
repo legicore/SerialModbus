@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -23,67 +23,67 @@
 #include "SerialModbusBase.h"
 
 #include <Arduino.h>
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
     #include <SoftwareSerial.h>
 #endif
 
 /*-----------------------------------------------------------*/
 
-struct MBExceptionString_s
+struct MB_ExceptionString_s
 {
-    MBException_t xException;
+    MB_Exception_t xException;
     const char * pcExceptionString;
 };
 
-typedef struct MBExceptionString_s MBExceptionString_t;
+typedef struct MB_ExceptionString_s MB_ExceptionString_t;
 
-static const MBExceptionString_t pxExceptionStrings[] = {
+static const MB_ExceptionString_t pxExceptionStrings[] = {
 
-    { OK, "OK" },
+    { MB_OK, "OK" },
 
     /* Standard exception codes. */
-    { ILLEGAL_FUNCTION,                         "ILLEGAL_FUNCTION" },
-    { ILLEGAL_DATA_ADDRESS,                     "ILLEGAL_DATA_ADDRESS" },
-    { ILLEGAL_DATA_VALUE,                       "ILLEGAL_DATA_VALUE" },
-    { SERVER_DEVICE_FAILURE,                    "SERVER_DEVICE_FAILURE" },
-    { ACKNOWLEDGE,                              "ACKNOWLEDGE" },
-    { SERVER_DEVICE_BUSY,                       "SERVER_DEVICE_BUSY" },
-    { MEMORY_PARITY_ERROR,                      "MEMORY_PARITY_ERROR" },
-    { GATEWAY_PATH_UNAVAILABLE,                 "GATEWAY_PATH_UNAVAILABLE" },
-    { GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND,  "GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND" },
+    { MB_ILLEGAL_FUNCTION,                          "ILLEGAL_FUNCTION" },
+    { MB_ILLEGAL_DATA_ADDRESS,                      "ILLEGAL_DATA_ADDRESS" },
+    { MB_ILLEGAL_DATA_VALUE,                        "ILLEGAL_DATA_VALUE" },
+    { MB_SERVER_DEVICE_FAILURE,                     "SERVER_DEVICE_FAILURE" },
+    { MB_ACKNOWLEDGE,                               "ACKNOWLEDGE" },
+    { MB_SERVER_DEVICE_BUSY,                        "SERVER_DEVICE_BUSY" },
+    { MB_MEMORY_PARITY_ERROR,                       "MEMORY_PARITY_ERROR" },
+    { MB_GATEWAY_PATH_UNAVAILABLE,                  "GATEWAY_PATH_UNAVAILABLE" },
+    { MB_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND,   "GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND" },
 
     /* Non-standard exception codes. */
-    { ILLEGAL_REQUEST,                          "ILLEGAL_REQUEST" },
-    { CHARACTER_OVERRUN,                        "CHARACTER_OVERRUN" },
-    { NO_REPLY,                                 "NO_REPLY" },
-    { ILLEGAL_CHECKSUM,                         "ILLEGAL_CHECKSUM" },
-    { ILLEGAL_STATE,                            "ILLEGAL_STATE" },
-    { ILLEGAL_BYTE_COUNT,                       "ILLEGAL_BYTE_COUNT" },
-    { ILLEGAL_COIL_VALUE,                       "ILLEGAL_COIL_VALUE" },
-    { ILLEGAL_OUTPUT_ADDRESS,                   "ILLEGAL_OUTPUT_ADDRESS" },
-    { ILLEGAL_OUTPUT_VALUE,                     "ILLEGAL_OUTPUT_VALUE" },
-    { ILLEGAL_QUANTITY,                         "ILLEGAL_QUANTITY" },
-    { ILLEGAL_QUERY_DATA,                       "ILLEGAL_QUERY_DATA" },
-    { ILLEGAL_SUB_FUNCTION,                     "ILLEGAL_SUB_FUNCTION" },
-    { ILLEGAL_REPLY_SUB_FUNCTION,               "ILLEGAL_REPLY_SUB_FUNCTION" },
+    { MB_ILLEGAL_REQUEST,                           "ILLEGAL_REQUEST" },
+    { MB_CHARACTER_OVERRUN,                         "CHARACTER_OVERRUN" },
+    { MB_NO_REPLY,                                  "NO_REPLY" },
+    { MB_ILLEGAL_CHECKSUM,                          "ILLEGAL_CHECKSUM" },
+    { MB_ILLEGAL_STATE,                             "ILLEGAL_STATE" },
+    { MB_ILLEGAL_BYTE_COUNT,                        "ILLEGAL_BYTE_COUNT" },
+    { MB_ILLEGAL_COIL_VALUE,                        "ILLEGAL_COIL_VALUE" },
+    { MB_ILLEGAL_OUTPUT_ADDRESS,                    "ILLEGAL_OUTPUT_ADDRESS" },
+    { MB_ILLEGAL_OUTPUT_VALUE,                      "ILLEGAL_OUTPUT_VALUE" },
+    { MB_ILLEGAL_QUANTITY,                          "ILLEGAL_QUANTITY" },
+    { MB_ILLEGAL_QUERY_DATA,                        "ILLEGAL_QUERY_DATA" },
+    { MB_ILLEGAL_SUB_FUNCTION,                      "ILLEGAL_SUB_FUNCTION" },
+    { MB_ILLEGAL_REPLY_SUB_FUNCTION,                "ILLEGAL_REPLY_SUB_FUNCTION" },
 
-#if( configEXTENDED_EXCEPTION_CODES == 1 )
+#if( configMB_EXT_EXCEPTION_CODES == 1 )
 
     /* Extended exception codes for server replies. */
-    { SERVER_ILLEGAL_FUNCTION,                  "SERVER_ILLEGAL_FUNCTION" },
-    { SERVER_ILLEGAL_STATE,                     "SERVER_ILLEGAL_STATE" },
-    { SERVER_ILLEGAL_ACCESS,                    "SERVER_ILLEGAL_ACCESS" },
-    { SERVER_ILLEGAL_QUANTITY,                  "SERVER_ILLEGAL_QUANTITY" },
-    { SERVER_ILLEGAL_COIL_VALUE,                "SERVER_ILLEGAL_COIL_VALUE" },
-    { SERVER_ILLEGAL_INPUT_DELIMITER,           "SERVER_ILLEGAL_INPUT_DELIMITER" },
-    { SERVER_ILLEGAL_SUB_FUNCTION,              "SERVER_ILLEGAL_SUB_FUNCTION" },
+    { MB_SERVER_ILLEGAL_FUNCTION,                   "SERVER_ILLEGAL_FUNCTION" },
+    { MB_SERVER_ILLEGAL_STATE,                      "SERVER_ILLEGAL_STATE" },
+    { MB_SERVER_ILLEGAL_ACCESS,                     "SERVER_ILLEGAL_ACCESS" },
+    { MB_SERVER_ILLEGAL_QUANTITY,                   "SERVER_ILLEGAL_QUANTITY" },
+    { MB_SERVER_ILLEGAL_COIL_VALUE,                 "SERVER_ILLEGAL_COIL_VALUE" },
+    { MB_SERVER_ILLEGAL_INPUT_DELIMITER,            "SERVER_ILLEGAL_INPUT_DELIMITER" },
+    { MB_SERVER_ILLEGAL_SUB_FUNCTION,               "SERVER_ILLEGAL_SUB_FUNCTION" },
 
 #endif
 
-    { NOK, "NOK" },
+    { MB_NOK, "NOK" },
 
     /* Marks the end of the list. */
-    { ( MBException_t ) 0xFF, NULL }
+    { ( MB_Exception_t ) 0xFF, NULL }
 };
 /*-----------------------------------------------------------*/
 
@@ -93,7 +93,7 @@ SerialModbusBase::SerialModbusBase()
     xReplyLength = 0;
 
     pxSerial = NULL;
-    #if defined( configMB_TYPE_SERIAL_SW )
+    #if defined( configMB_SERIAL_SW )
     {
         pxSWSerial = NULL;
     }
@@ -102,25 +102,25 @@ SerialModbusBase::SerialModbusBase()
     vSerialCtrlTx = NULL;
     vSerialCtrlRx = NULL;
 
-    xException = OK;
+    xStatus = MB_OK;
 
     ulInterFrameDelayUs = 0;
     ulTimerInterFrameDelayUs = 0;
     ulInterCharacterTimeoutUs = 0;
     ulTimerInterCharacterTimeoutUs = 0;
 
-    #if( configPROCESS_LOOP_HOOK == 1 )
+    #if( configMB_PROCESS_LOOP_HOOK == 1 )
     {
         vProcessLoopHook = NULL;
     }
     #endif
 
-    cAsciiInputDelimiter = configASCII_INPUT_DELIMITER;
+    cAsciiInputDelimiter = configMB_ASCII_INPUT_DELIMITER;
 
     vCustomDelayUs = NULL;
 
     xChecksumLength = 2;
-    #if( configMODE == configMODE_ASCII )
+    #if( configMB_MODE == configMB_MODE_ASCII )
     {
         xChecksumLength = 1;
     }
@@ -138,7 +138,7 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
     pxSerial = serial;
     pxSerial->begin( baud, config );
 
-    #if( configMODE == configMODE_RTU )
+    #if( configMB_MODE == configMB_MODE_RTU )
     {
         if( bCalculateTimeouts( baud, config ) != true )
         {
@@ -151,7 +151,7 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
 }
 /*-----------------------------------------------------------*/
 
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
 
     bool SerialModbusBase::begin( uint32_t baud, MB_SWSerial_t * serial )
     {
@@ -163,9 +163,9 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
         pxSWSerial = serial;
         pxSWSerial->begin( baud );
 
-        #if( configMODE == configMODE_RTU )
+        #if( configMB_MODE == configMB_MODE_RTU )
         {
-            if( bCalculateTimeouts( baud, configSERIAL_CONF_DEFAULT ) != true )
+            if( bCalculateTimeouts( baud, configMB_SERIAL_CONF_DEFAULT ) != true )
             {
                 return false;
             }
@@ -178,67 +178,67 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
 #endif
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
+MB_Status_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
 {
     uint16_t usTempChecksum = 0;
 
-    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configFRAME_LEN_MIN ) )
+    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configMB_FRAME_LEN_MIN ) )
     {
-        #if( configMODE == configMODE_RTU )
+        #if( configMB_MODE == configMB_MODE_RTU )
         {
             usTempChecksum = usCRC16( pucFrame, *pxFrameLength );
             pucFrame[ (*pxFrameLength)++ ] =  lowByte( usTempChecksum );
             pucFrame[ (*pxFrameLength)++ ] = highByte( usTempChecksum );
 
-            return OK;
+            return MB_OK;
         }
         #endif
 
-        #if( configMODE == configMODE_ASCII )
+        #if( configMB_MODE == configMB_MODE_ASCII )
         {
             usTempChecksum = ( uint16_t ) ucLRC( pucFrame, *pxFrameLength );
             pucFrame[ (*pxFrameLength)++ ] = ( uint8_t ) usTempChecksum;
 
-            return OK;
+            return MB_OK;
         }
         #endif
     }
 
-    return NOK;
+    return MB_NOK;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLength )
+MB_Status_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLength )
 {
     uint16_t usTempChecksum = 0;
 
-    if( ( pucFrame != NULL ) && ( xFrameLength >= configFRAME_LEN_MIN ) )
+    if( ( pucFrame != NULL ) && ( xFrameLength >= configMB_FRAME_LEN_MIN ) )
     {
-        #if( configMODE == configMODE_RTU )
+        #if( configMB_MODE == configMB_MODE_RTU )
         {
             usTempChecksum = usCRC16( pucFrame, xFrameLength - 2 );
             if( pucFrame[ xFrameLength - 2 ] == lowByte( usTempChecksum ) )
             {
                 if( pucFrame[ xFrameLength - 1 ] == highByte( usTempChecksum ) )
                 {
-                    return OK;
+                    return MB_OK;
                 }
             }
         }
         #endif
 
-        #if( configMODE == configMODE_ASCII )
+        #if( configMB_MODE == configMB_MODE_ASCII )
         {
             usTempChecksum = ( uint16_t ) ucLRC( pucFrame, xFrameLength - 1 );
             if( pucFrame[ xFrameLength - 1 ] == ( uint8_t ) usTempChecksum )
             {
-                return OK;
+                return MB_OK;
             }
         }
         #endif
     }
 
-    return NOK;
+    return MB_NOK;
 }
 /*-----------------------------------------------------------*/
 
@@ -299,11 +299,11 @@ uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
+MB_Status_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( *pxFrameLength < configFRAME_LEN_MIN ) )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < configMB_FRAME_LEN_MIN ) )
     {
-        return NOK;
+        return MB_NOK;
     }
 
     pucFrame[ ( *pxFrameLength * 2 ) + 2 ] = ( uint8_t ) cAsciiInputDelimiter;
@@ -319,15 +319,15 @@ MBStatus_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLe
 
     *pxFrameLength = ( *pxFrameLength * 2 ) + 3;
 
-    return OK;
+    return MB_OK;
 }
 /*-----------------------------------------------------------*/
 
-MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
+MB_Status_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
-    if( ( pucFrame == NULL ) || ( *pxFrameLength < ( configFRAME_LEN_MIN * 2 ) ) )
+    if( ( pucFrame == NULL ) || ( *pxFrameLength < ( configMB_FRAME_LEN_MIN * 2 ) ) )
     {
-        return NOK;
+        return MB_NOK;
     }
 
     *pxFrameLength = ( *pxFrameLength - 3 ) / 2;
@@ -337,7 +337,7 @@ MBStatus_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLe
         pucFrame[ i ] = ucAsciiToByte( pucFrame[ ( i * 2 ) + 1 ], pucFrame[ ( i * 2 ) + 2 ] );
     }
 
-    return OK;
+    return MB_OK;
 }
 /*-----------------------------------------------------------*/
 
@@ -420,7 +420,7 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 }
 /*-----------------------------------------------------------*/
 
-#if( configPROCESS_LOOP_HOOK == 1 )
+#if( configMB_PROCESS_LOOP_HOOK == 1 )
 
     void SerialModbusBase::setProcessLoopHook( void (* loopHookFunction)( void ) )
     {
@@ -432,10 +432,10 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 #endif
 /*-----------------------------------------------------------*/
 
-MBException_t SerialModbusBase::xSetException( MBException_t xExceptionPar )
+MB_Status_t SerialModbusBase::xSetException( MB_Exception_t xException )
 {
-    xException = xExceptionPar;
-    return xException;
+    xStatus = xException;
+    return xStatus;
 }
 /*-----------------------------------------------------------*/
 
@@ -512,7 +512,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
                 return true;
             }
         }
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
         else if( pxSWSerial != NULL )
         {
             if( pxSWSerial->available() > 0 )
@@ -531,7 +531,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
 
 size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLength )
 {
-    size_t xDataSent = 0;
+    size_t xBytesSent = 0;
 
     if( ( pucSendBuffer != NULL ) && ( pxBufferLength > 0 ) )
     {
@@ -542,16 +542,16 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 
         if( pxSerial != NULL )
         {
-            xDataSent = pxSerial->write( pucSendBuffer, pxBufferLength );
+            xBytesSent = pxSerial->write( pucSendBuffer, pxBufferLength );
             pxSerial->flush();
         }
-#if defined( configMB_TYPE_SERIAL_SW )
+#if defined( configMB_SERIAL_SW )
         else if( pxSWSerial != NULL )
         {
-            xDataSent = pxSWSerial->write( pucSendBuffer, pxBufferLength );
+            xBytesSent = pxSWSerial->write( pucSendBuffer, pxBufferLength );
         }
 #endif
-        #if( configMODE == configMODE_RTU )
+        #if( configMB_MODE == configMB_MODE_RTU )
         {
             /* Wait the amount of microseconds for the Inter Frame Delay to let
             the receiving device detect the end of the frame. */
@@ -565,7 +565,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
         }
     }
 
-    return xDataSent;
+    return xBytesSent;
 }
 /*-----------------------------------------------------------*/
 
@@ -703,7 +703,7 @@ void SerialModbusBase::setCustomDelay( void (* customDelay)( uint32_t delayUs ) 
 }
 /*-----------------------------------------------------------*/
 
-const char * SerialModbusBase::getExceptionString( MBException_t exception )
+const char * SerialModbusBase::getExceptionString( MB_Exception_t exception )
 {
     for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
     {

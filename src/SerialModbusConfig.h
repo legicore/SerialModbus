@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -23,92 +23,92 @@
 
 /*-----------------------------------------------------------*/
 
-#define configMODE_RTU                  1
-#define configMODE_ASCII                2
-#define configMODE                      configMODE_RTU
+#define configMB_MODE_RTU               1
+#define configMB_MODE_ASCII             2
+#define configMB_MODE                   configMB_MODE_RTU
 
-#define configFRAME_LEN_MIN             3
-#define configFRAME_LEN_MAX             64
+#define configMB_FRAME_LEN_MIN          3
+#define configMB_FRAME_LEN_MAX          64
 
 /* This value for the Arduino default serial configuration is taken from the 
 source code (8 data bits, no parity, 1 stop bit). */ 
-#define configSERIAL_CONF_DEFAULT       SERIAL_8N1
+#define configMB_SERIAL_CONF_DEFAULT    SERIAL_8N1
 
 /*-----------------------------------------------------------*/
 
-#define configID_BROADCAST              0
-#define configID_SERVER_MAX             247
+#define configMB_ID_BROADCAST           0
+#define configMB_ID_SERVER_MAX          247
 
-#define configASCII_INPUT_DELIMITER     '\n'
+#define configMB_ASCII_INPUT_DELIMITER  '\n'
 
-#define configTURNAROUND_DELAY_MS       200
-#define configRESPONSE_TIMEOUT_MS       1000
+#define configMB_TURNAROUND_DELAY_MS    200
+#define configMB_RESPONSE_TIMEOUT_MS    1000
 
 /*-----------------------------------------------------------*/
 
-#define configPROCESS_LOOP_HOOK         1
+#define configMB_PROCESS_LOOP_HOOK      1
 
-#define configEXTENDED_EXCEPTION_CODES  0
+#define configMB_EXT_EXCEPTION_CODES    0
 
-#define configSERVER_MULTI_ID           0
-#define configID_COUNT_MAX              8
+#define configMB_SERVER_MULTI_ID        0
+#define configMB_ID_COUNT_MAX           8
 
 /*-----------------------------------------------------------*/
 
 #define N 0 /* Not implemented */
 
 /* Bit Data Access */
-#define configFC01      N   /* READ_COILS */
-#define configFC02      N   /* READ_DISCRETE_INPUTS */
-#define configFC05      1   /* WRITE_SINGLE_COIL */
-#define configFC15      N   /* WRITE_MULTIPLE_COILS */
+#define configMB_FC01       N   /* READ_COILS */
+#define configMB_FC02       N   /* MB_READ_DISCRETE_INPUTS */
+#define configMB_FC05       1   /* MB_WRITE_SINGLE_COIL */
+#define configMB_FC15       N   /* MB_WRITE_MULTIPLE_COILS */
 
 /* Word Data Access */
-#define configFC03      1   /* READ_HOLDING_REGISTERS */
-#define configFC04      1   /* READ_INPUT_REGISTER */
-#define configFC06      1   /* WRITE_SINGLE_REGISTER */
-#define configFC16      1   /* WRITE_MULTIPLE_REGISTERS */
-#define configFC22      N   /* MASK_WRITE_REGISTER */
-#define configFC23      N   /* READ_WRITE_MULTIPLE_REGISTERS */
-#define configFC24      N   /* READ_FIFO_QUEUE */
+#define configMB_FC03       1   /* MB_READ_HOLDING_REGISTERS */
+#define configMB_FC04       1   /* READ_INPUT_REGISTER */
+#define configMB_FC06       1   /* MB_WRITE_SINGLE_REGISTER */
+#define configMB_FC16       1   /* MB_WRITE_MULTIPLE_REGISTERS */
+#define configMB_FC22       N   /* MB_MASK_WRITE_REGISTER */
+#define configMB_FC23       N   /* MB_READ_WRITE_MULTIPLE_REGISTERS */
+#define configMB_FC24       N   /* MB_READ_FIFO_QUEUE */
 
 /* File Record Data Access */
-#define configFC20      N   /* READ_FILE_RECORD */
-#define configFC21      N   /* WRITE_FILE_RECORD */
+#define configMB_FC20       N   /* MB_READ_FILE_RECORD */
+#define configMB_FC21       N   /* MB_WRITE_FILE_RECORD */
 
 /* Diagnostics */
-#define configFC07      N   /* READ_EXCEPTION_STATUS */
-#define configFC08      1   /* DIAGNOSTIC */
-#define configFC11      N   /* GET_COM_EVENT_COUNTER */
-#define configFC12      N   /* GET_COM_EVENT_LOG */
-#define configFC17      N   /* REPORT_SERVER_ID */
+#define configMB_FC07       N   /* MB_READ_EXCEPTION_STATUS */
+#define configMB_FC08       1   /* MB_DIAGNOSTIC */
+#define configMB_FC11       N   /* MB_GET_COM_EVENT_COUNTER */
+#define configMB_FC12       N   /* MB_GET_COM_EVENT_LOG */
+#define configMB_FC17       N   /* MB_REPORT_SERVER_ID */
 
-/* Diagnostic Sub-Function Codes */
-#define configSFC00     1   /* RETURN_QUERY_DATA */
-#define configSFC01     1   /* RESTART_COMMUNICATIONS_OPTION */
-#define configSFC02     1   /* RETURN_DIAGNOSTIC_REGISTER */
-#define configSFC03     1   /* CHANGE_ASCII_INPUT_DELIMITER */
-#define configSFC04     1   /* FORCE_LISTEN_ONLY_MODE */
-#define configSFC10     1   /* CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER */
-#define configSFC11     1   /* RETURN_BUS_MESSAGE_COUNT */
-#define configSFC12     1   /* RETURN_BUS_COMMUNICATION_ERROR_COUNT */
-#define configSFC13     1   /* RETURN_BUS_EXCEPTION_ERROR_COUNT */
-#define configSFC14     1   /* RETURN_SERVER_MESSAGE_COUNT */
-#define configSFC15     1   /* RETURN_SERVER_NO_RESPONSE_COUNT */
-#define configSFC16     1   /* RETURN_SERVER_NAK_COUNT */
-#define configSFC17     1   /* RETURN_SERVER_BUSY_COUNT */
-#define configSFC18     1   /* RETURN_BUS_CHARACTER_OVERRUN_COUNT */
-#define configSFC20     1   /* CLEAR_OVERRUN_COUNTER_AND_FLAG */
+/* MB_DIAGNOSTIC Sub-Function Codes */
+#define configMB_SFC00      1   /* MB_RETURN_QUERY_DATA */
+#define configMB_SFC01      1   /* MB_RESTART_COMMUNICATIONS_OPTION */
+#define configMB_SFC02      1   /* MB_RETURN_DIAGNOSTIC_REGISTER */
+#define configMB_SFC03      1   /* MB_CHANGE_ASCII_INPUT_DELIMITER */
+#define configMB_SFC04      1   /* MB_FORCE_LISTEN_ONLY_MODE */
+#define configMB_SFC10      1   /* MB_CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER */
+#define configMB_SFC11      1   /* MB_RETURN_BUS_MESSAGE_COUNT */
+#define configMB_SFC12      1   /* MB_RETURN_BUS_COMMUNICATION_ERROR_COUNT */
+#define configMB_SFC13      1   /* MB_RETURN_BUS_EXCEPTION_ERROR_COUNT */
+#define configMB_SFC14      1   /* MB_RETURN_SERVER_MESSAGE_COUNT */
+#define configMB_SFC15      1   /* MB_RETURN_SERVER_NO_RESPONSE_COUNT */
+#define configMB_SFC16      1   /* MB_RETURN_SERVER_NAK_COUNT */
+#define configMB_SFC17      1   /* MB_RETURN_SERVER_BUSY_COUNT */
+#define configMB_SFC18      1   /* MB_RETURN_BUS_CHARACTER_OVERRUN_COUNT */
+#define configMB_SFC20      1   /* MB_CLEAR_OVERRUN_COUNTER_AND_FLAG */
 
 #undef N /* Not implemented */
 
 /*-----------------------------------------------------------*/
 
-#if( ( configSERVER_MULTI_ID == 1 ) && ( configFC08 == 1 ) )
+#if( ( configMB_SERVER_MULTI_ID == 1 ) && ( configMB_FC08 == 1 ) )
     #warning Diagnostics (function code 8) does not work correctly when multi ID support is used!
 #endif
 
-#if( ( configFC08 == 1 ) && ( configSFC04 == 1 ) && ( configSFC01 == 0 ) )
+#if( ( configMB_FC08 == 1 ) && ( configMB_SFC04 == 1 ) && ( configMB_SFC01 == 0 ) )
     #warning Sub-function code 1 is needed to deactivate Listen Only Mode (sub-function code 4)!
 #endif
 

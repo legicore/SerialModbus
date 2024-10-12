@@ -6,7 +6,7 @@
  * 
  * @brief       TODO
  * 
- * @copyright   (c) 2023 Martin Legleiter
+ * @copyright   (c) 2024 Martin Legleiter
  * 
  * @license     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
@@ -36,28 +36,28 @@
         defined( ARDUINO_AVR_LEONARDO ) || \
         defined( ARDUINO_AVR_PRO )
 
-        #define configMB_TYPE_SERIAL        HardwareSerial
-        #define configMB_TYPE_SERIAL_SW     SoftwareSerial
+        #define configMB_SERIAL         HardwareSerial
+        #define configMB_SERIAL_SW      SoftwareSerial
 
     #elif defined( ARDUINO_AVR_NANO_EVERY ) || \
           defined( ARDUINO_AVR_UNO_WIFI_REV2 )
 
-        #define configMB_TYPE_SERIAL        UartClass
-        #define configMB_TYPE_SERIAL_SW     SoftwareSerial
+        #define configMB_SERIAL         UartClass
+        #define configMB_SERIAL_SW      SoftwareSerial
 
     #elif defined( ARDUINO_SAMD_MKRZERO ) || \
           defined( ARDUINO_SAMD_MKRWIFI1010 ) || \
           defined( ARDUINO_SAMD_NANO_33_IOT )
 
-        #define configMB_TYPE_SERIAL        Uart
+        #define configMB_SERIAL         Uart
 
     #elif defined( ARDUINO_MINIMA ) || \
           defined( ARDUINO_UNOWIFIR4 )
 
-        #define configMB_TYPE_SERIAL        UART
-        #define configMB_TYPE_SERIAL_SW     SoftwareSerial
+        #define configMB_SERIAL         UART
+        #define configMB_SERIAL_SW      SoftwareSerial
 
-        #define SERIAL_PORT_HARDWARE        Serial1
+        #define SERIAL_PORT_HARDWARE    Serial1
 
     #else
 
@@ -74,9 +74,9 @@
 /* If none of the needed defines is set, we try to use some assumed default
 values for the Arduino serial port. */
 
-#if !defined( configMB_TYPE_SERIAL )
+#if !defined( configMB_SERIAL )
 
-    #define configMB_TYPE_SERIAL HardwareSerial
+    #define configMB_SERIAL HardwareSerial
 
 #endif
 #if !defined( SERIAL_PORT_HARDWARE )
