@@ -40,6 +40,8 @@ enum MB_ClientState_e
 
 typedef enum MB_ClientState_e MB_ClientState_t;
 
+/*-----------------------------------------------------------*/
+
 struct MB_Request_s
 {
     uint8_t id;

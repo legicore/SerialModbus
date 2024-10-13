@@ -44,6 +44,8 @@ enum MB_ServerState_e
 
 typedef enum MB_ServerState_e MB_ServerState_t;
 
+/*-----------------------------------------------------------*/
+
 enum MB_Access_e
 {
     MB_NA = 0b00,   /* No Access */
@@ -53,6 +55,8 @@ enum MB_Access_e
 };
 
 typedef enum MB_Access_e MB_Access_t;
+
+/*-----------------------------------------------------------*/
 
 struct MB_Register_s
 {
@@ -123,7 +127,7 @@ private:
     void vHandlerFC06( void );
     void vHandlerFC16( void );
     void vHandlerFC08( void );
-    void vClearMB_DIAGNOSTICCounters( void );
+    void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
     uint16_t usServerExceptionErrorCount;
@@ -132,7 +136,7 @@ private:
     uint16_t usServerNAKCount;
     uint16_t usServerBusyCount;
     uint16_t usBusCharacterOverrunCount;
-    uint16_t usMB_DIAGNOSTICRegister;
+    uint16_t usDiagnosticRegister;
     bool bListenOnlyMode;
 #if( configMB_SERVER_MULTI_ID == 1 )
     uint8_t ucIdMap[ configMB_ID_COUNT_MAX ];

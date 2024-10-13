@@ -114,8 +114,8 @@ SerialModbusServer::SerialModbusServer()
 
     #if( configMB_FC08 == 1 )
     {
-        vClearMB_DIAGNOSTICCounters();
-        usMB_DIAGNOSTICRegister = 0x0000;
+        vClearDiagnosticCounters();
+        usDiagnosticRegister = 0x0000;
     }
     #endif
 
@@ -860,7 +860,7 @@ void SerialModbusServer::vHandlerFC08( void )
                 /* INFO: The Modbus spec prescribes here that the serial port
                 must be initialized and restarted, but we don't do that. */
 
-                vClearMB_DIAGNOSTICCounters();
+                vClearDiagnosticCounters();
 
                 /* Reset the Only Listen Mode. */
                 bListenOnlyMode = false;
@@ -887,8 +887,8 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                ucREPLY_DATA_HI = highByte( usMB_DIAGNOSTICRegister );
-                ucREPLY_DATA_LO =  lowByte( usMB_DIAGNOSTICRegister );
+                ucREPLY_DATA_HI = highByte( usDiagnosticRegister );
+                ucREPLY_DATA_LO =  lowByte( usDiagnosticRegister );
             }
             else
             {
@@ -947,7 +947,7 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             if( usREQUEST_DATA == 0x0000 )
             {
-                vClearMB_DIAGNOSTICCounters();
+                vClearDiagnosticCounters();
                 diagRegClear();
 
                 xReplyLength = xRequestLength;
@@ -1130,7 +1130,7 @@ void SerialModbusServer::vHandlerFC08( void )
 }
 /*-----------------------------------------------------------*/
 
-void SerialModbusServer::vClearMB_DIAGNOSTICCounters( void )
+void SerialModbusServer::vClearDiagnosticCounters( void )
 {
     usBusMessageCount            = 0;
     usBusCommunicationErrorCount = 0;
@@ -1145,7 +1145,7 @@ void SerialModbusServer::vClearMB_DIAGNOSTICCounters( void )
 
 uint16_t SerialModbusServer::diagRegGet( void )
 {
-    return usMB_DIAGNOSTICRegister;
+    return usDiagnosticRegister;
 }
 /*-----------------------------------------------------------*/
 
@@ -1153,7 +1153,7 @@ bool SerialModbusServer::diagRegGet( size_t bit )
 {
     if( bit <= 15 )
     {
-        if( bitRead( usMB_DIAGNOSTICRegister, bit ) == 1 )
+        if( bitRead( usDiagnosticRegister, bit ) == 1 )
         {
             return true;
         }
@@ -1167,7 +1167,7 @@ bool SerialModbusServer::diagRegSet( size_t bit )
 {
     if( bit <= 15 )
     {
-        bitSet( usMB_DIAGNOSTICRegister, bit );
+        bitSet( usDiagnosticRegister, bit );
         return true;
     }
 
@@ -1179,7 +1179,7 @@ bool SerialModbusServer::diagRegClear( size_t bit )
 {
     if( bit <= 15 )
     {
-        bitClear( usMB_DIAGNOSTICRegister, bit );
+        bitClear( usDiagnosticRegister, bit );
         return true;
     }
 
@@ -1189,7 +1189,7 @@ bool SerialModbusServer::diagRegClear( size_t bit )
 
 void SerialModbusServer::diagRegClear( void )
 {
-    usMB_DIAGNOSTICRegister = 0x0000;
+    usDiagnosticRegister = 0x0000;
 }
 /*-----------------------------------------------------------*/
 
