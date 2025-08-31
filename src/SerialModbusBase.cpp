@@ -425,7 +425,7 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
     void SerialModbusBase::setProcessLoopHook( void (* loopHookFunction)( void ) )
     {
         /* INFO: No NULL check to provide the ability to turn the loop hook 
-        function mechanism on and off. */
+         * function mechanism on and off. */
         vProcessLoopHook = loopHookFunction;
     }
 
@@ -554,7 +554,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
         #if( configMB_MODE == configMB_MODE_RTU )
         {
             /* Wait the amount of microseconds for the Inter Frame Delay to let
-            the receiving device detect the end of the frame. */
+             * the receiving device detect the end of the frame. */
             vDelayUs( ulInterFrameDelayUs );
         }
         #endif
@@ -576,34 +576,35 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
     if( ulBaud > 19200 )
     {
         /* For transfer rates higer than 19200 Baud Modbus recommend fixed
-        values for the inter character timeout and the inter frame delay. */
-        ulInterCharacterTimeoutUs = 750;
-        ulInterFrameDelayUs = 1750;
+         * values for the inter character timeout and the inter frame delay. */
+        ulInterCharacterTimeoutUs =  750;
+        ulInterFrameDelayUs       = 1750;
     }
     else
     {
         /* For transfer rates lower than 19200 Baud the timing is more critical
-        and must be calculated. */
-
-        /* Calculation example for the inter character timeout with 19200 baud
-        (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
-
-            19200 Baud / 11 Bits = 1745.45'
-
-        That means 1745.45' characters could be transmitted in 1 Second.
-
-            1000 ms / 1745.45 = 0.5729167' ms
-
-        So, one character needs 0.5729167' ms to be transmitted. The inter
-        character timeout is defined as 1.5x the time needed to transfer one
-        character (Inter frame delay is 3.5x).
-
-            0.5729167' ms * 1.5 = 0.859375 ms
-
-        And because our timers are working with microseconds we have a final
-        value of 859.375 us.
-
-            0.859375 ms * 1000 = 859.375 us */
+         * and must be calculated.
+         *
+         * Calculation example for the inter character timeout with 19200 baud
+         * (and standard Modbus UART configuration SERIAL_8N1 - 11 Bits):
+         *
+         *     19200 Baud / 11 Bits = 1745.45'
+         *
+         * That means 1745.45' characters could be transmitted in 1 Second.
+         *
+         *     1000 ms / 1745.45 = 0.5729167' ms
+         *
+         * So, one character needs 0.5729167' ms to be transmitted. The inter
+         * character timeout is defined as 1.5x the time needed to transfer one
+         * character (Inter frame delay is 3.5x).
+         *
+         *     0.5729167' ms * 1.5 = 0.859375 ms
+         *
+         * And because our timers are working with microseconds we have a final
+         * value of 859.375 us.
+         *
+         *     0.859375 ms * 1000 = 859.375 us
+         */
 
         switch( ulConfig )
         {
@@ -658,20 +659,21 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
         }
 
         /* Basic formula:
-
-                      1000
-            timeout = ---- * nbrOfBits * characterTimes * 1000
-                      baud
-
-        Final formulas:
-
-                                    nbrOfBits * 1000000 * 1.5
-            interCharacterTimeout = -------------------------
-                                            baud
-
-                              nbrOfBits * 1000000 * 3.5
-            interFrameDelay = -------------------------
-                                        baud */
+         *
+         *               1000
+         *     timeout = ---- * nbrOfBits * characterTimes * 1000
+         *               baud
+         *
+         * Final formulas:
+         *
+         *                             nbrOfBits * 1000000 * 1.5
+         *     interCharacterTimeout = -------------------------
+         *                                     baud
+         *
+         *                       nbrOfBits * 1000000 * 3.5
+         *     interFrameDelay = -------------------------
+         *                                 baud
+         */
 
         ulInterCharacterTimeoutUs = ulNbrOfBits * ( 1500000 / ulBaud );
         ulInterFrameDelayUs       = ulNbrOfBits * ( 3500000 / ulBaud );

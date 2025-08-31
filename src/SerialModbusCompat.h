@@ -30,7 +30,7 @@
     defined( ARDUINO_ARCH_RENESAS )
 
     /* Check the type of the currently selected board and set the needed
-    parameters if it is supported. */
+     * parameters if it is supported. */
     #if defined( ARDUINO_AVR_UNO ) || \
         defined( ARDUINO_AVR_MEGA2560 ) || \
         defined( ARDUINO_AVR_LEONARDO ) || \
@@ -72,7 +72,7 @@
 #endif
 
 /* If none of the needed defines is set, we try to use some assumed default
-values for the Arduino serial port. */
+ * values for the Arduino serial port. */
 
 #if !defined( configMB_SERIAL )
 

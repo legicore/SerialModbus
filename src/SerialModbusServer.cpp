@@ -214,7 +214,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
         if( a == 1 )
         {
             /* If there is only one entry in the register map, there is no need
-            to perform a check. */
+             * to perform a check. */
             return MB_OK;
         }
         else if( a > 1 )
@@ -226,7 +226,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
                     if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
                     {
                         /* Simplified representation of the algorithm :
-                        if( ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) ) */
+                         * ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) */
                         if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
                             ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
                         {
@@ -314,7 +314,7 @@ MB_Status_t SerialModbusServer::process( void )
                     #if( configMB_MODE == configMB_MODE_ASCII )
                     {
                         /* We are in ASCII mode, so we convert the frame to the
-                        ASCII format (this also updates the pdu length). */
+                         * ASCII format (this also updates the pdu length). */
                         ( void ) xRtuToAscii( pucReplyFrame, &xReplyLength );
                     }
                     #endif
@@ -351,13 +351,13 @@ MB_Status_t SerialModbusServer::process( void )
                     else
                     {
                         /* Receive buffer overflow -> Increment the bus
-                        charakter overrun counter. */
+                         * charakter overrun counter. */
                         vIncCPT8();
                         ( void ) xSetException( MB_CHARACTER_OVERRUN );
 
                         /* We go directly back to the idle state and don't send
-                        any reply because it would cause bus collisions if every
-                        server sends an error reply. */
+                         * any reply because it would cause bus collisions if
+                         * every server sends an error reply. */
                         vClearRequestFrame();
                         vSetState( SERVER_IDLE );
 
@@ -375,11 +375,11 @@ MB_Status_t SerialModbusServer::process( void )
                             if( xCheckChecksum( pucRequestFrame, xRequestLength ) == MB_OK )
                             {
                                 /* Received a new valid request -> Increment the
-                                bus message counter. */
+                                 * bus message counter. */
                                 vIncCPT1();
 
                                 /* Check if the received request is dedicated to
-                                us or if it is a broadcast. */
+                                 * us or if it is a broadcast. */
                                 if( ( bCheckId( ucREQUEST_ID ) == true ) ||
                                     ( ucREQUEST_ID == configMB_ID_BROADCAST ) )
                                 {
@@ -392,13 +392,13 @@ MB_Status_t SerialModbusServer::process( void )
                             else
                             {
                                 /* Checksum error -> Increment the bus
-                                communication error counter. */
+                                 * communication error counter. */
                                 vIncCPT2();
                             }
 
                             /* We go directly back to the idle state and don't
-                            send any reply because it would cause bus collisions
-                            if every server sends an error reply. */
+                             * send any error reply because it would cause bus
+                             * collisions if every server sends one. */
                             vClearRequestFrame();
                             vSetState( SERVER_IDLE );
                         }
@@ -408,24 +408,24 @@ MB_Status_t SerialModbusServer::process( void )
                     #if( configMB_MODE == configMB_MODE_ASCII )
                     {
                         /* Check for the end of the ASCII frame which is marked
-                        by a carriage-return ('\r') followed by a variable input
-                        delimiter (default: line-feed/'\n'). */
+                         * by a carriage-return ('\r') followed by a variable
+                         * input delimiter (default: line-feed/'\n'). */
                         if( pucRequestFrame[ xRequestLength - 1 ] == ( uint8_t ) cAsciiInputDelimiter )
                         {
                             if( pucRequestFrame[ xRequestLength - 2 ] == ( uint8_t ) '\r' )
                             {
                                 /* Convert the request frame from ASCII to RTU
-                                format and update the request length. */
+                                 * format and update the request length. */
                                 ( void ) xAsciiToRtu( pucRequestFrame, &xRequestLength );
 
                                 if( xCheckChecksum( pucRequestFrame, xRequestLength ) == MB_OK )
                                 {
                                     /* Received a new valid request ->
-                                    Increment the bus message counter. */
+                                     * Increment the bus message counter. */
                                     vIncCPT1();
 
-                                    /* Check if the received request is
-                                    dedicated to us or if it is a broadcast. */
+                                    /* Check if the request is dedicated to us
+                                     * or if it is a broadcast. */
                                     if( ( bCheckId( ucREQUEST_ID ) == true ) ||
                                         ( ucREQUEST_ID == configMB_ID_BROADCAST ) )
                                     {
@@ -436,14 +436,14 @@ MB_Status_t SerialModbusServer::process( void )
                                 else
                                 {
                                     /* Checksum error -> Increment the bus
-                                    communication error counter. */
+                                     * communication error counter. */
                                     vIncCPT2();
                                 }
 
                                 /* We go directly back to the idle state because
-                                we don't want to send any kind of reply. It
-                                would cause bus collisions if every server
-                                sends an error reply. */
+                                 * we don't want to send any kind of reply. It
+                                 * would cause bus collisions if every server
+                                 * sends an error reply. */
                                 vClearRequestFrame();
                                 vSetState( SERVER_IDLE );
                             }
@@ -458,8 +458,8 @@ MB_Status_t SerialModbusServer::process( void )
             case CHECKING_REQUEST :
             {
                 /* We received a valid request that is a broadcast or is
-                addressed to the Id of this deveice -> Increment the server
-                message counter. */
+                 * addressed to the Id of this deveice -> Increment the server
+                 * message counter. */
                 vIncCPT4();
 
                 if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == MB_OK )
@@ -478,10 +478,10 @@ MB_Status_t SerialModbusServer::process( void )
             {
 #if( configMB_FC08 == 1 )
                 /* If the Listen Only Mode is active we monitor all bus
-                messages, but we perform no data processing. Only a request with
-                function code 8 (MB_DIAGNOSTIC) and sub function code 1
-                (MB_RESTART_COMMUNICATIONS_OPTION) will be processed, because it is
-                needed to deactivate the only listen mode. */
+                 * messages, but we perform no data processing. Only a request
+                 * with function code 8 (MB_DIAGNOSTIC) and sub function code 1
+                 * (MB_RESTART_COMMUNICATIONS_OPTION) will be processed, because
+                 * it is needed to deactivate the only listen mode. */
                 if( ( bListenOnlyMode == false ) ||
                     ( ( ucREQUEST_FUNCTION_CODE == FC_DIAGNOSTIC ) &&
                       ( usREQUEST_SUB_FUNCTION_CODE == SFC_RESTART_COMMUNICATIONS_OPTION ) ) )
@@ -554,8 +554,8 @@ MB_Status_t SerialModbusServer::process( void )
                     }
                     else
                     {
-                        /* This is a broadcast, so we clear the reply frame to
-                        send no reply and increment the no response counter. */
+                        /* This is a broadcast, so we will not send a reply and
+                         * increment the no response counter. */
                         vClearReplyFrame();
                         vIncCPT5();
                     }
@@ -617,8 +617,8 @@ MB_Status_t SerialModbusServer::process( void )
         #if( configMB_PROCESS_LOOP_HOOK == 1 )
         {
             /* The process loop hook will only be executed when the state
-            mashine is not in the idle state. Otherwise the loop hook would be
-            execetued with every run through process(). */
+             * mashine is not in the idle state. Otherwise the loop hook would
+             * be execetued with every run through process(). */
             if( ( vProcessLoopHook != NULL ) && ( xState != SERVER_IDLE ) )
             {
                 ( vProcessLoopHook )();
@@ -641,8 +641,8 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
     }
 
     /* If the MB_DIAGNOSTIC functions are enabled we don't need to do the normal
-    request check. All diagnoctic functions are a part of the Modbus protocol
-    (and don't need any definition as a register etc.). */
+     * request check. All diagnoctic functions are a part of the Modbus protocol
+     * (and don't need any definition as a register etc.). */
     if( ucREQUEST_FUNCTION_CODE == ( uint8_t ) FC_DIAGNOSTIC )
     {
         return MB_OK;
@@ -652,13 +652,13 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
     xRegisterMapIndex = 0;
 
     /* Before we find a matching register map entry the exception will be set by
-    default. If successful the exception is reset to 'MB_OK' or will be overwritten
-    if another error occurs. Otherwise it persists which means that we could not
-    find a matching register map entry. */
+     * default. If successful the exception is reset to 'MB_OK' or will be
+     * overwritten if another error occurs. Otherwise it persists which means
+     * that we could not find a matching register map entry. */
     ( void ) xSetException( MB_ILLEGAL_DATA_ADDRESS );
 
     /* Scan the register map and check if the request address value lies in the
-    range of one of the mapped register entries. */
+     * range of one of the mapped register entries. */
     for( ; pxRegisterMap[ xRegisterMapIndex ].data != NULL; xRegisterMapIndex++ )
     {
 #if( configMB_SERVER_MULTI_ID == 1 )
@@ -674,7 +674,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
                     if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].uxFunctionCode )
                     {
                         /* Check if the type of the request function code has
-                        the right to access the destination register. */
+                         * the right to access the destination register. */
                         if( ( pxRegisterMap[ xRegisterMapIndex ].access & ( MB_Access_t ) pxAccessRights[ i ].uxAccess ) != 0 )
                         {
                             /* Reset the exception which was set from start. */
@@ -682,8 +682,8 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
                         }
 
                         /* While register access rights are not a standard
-                        feature of Modbus we will set a non standard exception
-                        and abort the for loop. */
+                         * feature of Modbus we will set a non standard
+                         * exception and abort the for loop. */
                         #if( configMB_EXT_EXCEPTION_CODES == 1 )
                         {
                             ( void ) xSetException( MB_SERVER_ILLEGAL_ACCESS );
@@ -699,7 +699,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
                 }
 
                 /* We could not find the function code in the access rights map
-                so we set the exception and abort the for loop. */
+                 * so we set the exception and abort the for loop. */
                 #if( configMB_EXT_EXCEPTION_CODES == 1 )
                 {
                     ( void ) xSetException( MB_SERVER_ILLEGAL_FUNCTION );
@@ -830,9 +830,9 @@ void SerialModbusServer::vHandlerFC08( void )
     ucREPLY_SUB_FUNCTION_CODE_LO = ucREQUEST_SUB_FUNCTION_CODE_LO;
 
     /* Some of the diagnoostic sub functions just return the received
-    request data (which is in most cases 0x0000). So we apply this data
-    directly at the beginning of the handler and will change it only in the
-    specific cases - the same goes for the reply length. */
+     * request data (which is in most cases 0x0000). So we apply this data
+     * directly at the beginning of the handler and will change it only in the
+     * specific cases - the same goes for the reply length. */
     ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
     ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
     xReplyLength = 6;
@@ -844,7 +844,7 @@ void SerialModbusServer::vHandlerFC08( void )
         {
             xReplyLength = 4;
 
-            for( ; xReplyLength < xRequestLength - xChecksumLength; xReplyLength++ )
+            for( ; xReplyLength < ( xRequestLength - xChecksumLength ); xReplyLength++ )
             {
                 pucReplyFrame[ xReplyLength ] = pucRequestFrame[ xReplyLength ];
             }
@@ -858,7 +858,7 @@ void SerialModbusServer::vHandlerFC08( void )
             if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == MB_CLEAR_COM_EVENT_LOG ) )
             {
                 /* INFO: The Modbus spec prescribes here that the serial port
-                must be initialized and restarted, but we don't do that. */
+                 * must be initialized and restarted, but we don't do that. */
 
                 vClearDiagnosticCounters();
 
@@ -868,11 +868,11 @@ void SerialModbusServer::vHandlerFC08( void )
                 if( usREQUEST_DATA == MB_CLEAR_COM_EVENT_LOG )
                 {
                     /* INFO: The Modbus spec prescribes here to clear the
-                    communication event log, which is not implemented. */
+                     * communication event log, which is not implemented. */
                 }
 
                 /* INFO: The Modbus spec prescribes here to perform a complete
-                restart of the device, but we skip that. */
+                 * restart of the device, but we skip that. */
             }
             else
             {
@@ -1096,7 +1096,7 @@ void SerialModbusServer::vHandlerFC08( void )
                 usBusCharacterOverrunCount = 0;
 
                 /* INFO: The Modbus spec prescribes here to also clear an error
-                flag, but this flag is nowhere specified. */
+                 * flag, but this flag is nowhere specified. */
             }
             else
             {
@@ -1289,7 +1289,7 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
             #if( configMB_SERVER_MULTI_ID == 1 )
             {
                 /* Just in case someone creates a register after calling the
-                begin method, we re-initialize the id map. */
+                 * begin method, we re-initialize the id map. */
                 vSetIdMap();
             }
             #endif

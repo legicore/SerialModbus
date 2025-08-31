@@ -31,7 +31,7 @@
 #define configMB_FRAME_LEN_MAX          64
 
 /* This value for the Arduino default serial configuration is taken from the 
-source code (8 data bits, no parity, 1 stop bit). */ 
+ * source code (8 data bits, no parity, 1 stop bit). */ 
 #define configMB_SERIAL_CONF_DEFAULT    SERIAL_8N1
 
 /*-----------------------------------------------------------*/

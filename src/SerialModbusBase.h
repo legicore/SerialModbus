@@ -119,6 +119,8 @@ enum MB_Status_e
     MB_ILLEGAL_SUB_FUNCTION                     = 0x1C,
     MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x1D,
 
+#if( configMB_EXT_EXCEPTION_CODES == 1 )
+
     /* Extended exception codes for server replies. */
     MB_SERVER_ILLEGAL_FUNCTION                  = 0x21,
     MB_SERVER_ILLEGAL_STATE                     = 0x22,
@@ -128,11 +130,20 @@ enum MB_Status_e
     MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x26,
     MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x27,
 
+#endif
+
     MB_NOK = 0xFE
 };
 
 typedef enum MB_Status_e MB_Status_t;
 typedef enum MB_Status_e MB_Exception_t;
+
+/*-----------------------------------------------------------*/
+
+#define MB_COIL_ON              0xFF00
+#define MB_COIL_OFF             0x0000
+
+#define MB_CLEAR_COM_EVENT_LOG  0xFF00
 
 /*-----------------------------------------------------------*/
 
@@ -222,48 +233,45 @@ protected:
 
 #define ucREQUEST_ADDRESS_HI            pucRequestFrame[ 2 ]
 #define ucREQUEST_ADDRESS_LO            pucRequestFrame[ 3 ]
-#define usREQUEST_ADDRESS               ( ( ( uint16_t ) ucREQUEST_ADDRESS_HI << 8 ) | ucREQUEST_ADDRESS_LO )
+#define usREQUEST_ADDRESS               ( ( ( uint16_t ) pucRequestFrame[ 2 ] << 8 ) | pucRequestFrame[ 3 ] )
 
 #define ucREQUEST_QUANTITY_HI           pucRequestFrame[ 4 ]
 #define ucREQUEST_QUANTITY_LO           pucRequestFrame[ 5 ]
-#define usREQUEST_QUANTITY              ( ( ( uint16_t ) ucREQUEST_QUANTITY_HI << 8 ) | ucREQUEST_QUANTITY_LO )
+#define usREQUEST_QUANTITY              ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
-#define MB_COIL_ON                      0xFF00
-#define MB_COIL_OFF                     0x0000
 #define ucREQUEST_COIL_VALUE_HI         pucRequestFrame[ 4 ]
 #define ucREQUEST_COIL_VALUE_LO         pucRequestFrame[ 5 ]
-#define usREQUEST_COIL_VALUE            ( ( ( uint16_t ) ucREQUEST_COIL_VALUE_HI << 8 ) | ucREQUEST_COIL_VALUE_LO )
+#define usREQUEST_COIL_VALUE            ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
 #define ucREQUEST_REGISTER_VALUE_HI     pucRequestFrame[ 4 ]
 #define ucREQUEST_REGISTER_VALUE_LO     pucRequestFrame[ 5 ]
-#define usREQUEST_REGISTER_VALUE        ( ( ( uint16_t ) ucREQUEST_REGISTER_VALUE_HI << 8 ) | ucREQUEST_REGISTER_VALUE_LO )
+#define usREQUEST_REGISTER_VALUE        ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
 #define ucREQUEST_OUTPUT_VALUE_HI       pucRequestFrame[ 4 ]
 #define ucREQUEST_OUTPUT_VALUE_LO       pucRequestFrame[ 5 ]
-#define usREQUEST_OUTPUT_VALUE          ( ( ( uint16_t ) ucREQUEST_OUTPUT_VALUE_HI << 8 ) | ucREQUEST_OUTPUT_VALUE_LO )
+#define usREQUEST_OUTPUT_VALUE          ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
 #define ucREQUEST_BYTE_COUNT_FC16       pucRequestFrame[ 6 ]
 
-#define MB_CLEAR_COM_EVENT_LOG          0xFF00
 #define ucREQUEST_SUB_FUNCTION_CODE_HI  pucRequestFrame[ 2 ]
 #define ucREQUEST_SUB_FUNCTION_CODE_LO  pucRequestFrame[ 3 ]
-#define usREQUEST_SUB_FUNCTION_CODE     ( ( ( uint16_t ) ucREQUEST_SUB_FUNCTION_CODE_HI << 8 ) | ucREQUEST_SUB_FUNCTION_CODE_LO )
+#define usREQUEST_SUB_FUNCTION_CODE     ( ( ( uint16_t ) pucRequestFrame[ 2 ] << 8 ) | pucRequestFrame[ 3 ] )
 
 #define ucREQUEST_DATA_HI               pucRequestFrame[ 4 ]
 #define ucREQUEST_DATA_LO               pucRequestFrame[ 5 ]
-#define usREQUEST_DATA                  ( ( ( uint16_t ) ucREQUEST_DATA_HI << 8 ) | ucREQUEST_DATA_LO )
+#define usREQUEST_DATA                  ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
 #define ucREQUEST_INPUT_DELIMITER_HI    pucRequestFrame[ 4 ]
 #define ucREQUEST_INPUT_DELIMITER_LO    pucRequestFrame[ 5 ]
-#define usREQUEST_INPUT_DELIMITER       ( ( ( uint16_t ) ucREQUEST_INPUT_DELIMITER_HI << 8 ) | ucREQUEST_INPUT_DELIMITER_LO )
+#define usREQUEST_INPUT_DELIMITER       ( ( ( uint16_t ) pucRequestFrame[ 4 ] << 8 ) | pucRequestFrame[ 5 ] )
 
 #define ucREQUEST_ADDRESS_WRITE_HI      pucRequestFrame[ 6 ]
 #define ucREQUEST_ADDRESS_WRITE_LO      pucRequestFrame[ 7 ]
-#define usREQUEST_ADDRESS_WRITE         ( ( ( uint16_t ) ucREQUEST_ADDRESS_WRITE_HI << 8 ) | ucREQUEST_ADDRESS_WRITE_LO )
+#define usREQUEST_ADDRESS_WRITE         ( ( ( uint16_t ) pucRequestFrame[ 6 ] << 8 ) | pucRequestFrame[ 7 ] )
 
 #define ucREQUEST_QUANTITY_WRITE_HI     pucRequestFrame[ 8 ]
 #define ucREQUEST_QUANTITY_WRITE_LO     pucRequestFrame[ 9 ]
-#define usREQUEST_QUANTITY_WRITE        ( ( ( uint16_t ) ucREQUEST_QUANTITY_WRITE_HI << 8 ) | ucREQUEST_QUANTITY_WRITE_LO )
+#define usREQUEST_QUANTITY_WRITE        ( ( ( uint16_t ) pucRequestFrame[ 8 ] << 8 ) | pucRequestFrame[ 9 ] )
 
 #define ucREQUEST_BYTE_COUNT_FC23       pucRequestFrame[ 10 ]
 
@@ -276,35 +284,35 @@ protected:
 
 #define ucREPLY_ADDRESS_HI              pucReplyFrame[ 2 ]
 #define ucREPLY_ADDRESS_LO              pucReplyFrame[ 3 ]
-#define usREPLY_ADDRESS                 ( ( ( uint16_t ) ucREPLY_ADDRESS_HI << 8 ) | ucREPLY_ADDRESS_LO )
+#define usREPLY_ADDRESS                 ( ( ( uint16_t ) pucReplyFrame[ 2 ] << 8 ) | pucReplyFrame[ 3 ] )
 
 #define ucREPLY_QUANTITY_HI             pucReplyFrame[ 4 ]
 #define ucREPLY_QUANTITY_LO             pucReplyFrame[ 5 ]
-#define usREPLY_QUANTITY                ( ( ( uint16_t ) ucREPLY_QUANTITY_HI << 8 ) | ucREPLY_QUANTITY_LO )
+#define usREPLY_QUANTITY                ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 #define ucREPLY_COIL_VALUE_HI           pucReplyFrame[ 4 ]
 #define ucREPLY_COIL_VALUE_LO           pucReplyFrame[ 5 ]
-#define usREPLY_COIL_VALUE              ( ( ( uint16_t ) ucREPLY_COIL_VALUE_HI << 8 ) | ucREPLY_COIL_VALUE_LO )
+#define usREPLY_COIL_VALUE              ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 #define ucREPLY_REGISTER_VALUE_HI       pucReplyFrame[ 4 ]
 #define ucREPLY_REGISTER_VALUE_LO       pucReplyFrame[ 5 ]
-#define usREPLY_REGISTER_VALUE          ( ( ( uint16_t ) ucREPLY_REGISTER_VALUE_HI << 8 ) | ucREPLY_REGISTER_VALUE_LO )
+#define usREPLY_REGISTER_VALUE          ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 #define ucREPLY_OUTPUT_VALUE_HI         pucReplyFrame[ 4 ]
 #define ucREPLY_OUTPUT_VALUE_LO         pucReplyFrame[ 5 ]
-#define usREPLY_OUTPUT_VALUE            ( ( ( uint16_t ) ucREPLY_OUTPUT_VALUE_HI << 8 ) | ucREPLY_OUTPUT_VALUE_LO )
+#define usREPLY_OUTPUT_VALUE            ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 #define ucREPLY_SUB_FUNCTION_CODE_HI    pucReplyFrame[ 2 ]
 #define ucREPLY_SUB_FUNCTION_CODE_LO    pucReplyFrame[ 3 ]
-#define usREPLY_SUB_FUNCTION_CODE       ( ( ( uint16_t ) ucREPLY_SUB_FUNCTION_CODE_HI << 8 ) | ucREPLY_SUB_FUNCTION_CODE_LO )
+#define usREPLY_SUB_FUNCTION_CODE       ( ( ( uint16_t ) pucReplyFrame[ 2 ] << 8 ) | pucReplyFrame[ 3 ] )
 
 #define ucREPLY_DATA_HI                 pucReplyFrame[ 4 ]
 #define ucREPLY_DATA_LO                 pucReplyFrame[ 5 ]
-#define usREPLY_DATA                    ( ( ( uint16_t ) ucREPLY_DATA_HI << 8 ) | ucREPLY_DATA_LO )
+#define usREPLY_DATA                    ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 #define ucREPLY_INPUT_DELIMITER_HI      pucReplyFrame[ 4 ]
 #define ucREPLY_INPUT_DELIMITER_LO      pucReplyFrame[ 5 ]
-#define usREPLY_INPUT_DELIMITER         ( ( ( uint16_t ) ucREPLY_INPUT_DELIMITER_HI << 8 ) | ucREPLY_INPUT_DELIMITER_LO )
+#define usREPLY_INPUT_DELIMITER         ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
 /*-----------------------------------------------------------*/
 
