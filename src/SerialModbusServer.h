@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusServer.h
+/*
+ * FILE:        SerialModbusServer.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,7 +17,7 @@
 #ifndef __SERIAL_MODBUS_SERVER_H__
 #define __SERIAL_MODBUS_SERVER_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include <string.h>
@@ -31,7 +31,7 @@
     #include <SoftwareSerial.h>
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_ServerState_e
 {
@@ -44,7 +44,7 @@ enum MB_ServerState_e
 
 typedef enum MB_ServerState_e MB_ServerState_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_Access_e
 {
@@ -56,7 +56,7 @@ enum MB_Access_e
 
 typedef enum MB_Access_e MB_Access_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 struct MB_Register_s
 {
@@ -78,7 +78,7 @@ typedef struct MB_Register_s MB_Register_t;
     #define MB_REGISTER_MAP_END { MB_NA, 0xFFFF, NULL, 0, NULL }
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 class SerialModbusServer : public SerialModbusBase
 {
@@ -151,7 +151,7 @@ private:
     bool bRegisterMapLock_sAPI;
     bool bRegisterMapLock;
 };
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if( configMB_FC08 == 1 )
 
@@ -208,6 +208,6 @@ private:
     #define vIncCPT8()
 
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_SERVER_H__ */

@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusClient.cpp
+/*
+ * FILE:        SerialModbusClient.cpp
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -25,7 +25,7 @@
 
 #include <Arduino.h>
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 SerialModbusClient::SerialModbusClient()
 {
@@ -44,49 +44,49 @@ SerialModbusClient::SerialModbusClient()
 
     xStatusSimpleAPI = MB_OK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vSetState( MB_ClientState_t xStatePar )
 {
     xState = xStatePar;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vStartTurnaroundDelay( void )
 {
     ulTimerTurnaroundDelayMs = millis();
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vStartResponseTimeout( void )
 {
     ulTimerResponseTimeoutMs = millis();
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusClient::bTimeoutTurnaroundDelay( void )
 {
     return ( millis() - ulTimerTurnaroundDelayMs ) >= ulTurnaroundDelayMs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusClient::bTimeoutResponseTimeout( void )
 {
     return ( millis() - ulTimerResponseTimeoutMs ) >= ulResponseTimeoutMs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusClient::getResponseTimeout( void )
 {
     return ulResponseTimeoutMs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusClient::getTurnaroundDelay( void )
 {
     return ulTurnaroundDelayMs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusClient::setResponseTimeout( uint32_t timeMs )
 {
@@ -98,7 +98,7 @@ bool SerialModbusClient::setResponseTimeout( uint32_t timeMs )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
 {
@@ -110,14 +110,14 @@ bool SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::setRequestMap( const MB_Request_t * requestMap )
 {
     pxRequestMap = requestMap;
     xRequestMapIndex = 0;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusClient::xProcessRequestMap( void )
 {
@@ -137,7 +137,7 @@ MB_Status_t SerialModbusClient::xProcessRequestMap( void )
 
     return MB_OK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool requestMap )
 {
@@ -352,7 +352,7 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool r
 
     return xSetChecksum( pucRequestFrame, &xRequestLength );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusClient::process( void )
 {
@@ -374,7 +374,7 @@ MB_Status_t SerialModbusClient::process( void )
         /* Get the current state and select the associated action. */
         switch( xState )
         {
-            case CLIENT_IDLE :
+            case CLIENT_IDLE : /*---------------------------------------------*/
             {
                 vClearReplyFrame();
 
@@ -412,7 +412,7 @@ MB_Status_t SerialModbusClient::process( void )
                 break;
             }
 
-            case WAITING_TURNAROUND_DELAY :
+            case WAITING_TURNAROUND_DELAY : /*--------------------------------*/
             {
                 /* Check if the Turnaround Delay has elapsed. */
                 if( bTimeoutTurnaroundDelay() == true )
@@ -425,7 +425,7 @@ MB_Status_t SerialModbusClient::process( void )
                 break;
             }
 
-            case WAITING_FOR_REPLY :
+            case WAITING_FOR_REPLY : /*---------------------------------------*/
             {
                 if( xReplyLength < configMB_FRAME_LEN_MAX )
                 {
@@ -524,7 +524,7 @@ MB_Status_t SerialModbusClient::process( void )
                 break;
             }
 
-            case PROCESSING_REPLY :
+            case PROCESSING_REPLY : /*----------------------------------------*/
             {
                 switch( ucREPLY_FUNCTION_CODE )
                 {
@@ -589,7 +589,7 @@ MB_Status_t SerialModbusClient::process( void )
                 break;
             }
 
-            case PROCESSING_ERROR :
+            case PROCESSING_ERROR : /*----------------------------------------*/
             {
                 vClearRequestFrame();
                 vClearReplyFrame();
@@ -622,7 +622,7 @@ MB_Status_t SerialModbusClient::process( void )
 
     return xStatus;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vHandlerFC03_04( void )
 {
@@ -652,7 +652,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
         vSetState( PROCESSING_ERROR );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vHandlerFC05( void )
 {
@@ -679,7 +679,7 @@ void SerialModbusClient::vHandlerFC05( void )
         vSetState( PROCESSING_ERROR );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vHandlerFC06( void )
 {
@@ -706,7 +706,7 @@ void SerialModbusClient::vHandlerFC06( void )
         vSetState( PROCESSING_ERROR );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vHandlerFC08( void )
 {
@@ -839,7 +839,7 @@ void SerialModbusClient::vHandlerFC08( void )
         vSetState( PROCESSING_ERROR );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusClient::vHandlerFC16( void )
 {
@@ -866,7 +866,7 @@ void SerialModbusClient::vHandlerFC16( void )
         vSetState( PROCESSING_ERROR );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
 {
@@ -888,37 +888,37 @@ int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint1
 
     return -1;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
     return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, 0x0000 );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
     return sendRequest( id, FC_READ_INPUT_REGISTERS, address, 0x0000 );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
 {
     return sendRequest( id, FC_WRITE_SINGLE_COIL, address, data );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
 {
     return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, data );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusClient::getLastException( void )
 {
     return xStatusSimpleAPI;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 const char * SerialModbusClient::getLastExceptionString( void )
 {

@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusConfig.h
+/*
+ * FILE:        SerialModbusConfig.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,11 +17,11 @@
 #ifndef __SERIAL_MODBUS_CONFIG_H__
 #define __SERIAL_MODBUS_CONFIG_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <Arduino.h>
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define configMB_MODE_RTU               1
 #define configMB_MODE_ASCII             2
@@ -34,7 +34,7 @@
  * source code (8 data bits, no parity, 1 stop bit). */ 
 #define configMB_SERIAL_CONF_DEFAULT    SERIAL_8N1
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define configMB_ID_BROADCAST           0
 #define configMB_ID_SERVER_MAX          247
@@ -44,7 +44,7 @@
 #define configMB_TURNAROUND_DELAY_MS    200
 #define configMB_RESPONSE_TIMEOUT_MS    1000
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define configMB_PROCESS_LOOP_HOOK      1
 
@@ -53,7 +53,7 @@
 #define configMB_SERVER_MULTI_ID        0
 #define configMB_ID_COUNT_MAX           8
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define N 0 /* Not implemented */
 
@@ -102,7 +102,7 @@
 
 #undef N /* Not implemented */
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if( ( configMB_SERVER_MULTI_ID == 1 ) && ( configMB_FC08 == 1 ) )
     #warning Diagnostics (function code 8) does not work correctly when multi ID support is used!
@@ -112,6 +112,6 @@
     #warning Sub-function code 1 is needed to deactivate Listen Only Mode (sub-function code 4)!
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_CONFIG_H__ */

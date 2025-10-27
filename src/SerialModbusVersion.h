@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusVersion.h
+/*
+ * FILE:        SerialModbusVersion.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,11 +17,11 @@
 #ifndef __SERIAL_MODBUS_VERSION_H__
 #define __SERIAL_MODBUS_VERSION_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <stdint.h>
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_MAJOR      1
 #define SERIALMODBUS_VERSION_MINOR      0
@@ -37,7 +37,7 @@
                                           ( ( uint32_t ) SERIALMODBUS_VERSION_MINOR <<  8 ) |   \
                                             ( uint32_t ) SERIALMODBUS_VERSION_PATCH           )
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_EQ( major, minor, patch )  \
 (                                                           \
@@ -45,13 +45,13 @@
     ( SERIALMODBUS_VERSION_MINOR == ( minor ) ) &&          \
     ( SERIALMODBUS_VERSION_PATCH == ( patch ) )             \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_NE( major, minor, patch )          \
 (                                                                   \
     !SERIALMODBUS_VERSION_CHK_EQ( ( major ), ( minor ), ( patch ) ) \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_LT( major, minor, patch )  \
 (                                                           \
@@ -70,7 +70,7 @@
         ( SERIALMODBUS_VERSION_PATCH <  ( patch ) )         \
     )                                                       \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_GT( major, minor, patch )  \
 (                                                           \
@@ -89,20 +89,20 @@
         ( SERIALMODBUS_VERSION_PATCH >  ( patch ) )         \
     )                                                       \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_LTOE( major, minor, patch )            \
 (                                                                       \
     SERIALMODBUS_VERSION_CHK_LT( ( major ), ( minor ), ( patch ) ) ||   \
     SERIALMODBUS_VERSION_CHK_EQ( ( major ), ( minor ), ( patch ) )      \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define SERIALMODBUS_VERSION_CHK_GTOE( major, minor, patch )            \
 (                                                                       \
     SERIALMODBUS_VERSION_CHK_GT( ( major ), ( minor ), ( patch ) ) ||   \
     SERIALMODBUS_VERSION_CHK_EQ( ( major ), ( minor ), ( patch ) )      \
 )
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_VERSION_H__ */

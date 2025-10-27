@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusClient.h
+/*
+ * FILE:        SerialModbusClient.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,7 +17,7 @@
 #ifndef __SERIAL_MODBUS_CLIENT_H__
 #define __SERIAL_MODBUS_CLIENT_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include <string.h>
@@ -27,7 +27,7 @@
 
 #include <Arduino.h>
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_ClientState_e
 {
@@ -40,7 +40,7 @@ enum MB_ClientState_e
 
 typedef enum MB_ClientState_e MB_ClientState_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 struct MB_Request_s
 {
@@ -56,7 +56,7 @@ typedef struct MB_Request_s MB_Request_t;
 
 #define MB_REQUEST_MAP_END { 0xFF, 0x00, 0xFFFF, NULL, 0, NULL }
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 class SerialModbusClient : public SerialModbusBase
 {
@@ -105,6 +105,6 @@ private:
     void vHandlerFC16( void );
     MB_Status_t xStatusSimpleAPI;
 };
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_CLIENT_H__ */

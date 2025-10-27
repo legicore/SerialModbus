@@ -1,16 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusBase.cpp
+/*
+ * FILE:        SerialModbusBase.cpp
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
- *              @see https://opensource.org/licenses/MIT.
+ *              https://opensource.org/licenses/MIT.
  */
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,15 +27,17 @@
     #include <SoftwareSerial.h>
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 struct MB_ExceptionString_s
 {
     MB_Exception_t xException;
-    const char * pcExceptionString;
+    const char * pcString;
 };
 
 typedef struct MB_ExceptionString_s MB_ExceptionString_t;
+
+/*----------------------------------------------------------------------------*/
 
 static const MB_ExceptionString_t pxExceptionStrings[] = {
 
@@ -85,7 +87,7 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     /* Marks the end of the list. */
     { ( MB_Exception_t ) 0xFF, NULL }
 };
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 SerialModbusBase::SerialModbusBase()
 {
@@ -126,7 +128,7 @@ SerialModbusBase::SerialModbusBase()
     }
     #endif
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t config )
 {
@@ -149,7 +151,7 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
 
     return true;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if defined( configMB_SERIAL_SW )
 
@@ -176,7 +178,7 @@ bool SerialModbusBase::begin( uint32_t baud, MB_Serial_t * serial, uint32_t conf
     }
 
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrameLength )
 {
@@ -206,7 +208,7 @@ MB_Status_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrame
 
     return MB_NOK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameLength )
 {
@@ -240,7 +242,7 @@ MB_Status_t SerialModbusBase::xCheckChecksum( uint8_t * pucFrame, size_t xFrameL
 
     return MB_NOK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
 {
@@ -266,7 +268,7 @@ uint16_t SerialModbusBase::usCRC16( uint8_t * pucData, size_t xDataLength )
 
     return usCrc;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 {
@@ -279,25 +281,25 @@ uint8_t SerialModbusBase::ucLRC( uint8_t * pucData, size_t xDataLength )
 
     return ( uint8_t ) ( -( ( int8_t ) ucLrc ) );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucByteToAsciiHi( uint8_t ucByte )
 {
     return ( ucByte >> 4 ) + ( ( ( ucByte >> 4 ) < 10 ) ? 48 : 55 );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucByteToAsciiLo( uint8_t ucByte )
 {
     return ( ucByte & 0x0F ) + ( ( ( ucByte & 0x0F ) < 10 ) ? 48 : 55 );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucAsciiToByte( uint8_t ucAsciiHi, uint8_t ucAsciiLo )
 {
     return ( ( ucAsciiHi - ( ( ucAsciiHi < 64 ) ? 48 : 55 ) ) << 4 ) | ( ucAsciiLo - ( ( ucAsciiLo < 64 ) ? 48 : 55 ) );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameLength )
 {
@@ -321,7 +323,7 @@ MB_Status_t SerialModbusBase::xRtuToAscii( uint8_t * pucFrame, size_t * pxFrameL
 
     return MB_OK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameLength )
 {
@@ -339,21 +341,21 @@ MB_Status_t SerialModbusBase::xAsciiToRtu( uint8_t * pucFrame, size_t * pxFrameL
 
     return MB_OK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::vClearReplyFrame( void )
 {
     // ( void ) memset( pucReplyFrame, 0x00, xReplyLength );
     xReplyLength = 0;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::vClearRequestFrame( void )
 {
     // ( void ) memset( pucRequestFrame, 0x00, xRequestLength );
     xRequestLength = 0;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) )
 {
@@ -370,55 +372,55 @@ bool SerialModbusBase::setSerialCtrl( void (* serialCtrlTx)( void ), void (* ser
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucRequestByte( size_t xNbr, size_t xOffset )
 {
     return pucRequestFrame[ xNbr + xOffset ];
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint16_t SerialModbusBase::usRequestWord( size_t xNbr, size_t xOffset )
 {
     return ( ( uint16_t ) ucRequestByte( xNbr, xOffset + xNbr ) << 8 ) | ucRequestByte( xNbr + 1, xOffset + xNbr );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusBase::ulRequestDword( size_t xNbr, size_t xOffset )
 {
     return ( ( uint32_t ) usRequestWord( xNbr, xOffset ) << 16 ) | usRequestWord( xNbr + 2, xOffset );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint64_t SerialModbusBase::uxRequestQword( size_t xNbr, size_t xOffset )
 {
     return ( ( uint64_t ) ulRequestDword( xNbr, xOffset ) << 32 ) | ulRequestDword( xNbr + 4, xOffset );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint8_t SerialModbusBase::ucReplyByte( size_t xNbr, size_t xOffset )
 {
     return pucReplyFrame[ xNbr + xOffset ];
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint16_t SerialModbusBase::usReplyWord( size_t xNbr, size_t xOffset )
 {
     return ( ( uint16_t ) ucReplyByte( xNbr, xOffset + xNbr ) << 8 ) | ucReplyByte( xNbr + 1, xOffset + xNbr );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusBase::ulReplyDword( size_t xNbr, size_t xOffset )
 {
     return ( ( uint32_t ) usReplyWord( xNbr, xOffset ) << 16 ) | usReplyWord( xNbr + 2, xOffset );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 {
     return ( ( uint64_t ) ulReplyDword( xNbr, xOffset ) << 32 ) | ulReplyDword( xNbr + 4, xOffset );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if( configMB_PROCESS_LOOP_HOOK == 1 )
 
@@ -430,50 +432,50 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
     }
 
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusBase::xSetException( MB_Exception_t xException )
 {
     xStatus = xException;
     return xStatus;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::vStartInterFrameDelay( void )
 {
     ulTimerInterFrameDelayUs = micros();
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::vStartInterCharacterTimeout( void )
 {
     ulTimerInterCharacterTimeoutUs = micros();
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::bTimeoutInterFrameDelay( void )
 {
     return ( micros() - ulTimerInterFrameDelayUs ) >= ulInterFrameDelayUs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::bTimeoutInterCharacterTimeout( void )
 {
     return ( micros() - ulTimerInterCharacterTimeoutUs ) >= ulInterCharacterTimeoutUs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusBase::getInterCharacterTimeout( void )
 {
     return ulInterCharacterTimeoutUs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint32_t SerialModbusBase::getInterFrameDelay( void )
 {
     return ulInterFrameDelayUs;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
 {
@@ -485,7 +487,7 @@ bool SerialModbusBase::setInterCharacterTimeout( uint32_t timeUs )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
 {
@@ -497,7 +499,7 @@ bool SerialModbusBase::setInterFrameDelay( uint32_t timeUs )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength )
 {
@@ -527,7 +529,7 @@ bool SerialModbusBase::bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBuff
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLength )
 {
@@ -567,7 +569,7 @@ size_t SerialModbusBase::xSendData( uint8_t * pucSendBuffer, size_t pxBufferLeng
 
     return xBytesSent;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
 {
@@ -681,7 +683,7 @@ bool SerialModbusBase::bCalculateTimeouts( uint32_t ulBaud, uint32_t ulConfig )
 
     return true;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
 {
@@ -694,7 +696,7 @@ void SerialModbusBase::vDelayUs( uint32_t ulDelayUs )
         ( vCustomDelayUs )( ulDelayUs );
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusBase::setCustomDelay( void (* customDelay)( uint32_t delayUs ) )
 {
@@ -703,15 +705,15 @@ void SerialModbusBase::setCustomDelay( void (* customDelay)( uint32_t delayUs ) 
         vCustomDelayUs = customDelay;
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 const char * SerialModbusBase::getExceptionString( MB_Exception_t exception )
 {
-    for( size_t i = 0; pxExceptionStrings[ i ].pcExceptionString != NULL; i++ )
+    for( size_t i = 0; pxExceptionStrings[ i ].pcString != NULL; i++ )
     {
         if( pxExceptionStrings[ i ].xException == exception )
         {
-            return pxExceptionStrings[ i ].pcExceptionString;
+            return pxExceptionStrings[ i ].pcString;
         }
     }
 

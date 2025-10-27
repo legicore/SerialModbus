@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusBase.h
+/*
+ * FILE:        SerialModbusBase.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,7 +17,7 @@
 #ifndef __SERIAL_MODBUS_BASE_H__
 #define __SERIAL_MODBUS_BASE_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include <string.h>
@@ -31,7 +31,7 @@
     #include <SoftwareSerial.h>
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_FunctionCode_e
 {
@@ -64,7 +64,7 @@ enum MB_FunctionCode_e
 
 typedef enum MB_FunctionCode_e MB_FunctionCode_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_SubFunctionCode_e
 {
@@ -87,7 +87,7 @@ enum MB_SubFunctionCode_e
 
 typedef enum MB_SubFunctionCode_e MB_SubFunctionCode_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 enum MB_Status_e
 {
@@ -138,20 +138,20 @@ enum MB_Status_e
 typedef enum MB_Status_e MB_Status_t;
 typedef enum MB_Status_e MB_Exception_t;
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define MB_COIL_ON              0xFF00
 #define MB_COIL_OFF             0x0000
 
 #define MB_CLEAR_COM_EVENT_LOG  0xFF00
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 typedef configMB_SERIAL MB_Serial_t;
 #if defined( configMB_SERIAL_SW )
     typedef configMB_SERIAL_SW MB_SWSerial_t;
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 class SerialModbusBase
 {
@@ -225,7 +225,7 @@ protected:
     char cAsciiInputDelimiter;
     size_t xChecksumLength;
 };
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define ucREQUEST_ID                    pucRequestFrame[ 0 ]
 #define ucREQUEST_FUNCTION_CODE         pucRequestFrame[ 1 ]
@@ -275,7 +275,7 @@ protected:
 
 #define ucREQUEST_BYTE_COUNT_FC23       pucRequestFrame[ 10 ]
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #define ucREPLY_ID                      pucReplyFrame[ 0 ]
 #define ucREPLY_FUNCTION_CODE           pucReplyFrame[ 1 ]
@@ -314,6 +314,6 @@ protected:
 #define ucREPLY_INPUT_DELIMITER_LO      pucReplyFrame[ 5 ]
 #define usREPLY_INPUT_DELIMITER         ( ( ( uint16_t ) pucReplyFrame[ 4 ] << 8 ) | pucReplyFrame[ 5 ] )
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_BASE_H__ */

@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusCompat.h
+/*
+ * FILE:        SerialModbusCompat.h
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -17,11 +17,11 @@
 #ifndef __SERIAL_MODBUS_COMPAT_H__
 #define __SERIAL_MODBUS_COMPAT_H__
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #include <Arduino.h>
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 /* Check if the architecture of the currently selected borad is supported. */
 #if defined( ARDUINO_ARCH_AVR ) || \
@@ -85,6 +85,6 @@
 
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #endif /* __SERIAL_MODBUS_COMPAT_H__ */

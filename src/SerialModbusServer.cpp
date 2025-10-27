@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * @file        SerialModbusServer.cpp
+/*
+ * FILE:        SerialModbusServer.cpp
  * 
- * @author      Martin Legleiter
+ * AUTHOR:      Martin Legleiter
  * 
- * @brief       TODO
+ * BRIEF:       TODO
  * 
- * @copyright   (c) 2024 Martin Legleiter
+ * COPYRIGHT:   (C) 2025 Martin Legleiter
  * 
- * @license     Use of this source code is governed by an MIT-style
+ * LICENCE:     Use of this source code is governed by an MIT-style
  *              license that can be found in the LICENSE file or at
  *              @see https://opensource.org/licenses/MIT.
  */
@@ -29,7 +29,7 @@
     #include <SoftwareSerial.h>
 #endif
 
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 struct MB_AccessRights_s
 {
@@ -106,7 +106,7 @@ static const MB_AccessRights_t pxAccessRights[] = {
     /* Marks the end of the list. */
     { MB_NA, 0b000000 }
 };
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 SerialModbusServer::SerialModbusServer()
 {
@@ -137,7 +137,7 @@ SerialModbusServer::SerialModbusServer()
     bRegisterMapLock_sAPI = false;
     bRegisterMapLock = false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial, uint32_t config )
 {
@@ -156,7 +156,7 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial,
 
     return SerialModbusBase::begin( baud, serial, config );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if defined( configMB_SERIAL_SW )
 
@@ -179,13 +179,13 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial,
     }
 
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vSetState( MB_ServerState_t xStatePar )
 {
     xState = xStatePar;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::setRegisterMap( MB_Register_t * registerMap )
 {
@@ -200,7 +200,7 @@ bool SerialModbusServer::setRegisterMap( MB_Register_t * registerMap )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusServer::checkRegisterMap( void )
 {
@@ -242,7 +242,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
 
     return MB_NOK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 #if( configMB_SERVER_MULTI_ID == 1 )
     
@@ -270,7 +270,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
     }
 
 #endif
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::bCheckId( uint8_t ucId )
 {
@@ -296,7 +296,7 @@ bool SerialModbusServer::bCheckId( uint8_t ucId )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusServer::process( void )
 {
@@ -630,7 +630,7 @@ MB_Status_t SerialModbusServer::process( void )
 
     return xStatus;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
 {
@@ -719,7 +719,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
 
     return MB_NOK;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vHandlerFC03_04( void )
 {
@@ -765,7 +765,7 @@ void SerialModbusServer::vHandlerFC03_04( void )
     }
     #endif
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vHandlerFC05( void )
 {
@@ -799,7 +799,7 @@ void SerialModbusServer::vHandlerFC05( void )
     }
     #endif
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vHandlerFC06( void )
 {
@@ -820,7 +820,7 @@ void SerialModbusServer::vHandlerFC06( void )
         ( pxRegisterMap[ xRegisterMapIndex ].callback )();
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vHandlerFC08( void )
 {
@@ -1128,7 +1128,7 @@ void SerialModbusServer::vHandlerFC08( void )
         }
     }
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vClearDiagnosticCounters( void )
 {
@@ -1141,13 +1141,13 @@ void SerialModbusServer::vClearDiagnosticCounters( void )
     usServerBusyCount            = 0;
     usBusCharacterOverrunCount   = 0;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 uint16_t SerialModbusServer::diagRegGet( void )
 {
     return usDiagnosticRegister;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::diagRegGet( size_t bit )
 {
@@ -1161,7 +1161,7 @@ bool SerialModbusServer::diagRegGet( size_t bit )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::diagRegSet( size_t bit )
 {
@@ -1173,7 +1173,7 @@ bool SerialModbusServer::diagRegSet( size_t bit )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::diagRegClear( size_t bit )
 {
@@ -1185,13 +1185,13 @@ bool SerialModbusServer::diagRegClear( size_t bit )
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::diagRegClear( void )
 {
     usDiagnosticRegister = 0x0000;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 void SerialModbusServer::vHandlerFC16( void )
 {
@@ -1242,7 +1242,7 @@ void SerialModbusServer::vHandlerFC16( void )
     }
     #endif
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, uint8_t id )
 {
@@ -1300,25 +1300,25 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( MB_RW, address, dataSize, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::createInputResgisters( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( MB_RD, address, dataSize, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( MB_RW, address, dataSize, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 {
@@ -1346,7 +1346,7 @@ int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 
     return ( int32_t ) -1;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t id )
 {
@@ -1375,43 +1375,43 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
 
     return false;
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusServer::getCoil( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusServer::getInputResgister( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 int32_t SerialModbusServer::getHoldingRegister( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::setCoil( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::setInputResgister( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
-/*-----------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 bool SerialModbusServer::bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry )
 {
