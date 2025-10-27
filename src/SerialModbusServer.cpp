@@ -209,12 +209,20 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
 
     if( pxRegisterMap != NULL )
     {
-        /* Count the number of entries in the register map. */
-        while( pxRegisterMap[ ++a ].data != NULL );
+        /* Count the number of entries in the register map and make sure that
+         * the data field is defined correctly. */
+        while( pxRegisterMap[ a ].dataSize != 0 )
+        {
+            if( pxRegisterMap[ a++ ].data == NULL )
+            {
+                return MB_NOK;
+            }
+        }
+
         if( a == 1 )
         {
             /* If there is only one entry in the register map, there is no need
-             * to perform a check. */
+             * to perform a overlap check. */
             return MB_OK;
         }
         else if( a > 1 )
@@ -226,9 +234,9 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
                     if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
                     {
                         /* Simplified representation of the algorithm :
-                         * ( a[ n-1 ] < b[ 0 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) */
-                        if( !( ( ( pxRegisterMap[ a ].address + ( uint16_t ) pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
-                            ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + ( uint16_t ) pxRegisterMap[ b ].dataSize - 1 ) ) ) )
+                         * ( a[ n-1 ] < b[ 0 ] ) NOR ( b[ n-1 ] < a[ 0 ] ) */
+                        if( !( ( ( pxRegisterMap[ a ].address + pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
+                               ( ( pxRegisterMap[ b ].address + pxRegisterMap[ b ].dataSize - 1 ) < pxRegisterMap[ a ].address ) ) )
                         {
                             return MB_NOK;
                         }
