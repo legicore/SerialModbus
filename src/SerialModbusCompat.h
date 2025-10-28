@@ -27,7 +27,8 @@
 #if defined( ARDUINO_ARCH_AVR ) || \
     defined( ARDUINO_ARCH_MEGAAVR ) || \
     defined( ARDUINO_ARCH_SAMD ) || \
-    defined( ARDUINO_ARCH_RENESAS )
+    defined( ARDUINO_ARCH_RENESAS ) || \
+    defined( ARDUINO_ARCH_ESP32 )
 
     /* Check the type of the currently selected board and set the needed
      * parameters if it is supported. */
@@ -58,6 +59,12 @@
         #define configMB_SERIAL_SW      SoftwareSerial
 
         #define SERIAL_PORT_HARDWARE    Serial1
+
+    #elif defined( ARDUINO_ARCH_ESP32 )
+
+        #define configMB_SERIAL         HardwareSerial
+
+        #define SERIAL_PORT_HARDWARE    Serial0
 
     #else
 
