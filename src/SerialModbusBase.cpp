@@ -68,6 +68,9 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     { MB_ILLEGAL_QUERY_DATA,                        "ILLEGAL_QUERY_DATA" },
     { MB_ILLEGAL_SUB_FUNCTION,                      "ILLEGAL_SUB_FUNCTION" },
     { MB_ILLEGAL_REPLY_SUB_FUNCTION,                "ILLEGAL_REPLY_SUB_FUNCTION" },
+    { MB_SERVER_REG_DATA,                           "MB_SERVER_REG_DATA" },
+    { MB_SERVER_REG_DATA_SIZE,                      "MB_SERVER_REG_DATA_SIZE" },
+    { MB_SERVER_REG_OVERLAP,                        "MB_SERVER_REG_OVERLAP" },
 
 #if( configMB_EXT_EXCEPTION_CODES == 1 )
 

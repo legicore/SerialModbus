@@ -213,10 +213,17 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
          * the data field is defined correctly. */
         while( pxRegisterMap[ a ].dataSize != 0 )
         {
-            if( pxRegisterMap[ a++ ].data == NULL )
+            if( pxRegisterMap[ a ].data == NULL )
             {
-                return MB_NOK;
+                return MB_SERVER_REG_DATA;
             }
+
+            if( pxRegisterMap[ a ].dataSize == 0 )
+            {
+                return MB_SERVER_REG_DATA_SIZE;
+            }
+
+            a++;
         }
 
         if( a == 1 )
@@ -234,11 +241,11 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
                     if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
                     {
                         /* Simplified representation of the algorithm :
-                         * ( a[ n-1 ] < b[ 0 ] ) NOR ( b[ n-1 ] < a[ 0 ] ) */
-                        if( !( ( ( pxRegisterMap[ a ].address + pxRegisterMap[ a ].dataSize - 1 ) < pxRegisterMap[ b ].address ) ||
-                               ( ( pxRegisterMap[ b ].address + pxRegisterMap[ b ].dataSize - 1 ) < pxRegisterMap[ a ].address ) ) )
+                         * ( b[ 0 ] > a[ n-1 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) */
+                        if( !( ( pxRegisterMap[ b ].address > ( pxRegisterMap[ a ].address + pxRegisterMap[ a ].dataSize - 1 ) ) ||
+                               ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + pxRegisterMap[ b ].dataSize - 1 ) ) ) )
                         {
-                            return MB_NOK;
+                            return MB_SERVER_REG_OVERLAP;
                         }
                     }
                 }
@@ -667,7 +674,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
 
     /* Scan the register map and check if the request address value lies in the
      * range of one of the mapped register entries. */
-    for( ; pxRegisterMap[ xRegisterMapIndex ].data != NULL; xRegisterMapIndex++ )
+    for( ; pxRegisterMap[ xRegisterMapIndex ].dataSize != 0; xRegisterMapIndex++ )
     {
 #if( configMB_SERVER_MULTI_ID == 1 )
         if( pxRegisterMap[ xRegisterMapIndex ].id == ucServerId )
@@ -1334,7 +1341,7 @@ int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 
     if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
+        for( size_t i = 0; pxRegisterMap[ i ].dataSize != 0; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )
@@ -1362,7 +1369,7 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
 
     if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
+        for( size_t i = 0; pxRegisterMap[ i ].dataSize != 0; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )

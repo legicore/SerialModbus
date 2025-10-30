@@ -118,6 +118,9 @@ enum MB_Status_e
     MB_ILLEGAL_QUERY_DATA                       = 0x1B,
     MB_ILLEGAL_SUB_FUNCTION                     = 0x1C,
     MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x1D,
+    MB_SERVER_REG_DATA                          = 0x1E,
+    MB_SERVER_REG_DATA_SIZE                     = 0x1F,
+    MB_SERVER_REG_OVERLAP                       = 0x20,
 
 #if( configMB_EXT_EXCEPTION_CODES == 1 )
 
