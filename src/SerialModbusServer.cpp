@@ -205,7 +205,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
     {
         /* Count the number of entries in the register map and make sure that
          * the data field is defined correctly. */
-        while( pxRegisterMap[ a ].dataSize != 0 )
+        while( IS_REGISTER_MAP_END( pxRegisterMap[ a ] ) != true )
         {
             if( pxRegisterMap[ a ].data == NULL )
             {
@@ -259,7 +259,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
     {
         bool bIdFound = false;
 
-        for( size_t i = 0; pxRegisterMap[ i ].data != NULL; i++ )
+        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
         {
             for( size_t j = 0; j < xIdCount; j++ )
             {
@@ -668,7 +668,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
 
     /* Scan the register map and check if the request address value lies in the
      * range of one of the mapped register entries. */
-    for( ; pxRegisterMap[ xRegisterMapIndex ].dataSize != 0; xRegisterMapIndex++ )
+    for( ; IS_REGISTER_MAP_END( pxRegisterMap[ xRegisterMapIndex ] ) != true; xRegisterMapIndex++ )
     {
 #if( configMB_SERVER_MULTI_ID == 1 )
         if( pxRegisterMap[ xRegisterMapIndex ].id == ucServerId )
@@ -1333,7 +1333,7 @@ int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 
     if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].dataSize != 0; i++ )
+        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )
@@ -1361,7 +1361,7 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
 
     if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) )
     {
-        for( size_t i = 0; pxRegisterMap[ i ].dataSize != 0; i++ )
+        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
             if( id == pxRegisterMap[ i ].id )

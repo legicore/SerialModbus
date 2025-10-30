@@ -72,10 +72,43 @@ struct MB_Register_s
 
 typedef struct MB_Register_s MB_Register_t;
 
-#if( configMB_SERVER_MULTI_ID == 1 )
-    #define MB_REGISTER_MAP_END { 0xFF, MB_NA, 0xFFFF, NULL, 0, NULL }
+#define REG_MAP_END_ID          0xFF
+#define REG_MAP_END_ACCESS      MB_NA
+#define REG_MAP_END_ADDRESS     0xFFFF
+#define REG_MAP_END_DATA        NULL
+#define REG_MAP_END_DATA_SIZE   0
+#define REG_MAP_END_CALLBACK    NULL
+
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    #define MB_REGISTER_MAP_END     { REG_MAP_END_ACCESS,    \
+                                      REG_MAP_END_ADDRESS,   \
+                                      REG_MAP_END_DATA,      \
+                                      REG_MAP_END_DATA_SIZE, \
+                                      REG_MAP_END_CALLBACK }
+
+    #define IS_REGISTER_MAP_END( ENTRY )    ( ( ( ENTRY ).access   == REG_MAP_END_ACCESS    ) && \
+                                              ( ( ENTRY ).address  == REG_MAP_END_ADDRESS   ) && \
+                                              ( ( ENTRY ).data     == REG_MAP_END_DATA      ) && \
+                                              ( ( ENTRY ).dataSize == REG_MAP_END_DATA_SIZE ) && \
+                                              ( ( ENTRY ).callback == REG_MAP_END_CALLBACK  ) )
+
 #else
-    #define MB_REGISTER_MAP_END { MB_NA, 0xFFFF, NULL, 0, NULL }
+
+    #define MB_REGISTER_MAP_END     { REG_MAP_END_ID,        \
+                                      REG_MAP_END_ACCESS,    \
+                                      REG_MAP_END_ADDRESS,   \
+                                      REG_MAP_END_DATA,      \
+                                      REG_MAP_END_DATA_SIZE, \
+                                      REG_MAP_END_CALLBACK }
+
+    #define IS_REGISTER_MAP_END( ENTRY )    ( ( ( ENTRY ).id       == REG_MAP_END_ID        ) && \
+                                              ( ( ENTRY ).access   == REG_MAP_END_ACCESS    ) && \
+                                              ( ( ENTRY ).address  == REG_MAP_END_ADDRESS   ) && \
+                                              ( ( ENTRY ).data     == REG_MAP_END_DATA      ) && \
+                                              ( ( ENTRY ).dataSize == REG_MAP_END_DATA_SIZE ) && \
+                                              ( ( ENTRY ).callback == REG_MAP_END_CALLBACK  ) )
+
 #endif
 
 /*----------------------------------------------------------------------------*/
