@@ -43,64 +43,64 @@ static const MB_AccessRights_t pxAccessRights[] = {
 
     /* Bit Data Access */
 #if( configMB_FC01 == 1 )
-    { MB_RD, FC_READ_COILS },
+    { MB_RO, FC_READ_COILS },
 #endif
 #if( configMB_FC02 == 1 )
-    { MB_RD, FC_READ_DISCRETE_INPUTS },
+    { MB_RO, FC_READ_DISCRETE_INPUTS },
 #endif
 #if( configMB_FC05 == 1 )
-    { MB_WR, FC_WRITE_SINGLE_COIL },
+    { MB_WO, FC_WRITE_SINGLE_COIL },
 #endif
 #if( configMB_FC15 == 1 )
-    { MB_WR, FC_WRITE_MULTIPLE_COILS },
+    { MB_WO, FC_WRITE_MULTIPLE_COILS },
 #endif
 
     /* Word Data Access */
 #if( configMB_FC03 == 1 )
-    { MB_RD, FC_READ_HOLDING_REGISTERS },
+    { MB_RW, FC_READ_HOLDING_REGISTERS },
 #endif
 #if( configMB_FC04 == 1 )
-    { MB_RD, FC_READ_INPUT_REGISTERS },
+    { MB_RO, FC_READ_INPUT_REGISTERS },
 #endif
 #if( configMB_FC06 == 1 )
-    { MB_WR, FC_WRITE_SINGLE_REGISTER },
+    { MB_WO, FC_WRITE_SINGLE_REGISTER },
 #endif
 #if( configMB_FC16 == 1 )
-    { MB_WR, FC_WRITE_MULTIPLE_REGISTERS },
+    { MB_WO, FC_WRITE_MULTIPLE_REGISTERS },
 #endif
 #if( configMB_FC22 == 1 )
-    { MB_WR, FC_MASK_WRITE_REGISTER },
+    { MB_WO, FC_MASK_WRITE_REGISTER },
 #endif
 #if( configMB_FC23 == 1 )
     { MB_RW, FC_READ_WRITE_MULTIPLE_REGISTERS },
 #endif
 #if( configMB_FC24 == 1 )
-    { MB_RD, FC_READ_FIFO_QUEUE },
+    { MB_RO, FC_READ_FIFO_QUEUE },
 #endif
 
     /* File Record Data Access */
 #if( configMB_FC20 == 1 )
-    { MB_RD, FC_READ_FILE_RECORD },
+    { MB_RO, FC_READ_FILE_RECORD },
 #endif
 #if( configMB_FC21 == 1 )
-    { MB_WR, FC_WRITE_FILE_RECORD },
+    { MB_WO, FC_WRITE_FILE_RECORD },
 #endif
 
     /* Diagnostics */
 #if( configMB_FC07 == 1 )
-    { MB_RD, FC_READ_EXCEPTION_STATUS },
+    { MB_RO, FC_READ_EXCEPTION_STATUS },
 #endif
 #if( configMB_FC08 == 1 )
     { MB_RW, FC_DIAGNOSTIC },
 #endif
 #if( configMB_FC11 == 1 )
-    { MB_RD, FC_GET_COM_EVENT_COUNTER },
+    { MB_RO, FC_GET_COM_EVENT_COUNTER },
 #endif
 #if( configMB_FC12 == 1 )
-    { MB_RD, FC_GET_COM_EVENT_LOG },
+    { MB_RO, FC_GET_COM_EVENT_LOG },
 #endif
 #if( configMB_FC17 == 1 )
-    { MB_RD, FC_REPORT_SERVER_ID },
+    { MB_RO, FC_REPORT_SERVER_ID },
 #endif
 
     /* Marks the end of the list. */
@@ -1317,7 +1317,7 @@ bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, uint8_t
 
 bool SerialModbusServer::createInputResgisters( uint16_t address, size_t dataSize, uint8_t id )
 {
-    return createRegister( MB_RD, address, dataSize, id );
+    return createRegister( MB_RO, address, dataSize, id );
 }
 /*----------------------------------------------------------------------------*/
 

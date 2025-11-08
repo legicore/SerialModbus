@@ -49,8 +49,8 @@ typedef enum MB_ServerState_e MB_ServerState_t;
 enum MB_Access_e
 {
     MB_NA = 0b00,   /* No Access */
-    MB_RD = 0b01,   /* Read only */
-    MB_WR = 0b10,   /* Write only */
+    MB_RO = 0b01,   /* Read only */
+    MB_WO = 0b10,   /* Write only */
     MB_RW = 0b11    /* Read and Write */
 };
 
