@@ -140,12 +140,8 @@ public:
     bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
     bool createInputResgisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
     bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
-    int32_t getCoil( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
-    int32_t getInputResgister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
-    int32_t getHoldingRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
-    bool setCoil( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
-    bool setInputResgister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
-    bool setHoldingRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
+    int32_t getRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
+    bool setRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
 
 private:
 

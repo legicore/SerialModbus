@@ -1384,37 +1384,13 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusServer::getCoil( uint16_t address, uint8_t id )
+int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
 {
     return lGetRegister( address, id );
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusServer::getInputResgister( uint16_t address, uint8_t id )
-{
-    return lGetRegister( address, id );
-}
-/*----------------------------------------------------------------------------*/
-
-int32_t SerialModbusServer::getHoldingRegister( uint16_t address, uint8_t id )
-{
-    return lGetRegister( address, id );
-}
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::setCoil( uint16_t address, uint16_t value, uint8_t id )
-{
-    return bSetRegister( address, value, id );
-}
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::setInputResgister( uint16_t address, uint16_t value, uint8_t id )
-{
-    return bSetRegister( address, value, id );
-}
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value, uint8_t id )
+bool SerialModbusServer::setRegister( uint16_t address, uint16_t value, uint8_t id )
 {
     return bSetRegister( address, value, id );
 }
