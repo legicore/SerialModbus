@@ -868,49 +868,67 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t data )
+MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t * data, size_t size )
 {
-    MB_Request_t xRequest = { 0xFF, 0x00, 0xFFFF, &data, 1, NULL };
-
-    xRequest.id = id;
-    xRequest.functionCode = functionCode;
-    xRequest.address = address;
+    MB_Request_t xRequest = { id, functionCode, address, data, size, NULL };
 
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == MB_OK )
     {
         xStatusSimpleAPI = process();
-        if( xStatusSimpleAPI == MB_OK )
-        {
-            return ( int32_t ) data;
-        }
     }
 
-    return -1;
+    return xStatusSimpleAPI;
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
+uint16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, 0x0000 );
+    uint16_t usData = 0;
+
+    if( sendRequest( id, FC_READ_HOLDING_REGISTERS, address, &usData, 1 ) == MB_OK )
+    {
+        return usData;
+    }
+
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
+MB_Status_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity )
 {
-    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, 0x0000 );
+    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, buffer, quantity );
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t data )
+uint16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 {
-    return sendRequest( id, FC_WRITE_SINGLE_COIL, address, data );
+    uint16_t usData = 0;
+
+    if( sendRequest( id, FC_READ_INPUT_REGISTERS, address, &usData, 1 ) == MB_OK )
+    {
+        return usData;
+    }
+
+    return 0;
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t data )
+MB_Status_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity )
 {
-    return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, data );
+    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, buffer, quantity );
+}
+/*----------------------------------------------------------------------------*/
+
+MB_Status_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+{
+    return sendRequest( id, FC_WRITE_SINGLE_COIL, address, &value, 1 );
+}
+/*----------------------------------------------------------------------------*/
+
+MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+{
+    return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, &value, 1 );
 }
 /*----------------------------------------------------------------------------*/
 
