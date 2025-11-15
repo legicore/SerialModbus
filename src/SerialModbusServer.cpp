@@ -133,6 +133,9 @@ SerialModbusServer::SerialModbusServer()
     #endif
 
     xRegisterMapSize = 0;
+
+    bRegisterMapLock_sAPI = false;
+    bRegisterMapLock = false;
 }
 /*----------------------------------------------------------------------------*/
 
@@ -186,13 +189,46 @@ void SerialModbusServer::vSetState( MB_ServerState_t xStatePar )
 
 bool SerialModbusServer::setRegisterMap( MB_Register_t * registerMap )
 {
-    if( registerMap != NULL )
+    if( registerMap == NULL )
     {
-        pxRegisterMap = registerMap;
+        if( bRegisterMapLock_sAPI == true )
+        {
+            bRegisterMapLock_sAPI = false;
+            if( pxRegisterMap != NULL )
+            {
+                free( pxRegisterMap );
+            }
+        }
+
+        pxRegisterMap = NULL;
+        bRegisterMapLock = false;
+
         return true;
+    }
+    else /* if( registerMap != NULL ) */
+    {
+        if( ( pxRegisterMap == NULL ) && ( bRegisterMapLock_sAPI == false ) )
+        {
+            pxRegisterMap = registerMap;
+            bRegisterMapLock = true;
+
+            return true;
+        }
     }
 
     return false;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::resetRegisterMap( void )
+{
+    return setRegisterMap( NULL );
+}
+/*----------------------------------------------------------------------------*/
+
+MB_Register_t * SerialModbusServer::getRegisterMap( void )
+{
+    return pxRegisterMap;
 }
 /*----------------------------------------------------------------------------*/
 
@@ -1257,7 +1293,8 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
 {
     MB_Register_t * pxRegisterMapTmp = NULL;
 
-    if( ( access == MB_NA ) || ( dataSize == 0 ) || ( id == 0 ) || ( id > configMB_ID_SERVER_MAX ) )
+    if( ( access == MB_NA ) || ( dataSize == 0 ) || ( id == 0 ) || ( id > configMB_ID_SERVER_MAX ) ||
+        ( bRegisterMapLock == true ) )
     {
         return false;
     }
@@ -1291,6 +1328,7 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
 
             ( void ) bClearRegisterMapEntry( &pxRegisterMapTmp[ xRegisterMapSize ] );
             pxRegisterMap = pxRegisterMapTmp;
+            bRegisterMapLock_sAPI = true;
             xRegisterMapSize += 1;
 
             #if( configMB_SERVER_MULTI_ID == 1 )
@@ -1315,7 +1353,7 @@ bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, uint8_t
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createInputResgisters( uint16_t address, size_t dataSize, uint8_t id )
+bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, uint8_t id )
 {
     return createRegister( MB_RO, address, dataSize, id );
 }

@@ -124,6 +124,8 @@ public:
 #endif
     MB_Status_t process( void );
     bool setRegisterMap( MB_Register_t * registerMap );
+    bool resetRegisterMap( void );
+    MB_Register_t * getRegisterMap( void );
     MB_Status_t checkRegisterMap( void );
 
     /* Only for function code 8 (MB_DIAGNOSTIC). */
@@ -138,7 +140,7 @@ public:
 
     bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
     bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
-    bool createInputResgisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createInputRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
     bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
     int32_t getRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
     bool setRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
@@ -177,6 +179,8 @@ private:
     int32_t lGetRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
     bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
     bool bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry );
+    bool bRegisterMapLock_sAPI;
+    bool bRegisterMapLock;
 };
 /*----------------------------------------------------------------------------*/
 
