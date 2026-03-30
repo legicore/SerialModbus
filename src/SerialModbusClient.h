@@ -49,7 +49,7 @@ struct MB_Request_s
     uint16_t address;
     uint16_t * data;
     size_t dataSize;
-    void (* callback)( void );
+    MB_Callback_t callback;
 };
 
 typedef struct MB_Request_s MB_Request_t;

@@ -67,7 +67,7 @@ struct MB_Register_s
     uint16_t address;
     uint16_t * data;
     size_t dataSize;
-    void (* callback)( void );
+    MB_Callback_t callback;
 };
 
 typedef struct MB_Register_s MB_Register_t;
@@ -138,10 +138,10 @@ public:
 
     /* Simplified API functions. */
 
-    bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
-    bool createCoils( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
-    bool createInputRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
-    bool createHoldingRegisters( uint16_t address, size_t dataSize, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_t callback = NULL, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createCoils( uint16_t address, size_t dataSize, MB_Callback_t callback = NULL, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_t callback = NULL, uint8_t id = configMB_ID_SERVER_MAX );
+    bool createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_t callback = NULL, uint8_t id = configMB_ID_SERVER_MAX );
     int32_t getRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
     bool setRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
 

@@ -360,7 +360,7 @@ void SerialModbusBase::vClearRequestFrame( void )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusBase::setSerialCtrl( void (* serialCtrlTx)( void ), void (* serialCtrlRx)( void ) )
+bool SerialModbusBase::setSerialCtrl( MB_Callback_t serialCtrlTx, MB_Callback_t serialCtrlRx )
 {
     if( ( serialCtrlTx != NULL ) && ( serialCtrlRx != NULL ) )
     {
@@ -427,7 +427,7 @@ uint64_t SerialModbusBase::uxReplyQword( size_t xNbr, size_t xOffset )
 
 #if( configMB_PROCESS_LOOP_HOOK == 1 )
 
-    void SerialModbusBase::setProcessLoopHook( void (* loopHookFunction)( void ) )
+    void SerialModbusBase::setProcessLoopHook( MB_Callback_t loopHookFunction )
     {
         /* INFO: No NULL check to provide the ability to turn the loop hook 
          * function mechanism on and off. */
