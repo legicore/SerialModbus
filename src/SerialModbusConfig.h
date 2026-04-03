@@ -46,7 +46,7 @@
 
 /*----------------------------------------------------------------------------*/
 
-#define configMB_PROCESS_LOOP_HOOK      1
+#define configMB_PROCESS_LOOP_HOOK      0
 
 #define configMB_EXT_EXCEPTION_CODES    0
 
