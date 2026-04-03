@@ -1289,7 +1289,7 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_t callback, uint8_t id )
+bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
 {
     MB_Register_t * pxRegisterMapTmp = NULL;
 
@@ -1356,19 +1356,19 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, MB_Callback_t callback, uint8_t id )
+bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
 {
     return createRegister( MB_RW, address, dataSize, callback, id );
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_t callback, uint8_t id )
+bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
 {
     return createRegister( MB_RO, address, dataSize, callback, id );
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_t callback, uint8_t id )
+bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
 {
     return createRegister( MB_RW, address, dataSize, callback, id );
 }

@@ -156,7 +156,7 @@ typedef configMB_SERIAL MB_Serial_t;
 #endif
 /*----------------------------------------------------------------------------*/
 
-typedef void (* MB_Callback_t)( void );
+typedef void (* MB_Callback_f)( void );
 
 /*----------------------------------------------------------------------------*/
 
@@ -169,9 +169,9 @@ public:
 #if defined( configMB_SERIAL_SW )
     bool begin( uint32_t baud, MB_SWSerial_t * serial );
 #endif
-    bool setSerialCtrl( MB_Callback_t serialCtrlTx, MB_Callback_t serialCtrlRx );
+    bool setSerialCtrl( MB_Callback_f serialCtrlTx, MB_Callback_f serialCtrlRx );
 #if( configMB_PROCESS_LOOP_HOOK == 1 )
-    void setProcessLoopHook( MB_Callback_t loopHookFunction );
+    void setProcessLoopHook( MB_Callback_f loopHookFunction );
 #endif
     void setCustomDelay( void (* customDelay)( uint32_t delayUs ) );
     const char * getExceptionString( MB_Exception_t exception );
@@ -194,8 +194,8 @@ protected:
     void vClearReplyFrame( void );
     bool bReceiveByte( uint8_t * pucReceiveBuffer, size_t * pxBufferLength );
     size_t xSendData( uint8_t * pucSendBuffer, size_t xBufferLength );
-    MB_Callback_t vSerialCtrlTx;
-    MB_Callback_t vSerialCtrlRx;
+    MB_Callback_f vSerialCtrlTx;
+    MB_Callback_f vSerialCtrlRx;
     MB_Serial_t * pxSerial;
 #if defined( configMB_SERIAL_SW )
     MB_SWSerial_t * pxSWSerial;
@@ -227,7 +227,7 @@ protected:
     MB_Status_t xRtuToAscii( uint8_t * pucRtuFrame, size_t * pxFrameLength );
     MB_Status_t xAsciiToRtu( uint8_t * pucAsciiFrame, size_t * pxFrameLength );
 #if( configMB_PROCESS_LOOP_HOOK == 1 )
-    MB_Callback_t vProcessLoopHook;
+    MB_Callback_f vProcessLoopHook;
 #endif
     char cAsciiInputDelimiter;
     size_t xChecksumLength;
