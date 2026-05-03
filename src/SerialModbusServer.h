@@ -176,8 +176,6 @@ private:
 #endif
     bool bCheckId( uint8_t ucId );
     size_t xRegisterMapSize;
-    int32_t lGetRegister( uint16_t address, uint8_t id = configMB_ID_SERVER_MAX );
-    bool bSetRegister( uint16_t address, uint16_t value, uint8_t id = configMB_ID_SERVER_MAX );
     bool bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry );
     bool bRegisterMapLock_sAPI;
     bool bRegisterMapLock;

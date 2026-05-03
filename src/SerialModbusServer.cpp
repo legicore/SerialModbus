@@ -1374,7 +1374,7 @@ bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSi
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
+int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
 {
     size_t xOffset = 0;
 
@@ -1402,7 +1402,7 @@ int32_t SerialModbusServer::lGetRegister( uint16_t address, uint8_t id )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t id )
+bool SerialModbusServer::setRegister( uint16_t address, uint16_t value, uint8_t id )
 {
     size_t xOffset = 0;
 
@@ -1428,18 +1428,6 @@ bool SerialModbusServer::bSetRegister( uint16_t address, uint16_t value, uint8_t
     }
 
     return false;
-}
-/*----------------------------------------------------------------------------*/
-
-int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
-{
-    return lGetRegister( address, id );
-}
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::setRegister( uint16_t address, uint16_t value, uint8_t id )
-{
-    return bSetRegister( address, value, id );
 }
 /*----------------------------------------------------------------------------*/
 
