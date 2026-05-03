@@ -868,9 +868,9 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t * data, size_t size )
+MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t * data, size_t size, MB_Callback_f callback )
 {
-    MB_Request_t xRequest = { id, functionCode, address, data, size, NULL };
+    MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 
     xStatusSimpleAPI = setRequest( &xRequest );
     if( xStatusSimpleAPI == MB_OK )
@@ -882,11 +882,11 @@ MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, u
 }
 /*----------------------------------------------------------------------------*/
 
-uint16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
+uint16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, MB_Callback_f callback )
 {
     uint16_t usData = 0;
 
-    if( sendRequest( id, FC_READ_HOLDING_REGISTERS, address, &usData, 1 ) == MB_OK )
+    if( sendRequest( id, FC_READ_HOLDING_REGISTERS, address, &usData, 1, callback ) == MB_OK )
     {
         return usData;
     }
@@ -895,17 +895,17 @@ uint16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity )
+MB_Status_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity, MB_Callback_f callback )
 {
-    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, buffer, quantity );
+    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, buffer, quantity, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-uint16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
+uint16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, MB_Callback_f callback )
 {
     uint16_t usData = 0;
 
-    if( sendRequest( id, FC_READ_INPUT_REGISTERS, address, &usData, 1 ) == MB_OK )
+    if( sendRequest( id, FC_READ_INPUT_REGISTERS, address, &usData, 1, callback ) == MB_OK )
     {
         return usData;
     }
@@ -914,21 +914,21 @@ uint16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity )
+MB_Status_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity, MB_Callback_f callback )
 {
-    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, buffer, quantity );
+    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, buffer, quantity, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value )
+MB_Status_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback )
 {
-    return sendRequest( id, FC_WRITE_SINGLE_COIL, address, &value, 1 );
+    return sendRequest( id, FC_WRITE_SINGLE_COIL, address, &value, 1, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value )
+MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback )
 {
-    return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, &value, 1 );
+    return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, &value, 1, callback );
 }
 /*----------------------------------------------------------------------------*/
 
