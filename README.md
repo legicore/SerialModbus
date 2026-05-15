@@ -9,8 +9,8 @@ In past and ongoing projects I worked with the RTOS (Realtime Operatin System) [
 ### Official Specification
 
 The library has been developed (and will be further improved/expanded) in strict compliance with the official Modbus specifications and guidlines.
-* [MODBUS Application Protocol Specification](http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf)
-* [MODBUS over serial line specification and implementation guid](http://www.modbus.org/docs/Modbus_over_serial_line_V1_02.pdf)
+* [MODBUS Application Protocol Specification](https://www.modbus.org/file/secure/modbusprotocolspecification.pdf)
+* [MODBUS over serial line specification and implementation guid](https://www.modbus.org/file/secure/modbusoverserial.pdf)
 
 ### Supported Function Codes
 
