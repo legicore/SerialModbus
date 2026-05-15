@@ -17,7 +17,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ctype.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusBase.h"
@@ -245,7 +244,7 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool r
 #if( configMB_SFC03 == 1 )
                 case SFC_CHANGE_ASCII_INPUT_DELIMITER:
                 {
-                    if( isAscii( *( ( char * ) request->data ) ) == true )
+                    if( bCheckAsciiInputDelimiter( *( ( char * ) request->data ) ) == true )
                     {
                         pucRequestFrame[ 4 ] = ( uint8_t ) *( ( char * ) request->data );
                         pucRequestFrame[ 5 ] = 0x00;

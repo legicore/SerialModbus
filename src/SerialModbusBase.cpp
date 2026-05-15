@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusCompat.h"
@@ -721,4 +722,22 @@ const char * SerialModbusBase::getExceptionString( MB_Exception_t exception )
     }
 
     return NULL;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusBase::bCheckAsciiInputDelimiter( char cDelimiter )
+{
+    /* The delimiter is not allowed to be NULL. */
+    if( cDelimiter != 0x00 )
+    {
+        /* The delimiter must be a control character. It is not allowed to be a
+         * character with a printable representation (that includes SPACE and
+         * any punctuation or any hexadecimal digit)! */
+        if( iscntrl( cDelimiter ) != 0 )
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

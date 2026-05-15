@@ -231,6 +231,7 @@ protected:
 #endif
     char cAsciiInputDelimiter;
     size_t xChecksumLength;
+    bool bCheckAsciiInputDelimiter( char cDelimiter );
 };
 /*----------------------------------------------------------------------------*/
 

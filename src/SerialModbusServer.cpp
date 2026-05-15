@@ -17,7 +17,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ctype.h>
 
 #include "SerialModbusConfig.h"
 #include "SerialModbusCompat.h"
@@ -946,7 +945,7 @@ void SerialModbusServer::vHandlerFC08( void )
 #if( configMB_SFC03 == 1 )
         case SFC_CHANGE_ASCII_INPUT_DELIMITER:
         {
-            if( ( isAscii( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
+            if( ( bCheckAsciiInputDelimiter( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
                 ( ucREQUEST_INPUT_DELIMITER_LO == 0x00 ) )
             {
                 cAsciiInputDelimiter = ( char ) ucREQUEST_INPUT_DELIMITER_HI;
