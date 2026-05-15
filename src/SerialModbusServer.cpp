@@ -883,7 +883,9 @@ void SerialModbusServer::vHandlerFC08( void )
 
     switch( usREQUEST_SUB_FUNCTION_CODE )
     {
+
 #if( configMB_SFC00 == 1 )
+
         case SFC_RETURN_QUERY_DATA:
         {
             xReplyLength = 4;
@@ -895,8 +897,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC01 == 1 )
+
         case SFC_RESTART_COMMUNICATIONS_OPTION:
         {
             if( ( usREQUEST_DATA == 0x0000 ) || ( usREQUEST_DATA == MB_CLEAR_COM_EVENT_LOG ) )
@@ -925,8 +929,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC02 == 1 )
+
         case SFC_RETURN_DIAGNOSTIC_REGISTER:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -941,8 +947,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC03 == 1 )
+
         case SFC_CHANGE_ASCII_INPUT_DELIMITER:
         {
             if( ( bCheckAsciiInputDelimiter( ( char ) ucREQUEST_INPUT_DELIMITER_HI ) == true ) &&
@@ -970,8 +978,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC04 == 1 )
+
         case SFC_FORCE_LISTEN_ONLY_MODE:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -985,8 +995,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC10 == 1 )
+
         case SFC_CLEAR_COUNTERS_AND_DIAGNOSTIC_REGISTER:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1003,8 +1015,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC11 == 1 )
+
         case SFC_RETURN_BUS_MESSAGE_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1019,8 +1033,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC12 == 1 )
+
         case SFC_RETURN_BUS_COMMUNICATION_ERROR_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1035,8 +1051,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC13 == 1 )
+
         case SFC_RETURN_BUS_EXCEPTION_ERROR_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1051,8 +1069,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC14 == 1 )
+
         case SFC_RETURN_SERVER_MESSAGE_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1067,8 +1087,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC15 == 1 )
+
         case SFC_RETURN_SERVER_NO_RESPONSE_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1083,8 +1105,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC16 == 1 )
+
         case SFC_RETURN_SERVER_NAK_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1099,8 +1123,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC17 == 1 )
+
         case SFC_RETURN_SERVER_BUSY_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1115,8 +1141,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC18 == 1 )
+
         case SFC_RETURN_BUS_CHARACTER_OVERRUN_COUNT:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1131,8 +1159,10 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
 #if( configMB_SFC20 == 1 )
+
         case SFC_CLEAR_OVERRUN_COUNTER_AND_FLAG:
         {
             if( usREQUEST_DATA == 0x0000 )
@@ -1149,7 +1179,9 @@ void SerialModbusServer::vHandlerFC08( void )
 
             break;
         }
+
 #endif
+
         default:
         {
             #if( configMB_EXT_EXCEPTION_CODES == 1 )
