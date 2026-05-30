@@ -741,3 +741,15 @@ bool SerialModbusBase::bCheckAsciiInputDelimiter( char cDelimiter )
 
     return false;
 }
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusBase::setAsciiInputDelimiter( char delimiter )
+{
+    if( bCheckAsciiInputDelimiter( delimiter ) == true )
+    {
+        cAsciiInputDelimiter = delimiter;
+        return true;
+    }
+
+    return false;
+}

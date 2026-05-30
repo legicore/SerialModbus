@@ -179,6 +179,7 @@ public:
     uint32_t getInterFrameDelay( void );
     bool setInterCharacterTimeout( uint32_t timeUs );
     bool setInterFrameDelay( uint32_t timeUs );
+    bool setAsciiInputDelimiter( char delimiter );
 
 protected:
 
