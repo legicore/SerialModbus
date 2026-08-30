@@ -78,7 +78,6 @@ public:
     MB_Status_t readInputRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
-    MB_Status_t getLastException( void );
     const char * getLastExceptionString( void );
 
 private:
@@ -103,7 +102,6 @@ private:
     void vHandlerFC06( void );
     void vHandlerFC08( void );
     void vHandlerFC16( void );
-    MB_Status_t xStatusSimpleAPI;
 };
 /*----------------------------------------------------------------------------*/
 

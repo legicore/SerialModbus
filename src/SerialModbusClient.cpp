@@ -40,8 +40,6 @@ SerialModbusClient::SerialModbusClient()
 
     ulTimerResponseTimeoutMs = 0;
     ulTimerTurnaroundDelayMs = 0;
-
-    xStatusSimpleAPI = MB_OK;
 }
 /*----------------------------------------------------------------------------*/
 
@@ -871,13 +869,13 @@ MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, u
 {
     MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 
-    xStatusSimpleAPI = setRequest( &xRequest );
-    if( xStatusSimpleAPI == MB_OK )
+    xStatus = setRequest( &xRequest );
+    if( xStatus == MB_OK )
     {
-        xStatusSimpleAPI = process();
+        ( void ) process();
     }
 
-    return xStatusSimpleAPI;
+    return xStatus;
 }
 /*----------------------------------------------------------------------------*/
 
@@ -905,13 +903,7 @@ MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t addres
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::getLastException( void )
-{
-    return xStatusSimpleAPI;
-}
-/*----------------------------------------------------------------------------*/
-
 const char * SerialModbusClient::getLastExceptionString( void )
 {
-    return getExceptionString( xStatusSimpleAPI );
+    return getExceptionString( xStatus );
 }
