@@ -147,12 +147,6 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial,
 
     ucServerId = id;
 
-    #if( configMB_SERVER_MULTI_ID == 1 )
-    {
-        vSetIdMap();
-    }
-    #endif
-
     return SerialModbusBase::begin( baud, serial, config );
 }
 /*----------------------------------------------------------------------------*/
@@ -167,12 +161,6 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial,
         }
 
         ucServerId = id;
-
-        #if( configMB_SERVER_MULTI_ID == 1 )
-        {
-            vSetIdMap();
-        }
-        #endif
 
         return SerialModbusBase::begin( baud, serial );
     }
@@ -293,6 +281,8 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
     void SerialModbusServer::vSetIdMap( void )
     {
         bool bIdFound = false;
+
+        xIdCount = 0;
 
         for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
         {
@@ -1383,8 +1373,8 @@ bool SerialModbusServer::createRegister( uint8_t id, MB_Access_t access, uint16_
 
             #if( configMB_SERVER_MULTI_ID == 1 )
             {
-                /* Just in case someone creates a register after calling the
-                 * begin method, we re-initialize the id map. */
+                /* In case a new ID gets introduced, we automatically reset the
+                 * ID map after every successful register creation. */
                 vSetIdMap();
             }
             #endif
