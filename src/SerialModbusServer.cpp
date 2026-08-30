@@ -1320,7 +1320,17 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createRegister( configMB_ID_SERVER_MAX, access, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
     MB_Register_t * pxRegisterMapTmp = NULL;
 
@@ -1387,29 +1397,69 @@ bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, s
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createCoils( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createCoils( configMB_ID_SERVER_MAX, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createCoils( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    return createRegister( MB_RW, address, dataSize, callback, id );
+    return createRegister( id, MB_RW, address, dataSize, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createInputRegisters( configMB_ID_SERVER_MAX, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createInputRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    return createRegister( MB_RO, address, dataSize, callback, id );
+    return createRegister( id, MB_RO, address, dataSize, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createHoldingRegisters( configMB_ID_SERVER_MAX, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createHoldingRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    return createRegister( MB_RW, address, dataSize, callback, id );
+    return createRegister( id, MB_RW, address, dataSize, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::getRegister( uint16_t address, uint16_t * data )
+    {
+        return getRegister( configMB_ID_SERVER_MAX, address, data );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::getRegister( uint8_t id, uint16_t address, uint16_t * data )
 {
     size_t xOffset = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) )
+    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) && ( data != NULL) )
     {
         for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
         {
@@ -1421,7 +1471,8 @@ int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
                     ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
                 {
                     xOffset = address - pxRegisterMap[ i ].address;
-                    return ( int32_t ) pxRegisterMap[ i ].data[ xOffset ];
+                    *data = pxRegisterMap[ i ].data[ xOffset ];
+                    return true;
                 }
 #if( configMB_SERVER_MULTI_ID == 1 )
             }
@@ -1429,11 +1480,21 @@ int32_t SerialModbusServer::getRegister( uint16_t address, uint8_t id )
         }
     }
 
-    return ( int32_t ) -1;
+    return false;
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::setRegister( uint16_t address, uint16_t value, uint8_t id )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::setRegister( uint16_t address, uint16_t value )
+    {
+        return setRegister( configMB_ID_SERVER_MAX, address, value );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::setRegister( uint8_t id, uint16_t address, uint16_t value )
 {
     size_t xOffset = 0;
 
