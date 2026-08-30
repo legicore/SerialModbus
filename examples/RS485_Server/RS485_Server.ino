@@ -43,9 +43,12 @@ void setup( void )
 
 void loop( void )
 {
+    uint16_t data = 0;
+
     ModbusServer.process();
 
-    if( ModbusServer.getRegister( 1000 ) == 1 )
+    ModbusServer.getRegister( 1000, &data );
+    if( data == 1 )
     {
         digitalWrite( LED_BUILTIN, HIGH );
     }
