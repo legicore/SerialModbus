@@ -881,41 +881,15 @@ MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, u
 }
 /*----------------------------------------------------------------------------*/
 
-uint16_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, MB_Callback_f callback )
+MB_Status_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity, MB_Callback_f callback )
 {
-    uint16_t usData = 0;
-
-    if( sendRequest( id, FC_READ_HOLDING_REGISTERS, address, &usData, 1, callback ) == MB_OK )
-    {
-        return usData;
-    }
-
-    return 0;
+    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, data, quantity, callback );
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::readHoldingRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity, MB_Callback_f callback )
+MB_Status_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity, MB_Callback_f callback )
 {
-    return sendRequest( id, FC_READ_HOLDING_REGISTERS, address, buffer, quantity, callback );
-}
-/*----------------------------------------------------------------------------*/
-
-uint16_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, MB_Callback_f callback )
-{
-    uint16_t usData = 0;
-
-    if( sendRequest( id, FC_READ_INPUT_REGISTERS, address, &usData, 1, callback ) == MB_OK )
-    {
-        return usData;
-    }
-
-    return 0;
-}
-/*----------------------------------------------------------------------------*/
-
-MB_Status_t SerialModbusClient::readInputRegister( uint8_t id, uint16_t address, uint16_t * buffer, size_t quantity, MB_Callback_f callback )
-{
-    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, buffer, quantity, callback );
+    return sendRequest( id, FC_READ_INPUT_REGISTERS, address, data, quantity, callback );
 }
 /*----------------------------------------------------------------------------*/
 
