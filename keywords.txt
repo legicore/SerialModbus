@@ -59,14 +59,10 @@ diagRegClear	KEYWORD2
 
 createRegister	KEYWORD2
 createCoils	KEYWORD2
-createInputResgisters	KEYWORD2
+createInputRegister	KEYWORD2
 createHoldingRegister	KEYWORD2
-getCoil	KEYWORD2
-getInputResgister	KEYWORD2
-getHoldingRegister	KEYWORD2
-setCoil	KEYWORD2
-setInputResgister	KEYWORD2
-setHoldingRegister	KEYWORD2
+getRegister	KEYWORD2
+setRegister	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
