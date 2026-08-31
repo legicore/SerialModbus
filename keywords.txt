@@ -33,7 +33,6 @@ getInterFrameDelay	KEYWORD2
 setInterCharacterTimeout	KEYWORD2
 setInterFrameDelay	KEYWORD2
 
-setRequestMap	KEYWORD2
 setRequest	KEYWORD2
 process	KEYWORD2
 getResponseTimeout	KEYWORD2

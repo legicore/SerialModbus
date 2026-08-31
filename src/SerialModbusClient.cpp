@@ -30,10 +30,7 @@ SerialModbusClient::SerialModbusClient()
 {
     xState = CLIENT_IDLE;
 
-    pxRequestMap = NULL;
-    xRequestMapIndex = 0;
     pxRequest = NULL;
-    bSkipRequestMap = false;
 
     ulTurnaroundDelayMs = configMB_TURNAROUND_DELAY_MS;
     ulResponseTimeoutMs = configMB_RESPONSE_TIMEOUT_MS;
@@ -109,46 +106,12 @@ bool SerialModbusClient::setTurnaroundDelay( uint32_t timeMs )
 }
 /*----------------------------------------------------------------------------*/
 
-void SerialModbusClient::setRequestMap( const MB_Request_t * requestMap )
-{
-    pxRequestMap = requestMap;
-    xRequestMapIndex = 0;
-}
-/*----------------------------------------------------------------------------*/
-
-MB_Status_t SerialModbusClient::xProcessRequestMap( void )
-{
-    if( pxRequestMap != NULL )
-    {
-        if( pxRequestMap[ xRequestMapIndex ].functionCode == 0x00 )
-        {
-            xRequestMapIndex = 0;
-        }
-
-        return setRequest( &pxRequestMap[ xRequestMapIndex++ ], true );
-    }
-    else
-    {
-        xRequestMapIndex = 0;
-    }
-
-    return MB_OK;
-}
-/*----------------------------------------------------------------------------*/
-
-MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool requestMap )
+MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
 {
     if( request == NULL )
     {
         return xSetException( MB_ILLEGAL_REQUEST );
     }
-
-    if( requestMap == false )
-    {
-        bSkipRequestMap = true;
-    }
-
-    ( void ) xSetException( MB_OK );
 
     if( ( request->id > configMB_ID_SERVER_MAX ) ||
         ( request->functionCode == 0x00 ) ||
@@ -353,18 +316,7 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request, bool r
 
 MB_Status_t SerialModbusClient::process( void )
 {
-    if( bSkipRequestMap == false )
-    {
-        if( xProcessRequestMap() != MB_OK )
-        {
-            ( void ) xSetException( MB_ILLEGAL_REQUEST );
-            vSetState( PROCESSING_ERROR );
-        }
-    }
-    else
-    {
-        bSkipRequestMap = false;
-    }
+    ( void ) xSetException( MB_OK );
 
     do
     {

@@ -63,8 +63,7 @@ class SerialModbusClient : public SerialModbusBase
 public:
 
     SerialModbusClient();
-    void setRequestMap( const MB_Request_t * requestMap );
-    MB_Status_t setRequest( const MB_Request_t * request, bool requestMap = false );
+    MB_Status_t setRequest( const MB_Request_t * request );
     MB_Status_t process( void );
     uint32_t getResponseTimeout( void );
     uint32_t getTurnaroundDelay( void );
@@ -85,11 +84,7 @@ private:
 
     MB_ClientState_t xState;
     void vSetState( MB_ClientState_t xStatePar );
-    MB_Status_t xProcessRequestMap( void );
     const MB_Request_t * pxRequest;
-    const MB_Request_t * pxRequestMap;
-    size_t xRequestMapIndex;
-    bool bSkipRequestMap;
     uint32_t ulTimerTurnaroundDelayMs;
     uint32_t ulTimerResponseTimeoutMs;
     uint32_t ulTurnaroundDelayMs;
