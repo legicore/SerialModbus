@@ -141,15 +141,15 @@ public:
 #if( configMB_SERVER_MULTI_ID == 0 )
     bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createCoils( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint16_t address, uint16_t value );
     bool getRegister( uint16_t address, uint16_t * data );
 #else
     bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createCoils( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createInputRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createHoldingRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint8_t id, uint16_t address, uint16_t value );
     bool getRegister( uint8_t id, uint16_t address, uint16_t * data );
 #endif
@@ -194,8 +194,8 @@ private:
 #if( configMB_SERVER_MULTI_ID == 0 )
     bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createCoils( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createInputRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createHoldingRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint8_t id, uint16_t address, uint16_t value );
     bool getRegister( uint8_t id, uint16_t address, uint16_t * data );
 #endif

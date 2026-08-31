@@ -1399,15 +1399,15 @@ bool SerialModbusServer::createCoils( uint8_t id, uint16_t address, size_t dataS
 
 #if( configMB_SERVER_MULTI_ID == 0 )
 
-    bool SerialModbusServer::createInputRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    bool SerialModbusServer::createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback )
     {
-        return createInputRegisters( configMB_ID_SERVER_MAX, address, dataSize, callback );
+        return createInputRegister( configMB_ID_SERVER_MAX, address, dataSize, callback );
     }
 
 #endif
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createInputRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
+bool SerialModbusServer::createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
     return createRegister( id, MB_RO, address, dataSize, callback );
 }
@@ -1415,15 +1415,15 @@ bool SerialModbusServer::createInputRegisters( uint8_t id, uint16_t address, siz
 
 #if( configMB_SERVER_MULTI_ID == 0 )
 
-    bool SerialModbusServer::createHoldingRegisters( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    bool SerialModbusServer::createHoldingRegister( uint16_t address, size_t dataSize, MB_Callback_f callback )
     {
-        return createHoldingRegisters( configMB_ID_SERVER_MAX, address, dataSize, callback );
+        return createHoldingRegister( configMB_ID_SERVER_MAX, address, dataSize, callback );
     }
 
 #endif
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::createHoldingRegisters( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
+bool SerialModbusServer::createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
     return createRegister( id, MB_RW, address, dataSize, callback );
 }

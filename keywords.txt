@@ -60,7 +60,7 @@ diagRegClear	KEYWORD2
 createRegister	KEYWORD2
 createCoils	KEYWORD2
 createInputResgisters	KEYWORD2
-createHoldingRegisters	KEYWORD2
+createHoldingRegister	KEYWORD2
 getCoil	KEYWORD2
 getInputResgister	KEYWORD2
 getHoldingRegister	KEYWORD2
