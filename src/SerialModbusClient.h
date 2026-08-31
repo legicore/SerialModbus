@@ -79,6 +79,7 @@ public:
     MB_Status_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
     const char * getLastExceptionString( void );
+    MB_Status_t getLastException( void );
 
 private:
 
