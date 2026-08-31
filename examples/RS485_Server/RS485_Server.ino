@@ -22,8 +22,8 @@ SerialModbusServer ModbusServer;
 
 /*----------------------------------------------------------------------------*/
 
-void max485Tx( void );
-void max485Rx( void );
+void rs485Tx( void );
+void rs485Rx( void );
 
 /*----------------------------------------------------------------------------*/
 
@@ -34,10 +34,11 @@ void setup( void )
 
     pinMode( RS485_CTRL_PIN, OUTPUT );
 
-    ModbusServer.setSerialCtrl( max485Tx, max485Rx );
+    ModbusServer.setSerialCtrl( rs485Tx, rs485Rx );
     ModbusServer.begin( 1, 9600 );
 
-    ModbusServer.createHoldingRegisters( 1000, 1 );
+    ModbusServer.createHoldingRegister( 1000, 1 );
+    ModbusServer.setRegister( 1000, 0 );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -59,13 +60,13 @@ void loop( void )
 }
 /*----------------------------------------------------------------------------*/
 
-void max485Tx( void )
+void rs485Tx( void )
 {
     digitalWrite( RS485_CTRL_PIN, HIGH );
 }
 /*----------------------------------------------------------------------------*/
 
-void max485Rx( void )
+void rs485Rx( void )
 {
     digitalWrite( RS485_CTRL_PIN, LOW );
 }

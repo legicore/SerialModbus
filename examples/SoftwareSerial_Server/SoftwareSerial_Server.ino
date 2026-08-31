@@ -27,7 +27,8 @@ void setup( void )
 
     ModbusServer.begin( 1, 9600, &SerialSW );
 
-    ModbusServer.createHoldingRegisters( 1000, 1 );
+    ModbusServer.createHoldingRegister( 1000, 1 );
+    ModbusServer.setRegister( 1000, 0 );
 }
 /*----------------------------------------------------------------------------*/
 
