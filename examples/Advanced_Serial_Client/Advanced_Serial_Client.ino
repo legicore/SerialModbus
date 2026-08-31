@@ -74,8 +74,7 @@ void loop( void )
         /* React to a possible request error - e.g. in conjunction with one of
          * the following methods:
          *      - ModbusClient.getExceptionString( result );
-         *      - ModbusClient.getLastExceptionString();
-         *      - ModbusClient.getLastException(); */
+         *      - ModbusClient.getLastExceptionString(); */
     }
 
     ModbusClient.setRequest( &requestMap[ 1 ] );

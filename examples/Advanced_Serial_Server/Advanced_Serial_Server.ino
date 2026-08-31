@@ -71,8 +71,7 @@ void loop( void )
         /* React to a possible processing error - e.g. in conjunction with one
          * of the following methods:
          *      - ModbusServer.getExceptionString( result );
-         *      - ModbusServer.getLastExceptionString();
-         *      - ModbusServer.getLastException(); */
+         *      - ModbusServer.getLastExceptionString(); */
     }
 }
 /*----------------------------------------------------------------------------*/

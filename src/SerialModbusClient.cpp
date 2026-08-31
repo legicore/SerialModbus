@@ -859,9 +859,3 @@ const char * SerialModbusClient::getLastExceptionString( void )
 {
     return getExceptionString( xStatus );
 }
-/*----------------------------------------------------------------------------*/
-
-MB_Status_t SerialModbusClient::getLastException( void )
-{
-    return xStatus;
-}
