@@ -104,36 +104,38 @@ enum MB_Status_e
     MB_GATEWAY_PATH_UNAVAILABLE                 = 0x0A,
     MB_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND  = 0x0B,
 
-    /* Non-standard exception codes. */
-    MB_ILLEGAL_REQUEST                          = 0x11,
-    MB_CHARACTER_OVERRUN                        = 0x12,
-    MB_NO_REPLY                                 = 0x13,
-    MB_ILLEGAL_CHECKSUM                         = 0x14,
-    MB_ILLEGAL_STATE                            = 0x15,
-    MB_ILLEGAL_BYTE_COUNT                       = 0x16,
-    MB_ILLEGAL_COIL_VALUE                       = 0x17,
-    MB_ILLEGAL_OUTPUT_ADDRESS                   = 0x18,
-    MB_ILLEGAL_OUTPUT_VALUE                     = 0x19,
-    MB_ILLEGAL_QUANTITY                         = 0x1A,
-    MB_ILLEGAL_QUERY_DATA                       = 0x1B,
-    MB_ILLEGAL_SUB_FUNCTION                     = 0x1C,
-    MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x1D,
-    MB_SERVER_REG_DATA                          = 0x1E,
-    MB_SERVER_REG_DATA_SIZE                     = 0x1F,
-    MB_SERVER_REG_OVERLAP                       = 0x20,
-
 #if( configMB_EXT_EXCEPTION_CODES == 1 )
 
     /* Extended exception codes for server replies. */
-    MB_SERVER_ILLEGAL_FUNCTION                  = 0x21,
-    MB_SERVER_ILLEGAL_STATE                     = 0x22,
-    MB_SERVER_ILLEGAL_ACCESS                    = 0x23,
-    MB_SERVER_ILLEGAL_QUANTITY                  = 0x24,
-    MB_SERVER_ILLEGAL_COIL_VALUE                = 0x25,
-    MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x26,
-    MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x27,
+    MB_SERVER_ILLEGAL_FUNCTION                  = 0x11,
+    MB_SERVER_ILLEGAL_STATE                     = 0x12,
+    MB_SERVER_ILLEGAL_ACCESS                    = 0x13,
+    MB_SERVER_ILLEGAL_QUANTITY                  = 0x14,
+    MB_SERVER_ILLEGAL_COIL_VALUE                = 0x15,
+    MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x16,
+    MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x17,
 
 #endif
+
+    /* Non-standard exception codes. */
+    MB_ILLEGAL_REQUEST                          = 0x31,
+    MB_CHARACTER_OVERRUN                        = 0x32,
+    MB_NO_REPLY                                 = 0x33,
+    MB_ILLEGAL_CHECKSUM                         = 0x34,
+    MB_ILLEGAL_STATE                            = 0x35,
+    MB_ILLEGAL_BYTE_COUNT                       = 0x36,
+    MB_ILLEGAL_COIL_VALUE                       = 0x37,
+    MB_ILLEGAL_OUTPUT_ADDRESS                   = 0x38,
+    MB_ILLEGAL_OUTPUT_VALUE                     = 0x39,
+    MB_ILLEGAL_QUANTITY                         = 0x3A,
+    MB_ILLEGAL_QUERY_DATA                       = 0x3B,
+    MB_ILLEGAL_SUB_FUNCTION                     = 0x3C,
+    MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x3D,
+
+    /* Non-standard exception codes (server only). */
+    MB_SERVER_REG_DATA                          = 0x50,
+    MB_SERVER_REG_DATA_SIZE                     = 0x51,
+    MB_SERVER_REG_OVERLAP                       = 0x52,
 
     MB_NOK = 0xFE
 };

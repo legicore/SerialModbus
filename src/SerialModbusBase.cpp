@@ -55,6 +55,19 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     { MB_GATEWAY_PATH_UNAVAILABLE,                  "GATEWAY_PATH_UNAVAILABLE" },
     { MB_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND,   "GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND" },
 
+#if( configMB_EXT_EXCEPTION_CODES == 1 )
+
+    /* Extended exception codes for server replies. */
+    { MB_SERVER_ILLEGAL_FUNCTION,                   "SERVER_ILLEGAL_FUNCTION" },
+    { MB_SERVER_ILLEGAL_STATE,                      "SERVER_ILLEGAL_STATE" },
+    { MB_SERVER_ILLEGAL_ACCESS,                     "SERVER_ILLEGAL_ACCESS" },
+    { MB_SERVER_ILLEGAL_QUANTITY,                   "SERVER_ILLEGAL_QUANTITY" },
+    { MB_SERVER_ILLEGAL_COIL_VALUE,                 "SERVER_ILLEGAL_COIL_VALUE" },
+    { MB_SERVER_ILLEGAL_INPUT_DELIMITER,            "SERVER_ILLEGAL_INPUT_DELIMITER" },
+    { MB_SERVER_ILLEGAL_SUB_FUNCTION,               "SERVER_ILLEGAL_SUB_FUNCTION" },
+
+#endif
+
     /* Non-standard exception codes. */
     { MB_ILLEGAL_REQUEST,                           "ILLEGAL_REQUEST" },
     { MB_CHARACTER_OVERRUN,                         "CHARACTER_OVERRUN" },
@@ -69,22 +82,11 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     { MB_ILLEGAL_QUERY_DATA,                        "ILLEGAL_QUERY_DATA" },
     { MB_ILLEGAL_SUB_FUNCTION,                      "ILLEGAL_SUB_FUNCTION" },
     { MB_ILLEGAL_REPLY_SUB_FUNCTION,                "ILLEGAL_REPLY_SUB_FUNCTION" },
-    { MB_SERVER_REG_DATA,                           "MB_SERVER_REG_DATA" },
-    { MB_SERVER_REG_DATA_SIZE,                      "MB_SERVER_REG_DATA_SIZE" },
-    { MB_SERVER_REG_OVERLAP,                        "MB_SERVER_REG_OVERLAP" },
 
-#if( configMB_EXT_EXCEPTION_CODES == 1 )
-
-    /* Extended exception codes for server replies. */
-    { MB_SERVER_ILLEGAL_FUNCTION,                   "SERVER_ILLEGAL_FUNCTION" },
-    { MB_SERVER_ILLEGAL_STATE,                      "SERVER_ILLEGAL_STATE" },
-    { MB_SERVER_ILLEGAL_ACCESS,                     "SERVER_ILLEGAL_ACCESS" },
-    { MB_SERVER_ILLEGAL_QUANTITY,                   "SERVER_ILLEGAL_QUANTITY" },
-    { MB_SERVER_ILLEGAL_COIL_VALUE,                 "SERVER_ILLEGAL_COIL_VALUE" },
-    { MB_SERVER_ILLEGAL_INPUT_DELIMITER,            "SERVER_ILLEGAL_INPUT_DELIMITER" },
-    { MB_SERVER_ILLEGAL_SUB_FUNCTION,               "SERVER_ILLEGAL_SUB_FUNCTION" },
-
-#endif
+    /* Non-standard exception codes (server only). */
+    { MB_SERVER_REG_DATA,                           "SERVER_REG_DATA" },
+    { MB_SERVER_REG_DATA_SIZE,                      "SERVER_REG_DATA_SIZE" },
+    { MB_SERVER_REG_OVERLAP,                        "SERVER_REG_OVERLAP" },
 
     { MB_NOK, "NOK" },
 
