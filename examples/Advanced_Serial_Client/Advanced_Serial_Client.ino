@@ -15,7 +15,6 @@
 /*----------------------------------------------------------------------------*/
 
 SerialModbusClient ModbusClient;
-
 uint16_t data = 0;
 
 /*----------------------------------------------------------------------------*/
@@ -25,8 +24,8 @@ void callback( void );
 /*----------------------------------------------------------------------------*/
 
 MB_Request_t requestMap[] = {
-    { 1, FC_WRITE_SINGLE_REGISTER,  1000, &data, 1, NULL },
-    { 1, FC_READ_HOLDING_REGISTERS, 2000, &data, 1, callback },
+    { 1, FC_WRITE_SINGLE_REGISTER,  1000, &data, 1, callback },
+    { 1, FC_READ_HOLDING_REGISTERS, 2000, &data, 1, NULL },
     MB_REQUEST_MAP_END
 };
 /*----------------------------------------------------------------------------*/
@@ -36,6 +35,10 @@ void setup( void )
     pinMode( LED_BUILTIN, OUTPUT );
     digitalWrite( LED_BUILTIN, LOW );
 
+    /* INFO:    The begin() method has two more parameters with default values.
+     *          The following line shows the optional parameters to set the 
+     *          serial interface we want to use and its configuration.
+     *          e.g.: ModbusClient.begin( 9600, &Serial, SERIAL_8N1 ); */
     ModbusClient.begin( 9600 );
 
     /* The following functions can be used to get and set various timings.
@@ -47,10 +50,10 @@ void setup( void )
      *          values which can be found in SerialModbusConfig.h. */
 
     // uint32_t interCharacterTimeout = ModbusClient.getInterCharacterTimeout();
-    // ModbusClient.setInterFrameDelay( interCharacterTimeout );
+    // ModbusClient.setInterCharacterTimeout( interCharacterTimeout );
 
     // uint32_t interFrameDelay = ModbusClient.getInterFrameDelay();
-    // ModbusClient.setInterCharacterTimeout( interFrameDelay );
+    // ModbusClient.setInterFrameDelay( interFrameDelay );
 
     // uint32_t responseTimeout = ModbusClient.getResponseTimeout();
     // ModbusClient.setResponseTimeout( responseTimeout );
@@ -64,40 +67,30 @@ void loop( void )
 {
     MB_Status_t result = MB_OK;
 
-    result = ModbusClient.setRequest( &requestMap[ 0 ] );
+    ModbusClient.setRequest( &requestMap[ 0 ] );
+    result = ModbusClient.process();
     if( result != MB_OK )
     {
-        /* React to a possible request error. E.g. get an exception string based
-         * on the result of the last operation on the Modbus object. */
-        // Serial.println( ModbusClient.getExceptionString( result ) );
+        /* React to a possible request error - e.g. in conjunction with one of
+         * the following methods:
+         *      - ModbusClient.getExceptionString( result );
+         *      - ModbusClient.getLastExceptionString();
+         *      - ModbusClient.getLastException(); */
     }
 
-    result = ModbusClient.process();
-    if( result == MB_OK )
+    ModbusClient.setRequest( &requestMap[ 1 ] );
+    if( ModbusClient.process() == MB_OK )
     {
         /* Instead of a callback function, we can also react here to the result
          * of a successful request. */
-        if( data == 1 )
+        if( data == 0 )
         {
-            digitalWrite( LED_BUILTIN, HIGH );
+            data = 1;
         }
         else
         {
-            digitalWrite( LED_BUILTIN, LOW );
+            data = 0;
         }
-    }
-
-    if( ModbusClient.setRequest( &requestMap[ 1 ] ) != MB_OK )
-    {
-        /* React to a possible request error. If you don't want to manage a
-         * specific variable, you can get an exception string based on the
-         * internally held status of the last operation. */
-        // Serial.println( getLastExceptionString() );
-    }
-
-    if( ModbusClient.process() != MB_OK )
-    {
-        /* React to a possible request error. */
     }
 
     delay( 1000 );
@@ -106,12 +99,12 @@ void loop( void )
 
 void callback( void )
 {
-    if( data == 0 )
+    if( data == 1 )
     {
-        data = 1;
+        digitalWrite( LED_BUILTIN, HIGH );
     }
     else
     {
-        data = 0;
+        digitalWrite( LED_BUILTIN, LOW );
     }
 }
