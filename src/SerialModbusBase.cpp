@@ -727,6 +727,12 @@ const char * SerialModbusBase::getExceptionString( MB_Exception_t exception )
 }
 /*----------------------------------------------------------------------------*/
 
+const char * SerialModbusBase::getLastExceptionString( void )
+{
+    return getExceptionString( xStatus );
+}
+/*----------------------------------------------------------------------------*/
+
 bool SerialModbusBase::bCheckAsciiInputDelimiter( char cDelimiter )
 {
     /* The delimiter is not allowed to be NULL. */

@@ -853,9 +853,3 @@ MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t addres
 {
     return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, &value, 1, callback );
 }
-/*----------------------------------------------------------------------------*/
-
-const char * SerialModbusClient::getLastExceptionString( void )
-{
-    return getExceptionString( xStatus );
-}

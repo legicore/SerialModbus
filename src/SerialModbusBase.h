@@ -177,6 +177,7 @@ public:
 #endif
     void setCustomDelay( void (* customDelay)( uint32_t delayUs ) );
     const char * getExceptionString( MB_Exception_t exception );
+    const char * getLastExceptionString( void );
     uint32_t getInterCharacterTimeout( void );
     uint32_t getInterFrameDelay( void );
     bool setInterCharacterTimeout( uint32_t timeUs );
