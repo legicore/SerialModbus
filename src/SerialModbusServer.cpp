@@ -56,7 +56,7 @@ static const MB_AccessRights_t pxAccessRights[] = {
 
     /* Word Data Access */
 #if( configMB_FC03 == 1 )
-    { MB_RW, FC_READ_HOLDING_REGISTERS },
+    { MB_RO, FC_READ_HOLDING_REGISTERS },
 #endif
 #if( configMB_FC04 == 1 )
     { MB_RO, FC_READ_INPUT_REGISTERS },
