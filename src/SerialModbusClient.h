@@ -54,7 +54,26 @@ struct MB_Request_s
 
 typedef struct MB_Request_s MB_Request_t;
 
-#define MB_REQUEST_MAP_END { 0xFF, 0x00, 0xFFFF, NULL, 0, NULL }
+#define REQ_MAP_END_ID              0xFF
+#define REQ_MAP_END_FUNCTION_CODE   0x00
+#define REQ_MAP_END_ADDRESS         0xFFFF
+#define REQ_MAP_END_DATA            NULL
+#define REQ_MAP_END_DATA_SIZE       0
+#define REQ_MAP_END_CALLBACK        NULL
+
+#define MB_REQUEST_MAP_END  { REQ_MAP_END_ID,            \
+                              REQ_MAP_END_FUNCTION_CODE, \
+                              REQ_MAP_END_ADDRESS,       \
+                              REQ_MAP_END_DATA,          \
+                              REQ_MAP_END_DATA_SIZE,     \
+                              REQ_MAP_END_CALLBACK }
+
+#define IS_REQUEST_MAP_END( ENTRY ) ( ( ( ENTRY ).id           == REQ_MAP_END_ID            ) && \
+                                      ( ( ENTRY ).functionCode == REQ_MAP_END_FUNCTION_CODE ) && \
+                                      ( ( ENTRY ).address      == REQ_MAP_END_ADDRESS       ) && \
+                                      ( ( ENTRY ).data         == REQ_MAP_END_DATA          ) && \
+                                      ( ( ENTRY ).dataSize     == REQ_MAP_END_DATA_SIZE     ) && \
+                                      ( ( ENTRY ).callback     == REQ_MAP_END_CALLBACK      ) )
 
 /*----------------------------------------------------------------------------*/
 
