@@ -82,6 +82,8 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     { MB_ILLEGAL_QUERY_DATA,                        "ILLEGAL_QUERY_DATA" },
     { MB_ILLEGAL_SUB_FUNCTION,                      "ILLEGAL_SUB_FUNCTION" },
     { MB_ILLEGAL_REPLY_SUB_FUNCTION,                "ILLEGAL_REPLY_SUB_FUNCTION" },
+    { MB_CHECKSUM_CALCULATION,                      "CHECKSUM_CALCULATION" },
+    { MB_NO_REQUEST,                                "NO_REQUEST" },
 
     /* Non-standard exception codes (server only). */
     { MB_SERVER_REG_DATA,                           "SERVER_REG_DATA" },

@@ -113,6 +113,8 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
         return xSetException( MB_ILLEGAL_REQUEST );
     }
 
+    ( void ) xSetException( MB_OK );
+
     if( ( request->id > configMB_ID_SERVER_MAX ) ||
         ( request->functionCode == 0x00 ) ||
         ( request->dataSize == 0 ) )
@@ -308,15 +310,29 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
         }
     }
 
+    if( xSetChecksum( pucRequestFrame, &xRequestLength ) != MB_OK )
+    {
+        return xSetException( MB_CHECKSUM_CALCULATION );
+    }
+
     pxRequest = request;
 
-    return xSetChecksum( pucRequestFrame, &xRequestLength );
+    return xStatus;
 }
 /*----------------------------------------------------------------------------*/
 
 MB_Status_t SerialModbusClient::process( void )
 {
-    ( void ) xSetException( MB_OK );
+    if( ( pxRequest == NULL ) && ( xStatus == MB_OK ) )
+    {
+        ( void ) xSetException( MB_NO_REQUEST );
+    }
+
+    if( xStatus != MB_OK )
+    {
+        vClearRequestFrame();
+        return xStatus;
+    }
 
     do
     {
@@ -568,6 +584,8 @@ MB_Status_t SerialModbusClient::process( void )
         #endif
     }
     while( xState != CLIENT_IDLE );
+
+    pxRequest = NULL;
 
     return xStatus;
 }
@@ -821,10 +839,12 @@ MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, u
 {
     MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 
-    xStatus = setRequest( &xRequest );
-    if( xStatus == MB_OK )
+    if( setRequest( &xRequest ) == MB_OK )
     {
-        ( void ) process();
+        if( xStatus == MB_OK )
+        {
+            ( void ) process();
+        }
     }
 
     return xStatus;

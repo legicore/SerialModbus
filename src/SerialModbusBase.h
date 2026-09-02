@@ -131,6 +131,8 @@ enum MB_Status_e
     MB_ILLEGAL_QUERY_DATA                       = 0x3B,
     MB_ILLEGAL_SUB_FUNCTION                     = 0x3C,
     MB_ILLEGAL_REPLY_SUB_FUNCTION               = 0x3D,
+    MB_CHECKSUM_CALCULATION                     = 0x3E,
+    MB_NO_REQUEST                               = 0x3F,
 
     /* Non-standard exception codes (server only). */
     MB_SERVER_REG_DATA                          = 0x50,
