@@ -169,6 +169,21 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
             break;
         }
 #endif
+#if( configMB_FC07 == 1 )
+        case FC_READ_EXCEPTION_STATUS:
+        {
+            if( request->data != NULL )
+            {
+                xRequestLength = 2;
+            }
+            else
+            {
+                return xSetException( MB_ILLEGAL_REQUEST );
+            }
+
+            break;
+        }
+#endif
 #if( configMB_FC08 == 1 )
         case FC_DIAGNOSTIC:
         {
@@ -524,6 +539,13 @@ MB_Status_t SerialModbusClient::process( void )
                         break;
                     }
 #endif
+#if( configMB_FC07 == 1 )
+                    case FC_READ_EXCEPTION_STATUS :
+                    {
+                        vHandlerFC07();
+                        break;
+                    }
+#endif
 #if( configMB_FC08 == 1 )
                     case FC_DIAGNOSTIC :
                     {
@@ -677,6 +699,17 @@ void SerialModbusClient::vHandlerFC06( void )
     {
         ( void ) xSetException( MB_ILLEGAL_OUTPUT_ADDRESS );
         vSetState( PROCESSING_ERROR );
+    }
+}
+/*----------------------------------------------------------------------------*/
+
+void SerialModbusClient::vHandlerFC07( void )
+{
+    pxRequest->data[ 0 ] = ucREPLY_EXCEPTION_STATUS;
+
+    if( pxRequest->callback != NULL )
+    {
+        ( pxRequest->callback )();
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -873,4 +906,10 @@ MB_Status_t SerialModbusClient::writeSingleCoil( uint8_t id, uint16_t address, u
 MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback )
 {
     return sendRequest( id, FC_WRITE_SINGLE_REGISTER, address, &value, 1, callback );
+}
+/*----------------------------------------------------------------------------*/
+
+MB_Status_t SerialModbusClient::readExceptionStaus( uint8_t id, uint16_t * data, MB_Callback_f callback )
+{
+    return sendRequest( id, FC_READ_EXCEPTION_STATUS, 0x0000, data, 1, callback );
 }

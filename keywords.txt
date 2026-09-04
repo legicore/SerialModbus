@@ -45,6 +45,7 @@ readHoldingRegister	KEYWORD2
 readInputRegister	KEYWORD2
 writeSingleCoil	KEYWORD2
 writeSingleRegister	KEYWORD2
+readExceptionStaus	KEYWORD2
 getLastException	KEYWORD2
 getLastExceptionString	KEYWORD2
 

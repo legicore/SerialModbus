@@ -18,6 +18,7 @@ The library has been developed (and will be further improved/expanded) in strict
 * 4 ( READ_INPUT_REGISTER )
 * 5 ( WRITE_SINGLE_COIL )
 * 6 ( WRITE_SINGLE_REGISTER )
+* 7 ( READ_EXCEPTION_STATUS )
 * 8 ( DIAGNOSTIC )
 * 16 ( WRITE_MULTIPLE_REGISTERS )
 

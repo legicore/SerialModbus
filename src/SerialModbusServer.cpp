@@ -545,6 +545,13 @@ MB_Status_t SerialModbusServer::process( void )
                             break;
                         }
 #endif
+#if( configMB_FC07 == 1 )
+                        case FC_READ_EXCEPTION_STATUS :
+                        {
+                            vHandlerFC07();
+                            break;
+                        }
+#endif
 #if( configMB_FC08 == 1 )
                         case FC_DIAGNOSTIC :
                         {
@@ -674,10 +681,14 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
         return MB_NOK;
     }
 
-    /* If the MB_DIAGNOSTIC functions are enabled we don't need to do the normal
-     * request check. All diagnoctic functions are a part of the Modbus protocol
-     * (and don't need any definition as a register etc.). */
-    if( ucREQUEST_FUNCTION_CODE == ( uint8_t ) FC_DIAGNOSTIC )
+    /* If any Modbus diagnostics are enabled we don't need to do the normal
+     * request check on them. All diagnoctic functions are a part of the Modbus
+     * protocol (and don't need any definition as a register etc.). */
+    if( ( ucREQUEST_FUNCTION_CODE == FC_READ_EXCEPTION_STATUS ) ||
+        ( ucREQUEST_FUNCTION_CODE == FC_DIAGNOSTIC            ) ||
+        ( ucREQUEST_FUNCTION_CODE == FC_GET_COM_EVENT_COUNTER ) ||
+        ( ucREQUEST_FUNCTION_CODE == FC_GET_COM_EVENT_LOG     ) ||
+        ( ucREQUEST_FUNCTION_CODE == FC_REPORT_SERVER_ID      ) )
     {
         return MB_OK;
     }
@@ -848,6 +859,20 @@ void SerialModbusServer::vHandlerFC06( void )
     ucREPLY_REGISTER_VALUE_LO = ucREQUEST_REGISTER_VALUE_LO;
 
     xReplyLength = 6;
+
+    if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+    {
+        ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+    }
+}
+/*----------------------------------------------------------------------------*/
+
+void SerialModbusServer::vHandlerFC07( void )
+{
+    ucREPLY_FUNCTION_CODE    = ucREQUEST_FUNCTION_CODE;
+    ucREPLY_EXCEPTION_STATUS = ( uint8_t ) xStatus;
+
+    xReplyLength = 3;
 
     if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
     {

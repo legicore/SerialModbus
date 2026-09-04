@@ -165,6 +165,7 @@ private:
     void vHandlerFC03_04( void );
     void vHandlerFC05( void );
     void vHandlerFC06( void );
+    void vHandlerFC07( void );
     void vHandlerFC16( void );
     void vHandlerFC08( void );
     void vClearDiagnosticCounters( void );

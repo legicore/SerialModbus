@@ -295,6 +295,7 @@ protected:
 #define ucREPLY_FUNCTION_CODE           pucReplyFrame[ 1 ]
 #define ucREPLY_BYTE_COUNT              pucReplyFrame[ 2 ]
 #define ucREPLY_ERROR_CODE              pucReplyFrame[ 2 ]
+#define ucREPLY_EXCEPTION_STATUS        pucReplyFrame[ 2 ]
 
 #define ucREPLY_ADDRESS_HI              pucReplyFrame[ 2 ]
 #define ucREPLY_ADDRESS_LO              pucReplyFrame[ 3 ]

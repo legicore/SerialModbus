@@ -96,6 +96,7 @@ public:
     MB_Status_t readInputRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
+    MB_Status_t readExceptionStaus( uint8_t id, uint16_t * data, MB_Callback_f callback = NULL );
 
 private:
 
@@ -113,6 +114,7 @@ private:
     void vHandlerFC03_04( void );
     void vHandlerFC05( void );
     void vHandlerFC06( void );
+    void vHandlerFC07( void );
     void vHandlerFC08( void );
     void vHandlerFC16( void );
 };
