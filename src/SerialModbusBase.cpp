@@ -192,7 +192,9 @@ MB_Status_t SerialModbusBase::xSetChecksum( uint8_t * pucFrame, size_t * pxFrame
 {
     uint16_t usTempChecksum = 0;
 
-    if( ( pucFrame != NULL ) && ( *pxFrameLength >= configMB_FRAME_LEN_MIN ) )
+    /* The smalles legal frame (without a checksum) holds at least 2 bytes
+     * (Id + function code, e.g.: function code 7). */
+    if( ( pucFrame != NULL ) && ( *pxFrameLength >= 2 ) )
     {
         #if( configMB_MODE == configMB_MODE_RTU )
         {
