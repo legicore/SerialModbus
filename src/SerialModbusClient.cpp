@@ -839,13 +839,8 @@ MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, u
 {
     MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 
-    if( setRequest( &xRequest ) == MB_OK )
-    {
-        if( xStatus == MB_OK )
-        {
-            ( void ) process();
-        }
-    }
+    ( void ) setRequest( &xRequest );
+    ( void ) process();
 
     return xStatus;
 }
