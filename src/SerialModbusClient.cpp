@@ -135,9 +135,17 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
         case FC_READ_HOLDING_REGISTERS:
         case FC_READ_INPUT_REGISTERS:
         {
-            pucRequestFrame[ 4 ] = highByte( request->dataSize );
-            pucRequestFrame[ 5 ] =  lowByte( request->dataSize );
-            xRequestLength = 6;
+            if( request->data != NULL )
+            {
+                pucRequestFrame[ 4 ] = highByte( request->dataSize );
+                pucRequestFrame[ 5 ] =  lowByte( request->dataSize );
+
+                xRequestLength = 6;
+            }
+            else
+            {
+                return xSetException( MB_ILLEGAL_REQUEST );
+            }
 
             break;
         }
@@ -150,6 +158,7 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
             {
                 pucRequestFrame[ 4 ] = highByte( request->data[ 0 ] );
                 pucRequestFrame[ 5 ] =  lowByte( request->data[ 0 ] );
+
                 xRequestLength = 6;
             }
             else
@@ -598,14 +607,11 @@ void SerialModbusClient::vHandlerFC03_04( void )
     /* Check the reply byte count. */
     if( ucREPLY_BYTE_COUNT == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
     {
-        if( pxRequest->data != NULL )
-        {
-            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
+        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRequest->address );
 
-            for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
-            {
-                pxRequest->data[ i + xOffset ] = usReplyWord( i );
-            }
+        for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
+        {
+            pxRequest->data[ i + xOffset ] = usReplyWord( i );
         }
 
         if( pxRequest->callback != NULL )
