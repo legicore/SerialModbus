@@ -46,6 +46,17 @@ typedef enum MB_ServerState_e MB_ServerState_t;
 
 /*----------------------------------------------------------------------------*/
 
+enum MB_DataType_e
+{
+    MB_DATA_NONE  = 0,  /* No data */
+    MB_DATA_BITS  = 1,  /* Bits data */
+    MB_DATA_WORDS = 2   /* Words data */
+};
+
+typedef enum MB_DataType_e MB_DataType_t;
+
+/*----------------------------------------------------------------------------*/
+
 enum MB_Access_e
 {
     MB_NA = 0b00,   /* No Access */
@@ -67,6 +78,7 @@ struct MB_Register_s
     uint16_t address;
     uint16_t * data;
     size_t dataSize;
+    MB_DataType_t dataType;
     MB_Callback_f callback;
 };
 
@@ -77,6 +89,7 @@ typedef struct MB_Register_s MB_Register_t;
 #define REG_MAP_END_ADDRESS     0xFFFF
 #define REG_MAP_END_DATA        NULL
 #define REG_MAP_END_DATA_SIZE   0
+#define REG_MAP_END_DATA_TYPE   MB_DATA_WORDS
 #define REG_MAP_END_CALLBACK    NULL
 
 #if( configMB_SERVER_MULTI_ID == 0 )
@@ -85,12 +98,14 @@ typedef struct MB_Register_s MB_Register_t;
                                       REG_MAP_END_ADDRESS,   \
                                       REG_MAP_END_DATA,      \
                                       REG_MAP_END_DATA_SIZE, \
+                                      REG_MAP_END_DATA_TYPE, \
                                       REG_MAP_END_CALLBACK }
 
     #define IS_REGISTER_MAP_END( ENTRY )    ( ( ( ENTRY ).access   == REG_MAP_END_ACCESS    ) && \
                                               ( ( ENTRY ).address  == REG_MAP_END_ADDRESS   ) && \
                                               ( ( ENTRY ).data     == REG_MAP_END_DATA      ) && \
                                               ( ( ENTRY ).dataSize == REG_MAP_END_DATA_SIZE ) && \
+                                              ( ( ENTRY ).dataType == REG_MAP_END_DATA_TYPE ) && \
                                               ( ( ENTRY ).callback == REG_MAP_END_CALLBACK  ) )
 
 #else
@@ -100,6 +115,7 @@ typedef struct MB_Register_s MB_Register_t;
                                       REG_MAP_END_ADDRESS,   \
                                       REG_MAP_END_DATA,      \
                                       REG_MAP_END_DATA_SIZE, \
+                                      REG_MAP_END_DATA_TYPE, \
                                       REG_MAP_END_CALLBACK }
 
     #define IS_REGISTER_MAP_END( ENTRY )    ( ( ( ENTRY ).id       == REG_MAP_END_ID        ) && \
@@ -107,10 +123,10 @@ typedef struct MB_Register_s MB_Register_t;
                                               ( ( ENTRY ).address  == REG_MAP_END_ADDRESS   ) && \
                                               ( ( ENTRY ).data     == REG_MAP_END_DATA      ) && \
                                               ( ( ENTRY ).dataSize == REG_MAP_END_DATA_SIZE ) && \
+                                              ( ( ENTRY ).dataType == REG_MAP_END_DATA_TYPE ) && \
                                               ( ( ENTRY ).callback == REG_MAP_END_CALLBACK  ) )
 
 #endif
-
 /*----------------------------------------------------------------------------*/
 
 class SerialModbusServer : public SerialModbusBase
@@ -139,15 +155,31 @@ public:
     /* Simplified API functions. */
 
 #if( configMB_SERVER_MULTI_ID == 0 )
-    bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createCoils( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_DataType_t dataType = MB_DATA_WORDS, MB_Callback_f callback = NULL );
+
+    bool createCoil( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setCoil( uint16_t address, uint16_t value );
+    bool getCoil( uint16_t address, uint16_t * data );
+
+    bool createDiscreteInput( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setDiscreteInput( uint16_t address, uint16_t value );
+    bool getDiscreteInput( uint16_t address, uint16_t * data );
+
     bool createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createHoldingRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint16_t address, uint16_t value );
     bool getRegister( uint16_t address, uint16_t * data );
 #else
-    bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createCoils( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_DataType_t dataType = MB_DATA_WORDS, MB_Callback_f callback = NULL );
+
+    bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setCoil( uint8_t id, uint16_t address, uint16_t value );
+    bool getCoil( uint8_t id, uint16_t address, uint16_t * data );
+
+    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setDiscreteInput( uint8_t id, uint16_t address, uint16_t value );
+    bool getDiscreteInput( uint8_t id, uint16_t address, uint16_t * data );
+
     bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint8_t id, uint16_t address, uint16_t value );
@@ -193,8 +225,16 @@ private:
     /* Simplified API functions. */
 
 #if( configMB_SERVER_MULTI_ID == 0 )
-    bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
-    bool createCoils( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_DataType_t dataType = MB_DATA_WORDS, MB_Callback_f callback = NULL );
+
+    bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setCoil( uint8_t id, uint16_t address, uint16_t value );
+    bool getCoil( uint8_t id, uint16_t address, uint16_t * data );
+
+    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool setDiscreteInput( uint8_t id, uint16_t address, uint16_t value );
+    bool getDiscreteInput( uint8_t id, uint16_t address, uint16_t * data );
+
     bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
     bool setRegister( uint8_t id, uint16_t address, uint16_t value );

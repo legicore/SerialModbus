@@ -58,7 +58,12 @@ diagRegSet	KEYWORD2
 diagRegClear	KEYWORD2
 
 createRegister	KEYWORD2
-createCoils	KEYWORD2
+createCoil	KEYWORD2
+setCoil	KEYWORD2
+getCoil	KEYWORD2
+createDiscreteInput	KEYWORD2
+setDiscreteInput	KEYWORD2
+getDiscreteInput	KEYWORD2
 createInputRegister	KEYWORD2
 createHoldingRegister	KEYWORD2
 getRegister	KEYWORD2

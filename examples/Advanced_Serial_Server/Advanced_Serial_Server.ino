@@ -24,8 +24,8 @@ void callback( void );
 /*----------------------------------------------------------------------------*/
 
 MB_Register_t registerMap[] = {
-    { MB_WO, 1000, &data, 1, NULL },
-    { MB_RO, 2000, &data, 1, callback },
+    { MB_WO, 1000, &data, 1, MB_DATA_WORDS, NULL },
+    { MB_RO, 2000, &data, 1, MB_DATA_WORDS, callback },
     MB_REGISTER_MAP_END
 };
 /*----------------------------------------------------------------------------*/
