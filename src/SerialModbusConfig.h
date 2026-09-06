@@ -30,8 +30,8 @@
 #define configMB_FRAME_LEN_MIN          3
 #define configMB_FRAME_LEN_MAX          64
 
-/* This value for the Arduino default serial configuration is taken from the 
- * source code (8 data bits, no parity, 1 stop bit). */ 
+/* This value for the Arduino default serial configuration is taken from the
+ * source code (8 data bits, no parity, 1 stop bit). */
 #define configMB_SERIAL_CONF_DEFAULT    SERIAL_8N1
 
 /*----------------------------------------------------------------------------*/
@@ -77,13 +77,13 @@
 #define configMB_FC21       N   /* FC_WRITE_FILE_RECORD */
 
 /* Diagnostics */
-#define configMB_FC07       N   /* FC_READ_EXCEPTION_STATUS */
+#define configMB_FC07       1   /* FC_READ_EXCEPTION_STATUS */
 #define configMB_FC08       1   /* FC_DIAGNOSTIC */
 #define configMB_FC11       N   /* FC_GET_COM_EVENT_COUNTER */
 #define configMB_FC12       N   /* FC_GET_COM_EVENT_LOG */
 #define configMB_FC17       N   /* FC_REPORT_SERVER_ID */
 
-/* MB_DIAGNOSTIC Sub-Function Codes */
+/* Sub-Function Codes */
 #define configMB_SFC00      1   /* SFC_RETURN_QUERY_DATA */
 #define configMB_SFC01      1   /* SFC_RESTART_COMMUNICATIONS_OPTION */
 #define configMB_SFC02      1   /* SFC_RETURN_DIAGNOSTIC_REGISTER */
