@@ -30,11 +30,6 @@
 
 /*----------------------------------------------------------------------------*/
 
-#define BITS_TO_WORDS( xNbrOfBits ) \
-    ( ( ( xNbrOfBits ) / 16 ) + ( ( ( ( xNbrOfBits ) % 16 ) == 0 ) ? 0 : 1 ) )
-
-/*----------------------------------------------------------------------------*/
-
 struct MB_AccessRights_s
 {
     MB_DataType_t xDataType;
@@ -787,8 +782,8 @@ void SerialModbusServer::vHandlerFC03_04( void )
         {
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] );
-                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] );
             }
 
             ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -828,16 +823,16 @@ void SerialModbusServer::vHandlerFC05( void )
 
     if( ( usREQUEST_COIL_VALUE == MB_COIL_ON ) || ( usREQUEST_COIL_VALUE == MB_COIL_OFF ) )
     {
-        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) / 16;
-        xBit    = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) % 16;
+        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) / 8;
+        xBit    = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) % 8;
 
         if( usREQUEST_COIL_VALUE == MB_COIL_ON )
         {
-            bitSet( pxRegisterMap[ xRegisterMapIndex ].data[ xOffset ], xBit );
+            bitSet( ( ( uint8_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ], xBit );
         }
         else
         {
-            bitClear( pxRegisterMap[ xRegisterMapIndex ].data[ xOffset ], xBit );
+            bitClear( ( ( uint8_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ], xBit );
         }
 
         ucREPLY_FUNCTION_CODE   = ucREQUEST_FUNCTION_CODE;
@@ -872,7 +867,7 @@ void SerialModbusServer::vHandlerFC06( void )
 {
     size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
 
-    pxRegisterMap[ xRegisterMapIndex ].data[ xOffset ] = usREQUEST_REGISTER_VALUE;
+    ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ] = usREQUEST_REGISTER_VALUE;
 
     ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
     ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
@@ -1320,7 +1315,7 @@ void SerialModbusServer::vHandlerFC16( void )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
-                    pxRegisterMap[ xRegisterMapIndex ].data[ i + xOffset ] = usRequestWord( i, 7 );
+                    ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] = usRequestWord( i, 7 );
                 }
 
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -1398,7 +1393,7 @@ bool SerialModbusServer::createRegister( uint8_t id, MB_Access_t access, uint16_
     {
         if( dataType == MB_DATA_BITS )
         {
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].data = ( uint16_t * ) calloc( BITS_TO_WORDS( dataSize ), sizeof( uint16_t ) );
+            pxRegisterMapTmp[ xRegisterMapSize - 1 ].data = ( uint8_t * ) calloc( mbBITS_TO_BYTES( dataSize ), sizeof( uint8_t ) );
         }
         else
         {
@@ -1480,10 +1475,10 @@ bool SerialModbusServer::getCoil( uint8_t id, uint16_t address, uint16_t * data 
                     ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
                     ( pxRegisterMap[ i ].dataType == MB_DATA_BITS ) )
                 {
-                    xOffset = ( address - pxRegisterMap[ i ].address ) / 16;
-                    xBit    = ( address - pxRegisterMap[ i ].address ) % 16;
+                    xOffset = ( address - pxRegisterMap[ i ].address ) / 8;
+                    xBit    = ( address - pxRegisterMap[ i ].address ) % 8;
 
-                    if( bitRead( pxRegisterMap[ i ].data[ xOffset ], xBit ) == 1 )
+                    if( bitRead( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit ) == 1 )
                     {
                         *data = MB_COIL_ON;
                     }
@@ -1532,16 +1527,16 @@ bool SerialModbusServer::setCoil( uint8_t id, uint16_t address, uint16_t value )
                     ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
                     ( pxRegisterMap[ i ].dataType == MB_DATA_BITS ) )
                 {
-                    xOffset = ( address - pxRegisterMap[ i ].address ) / 16;
-                    xBit    = ( address - pxRegisterMap[ i ].address ) % 16;
+                    xOffset = ( address - pxRegisterMap[ i ].address ) / 8;
+                    xBit    = ( address - pxRegisterMap[ i ].address ) % 8;
 
                     if( ( value == 1 ) || ( value == MB_COIL_ON ) )
                     {
-                        bitSet( pxRegisterMap[ i ].data[ xOffset ], xBit );
+                        bitSet( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit );
                     }
                     else
                     {
-                        bitClear( pxRegisterMap[ i ].data[ xOffset ], xBit );
+                        bitClear( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit );
                     }
 
                     return true;
@@ -1663,7 +1658,7 @@ bool SerialModbusServer::getRegister( uint8_t id, uint16_t address, uint16_t * d
                     ( pxRegisterMap[ i ].dataType == MB_DATA_WORDS ) )
                 {
                     xOffset = address - pxRegisterMap[ i ].address;
-                    *data = pxRegisterMap[ i ].data[ xOffset ];
+                    *data = ( ( uint16_t * ) pxRegisterMap[ i ].data )[ xOffset ];
                     return true;
                 }
 #if( configMB_SERVER_MULTI_ID == 1 )
@@ -1703,7 +1698,7 @@ bool SerialModbusServer::setRegister( uint8_t id, uint16_t address, uint16_t val
                     ( pxRegisterMap[ i ].dataType == MB_DATA_WORDS ) )
                 {
                     xOffset = address - pxRegisterMap[ i ].address;
-                    pxRegisterMap[ i ].data[ xOffset ] = value;
+                    ( ( uint16_t * ) pxRegisterMap[ i ].data )[ xOffset ] = value;
                     return true;
                 }
 #if( configMB_SERVER_MULTI_ID == 1 )

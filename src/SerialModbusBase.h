@@ -147,6 +147,11 @@ typedef enum MB_Status_e MB_Exception_t;
 
 /*----------------------------------------------------------------------------*/
 
+#define mbBITS_TO_BYTES( xNbrOfBits ) \
+    ( ( ( xNbrOfBits ) / 8 ) + ( ( ( ( xNbrOfBits ) % 8 ) == 0 ) ? 0 : 1 ) )
+
+/*----------------------------------------------------------------------------*/
+
 #define MB_COIL_ON              0xFF00
 #define MB_COIL_OFF             0x0000
 

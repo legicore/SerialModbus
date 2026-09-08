@@ -76,7 +76,7 @@ struct MB_Register_s
 #endif
     MB_Access_t access;
     uint16_t address;
-    uint16_t * data;
+    void * data;
     size_t dataSize;
     MB_DataType_t dataType;
     MB_Callback_f callback;

@@ -47,7 +47,7 @@ struct MB_Request_s
     uint8_t id;
     uint8_t functionCode;
     uint16_t address;
-    uint16_t * data;
+    void * data;
     size_t dataSize;
     MB_Callback_f callback;
 };

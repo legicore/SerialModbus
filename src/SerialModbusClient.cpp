@@ -156,8 +156,8 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
         {
             if( request->data != NULL )
             {
-                pucRequestFrame[ 4 ] = highByte( request->data[ 0 ] );
-                pucRequestFrame[ 5 ] =  lowByte( request->data[ 0 ] );
+                pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->data )[ 0 ] );
+                pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->data )[ 0 ] );
 
                 xRequestLength = 6;
             }
@@ -217,8 +217,8 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
                 {
                     if( request->data != NULL )
                     {
-                        pucRequestFrame[ 4 ] = highByte( request->data[ 0 ] );
-                        pucRequestFrame[ 5 ] =  lowByte( request->data[ 0 ] );
+                        pucRequestFrame[ 4 ] = highByte( ( ( uint16_t * ) request->data )[ 0 ] );
+                        pucRequestFrame[ 5 ] =  lowByte( ( ( uint16_t * ) request->data )[ 0 ] );
                     }
                     else
                     {
@@ -315,8 +315,9 @@ MB_Status_t SerialModbusClient::setRequest( const MB_Request_t * request )
             {
                 for( size_t i = 0; i < request->dataSize; i++ )
                 {
-                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( request->data[ i ] );
-                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( request->data[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 7 ] = highByte( ( ( uint16_t * ) request->data )[ i ] );
+                    pucRequestFrame[ ( i * 2 ) + 8 ] =  lowByte( ( ( uint16_t * ) request->data )[ i ] );
+
                     xRequestLength += 2;
                 }
             }
@@ -633,7 +634,7 @@ void SerialModbusClient::vHandlerFC03_04( void )
 
         for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
         {
-            pxRequest->data[ i + xOffset ] = usReplyWord( i );
+            ( ( uint16_t * ) pxRequest->data )[ i + xOffset ] = usReplyWord( i );
         }
 
         if( pxRequest->callback != NULL )
@@ -705,7 +706,7 @@ void SerialModbusClient::vHandlerFC06( void )
 
 void SerialModbusClient::vHandlerFC07( void )
 {
-    pxRequest->data[ 0 ] = ucREPLY_EXCEPTION_STATUS;
+    ( ( uint8_t * ) pxRequest->data )[ 0 ] = ucREPLY_EXCEPTION_STATUS;
 
     if( pxRequest->callback != NULL )
     {
@@ -820,7 +821,7 @@ void SerialModbusClient::vHandlerFC08( void )
             {
                 if( pxRequest->data != NULL )
                 {
-                    pxRequest->data[ 0 ] = usREPLY_DATA;
+                    ( ( uint16_t * ) pxRequest->data )[ 0 ] = usREPLY_DATA;
                 }
 
                 break;
