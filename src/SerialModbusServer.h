@@ -221,6 +221,7 @@ private:
     bool bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry );
     bool bRegisterMapLock_sAPI;
     bool bRegisterMapLock;
+    bool bFindAddress( uint8_t ucId, int16_t usAddress );
 
     /* Simplified API functions. */
 
