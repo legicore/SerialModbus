@@ -23,10 +23,10 @@ void callback( void );
 
 /*----------------------------------------------------------------------------*/
 
-MB_Register_t registerMap[] = {
-    { MB_WO, 1000, &data, 1, MB_DATA_WORDS, NULL },
-    { MB_RO, 2000, &data, 1, MB_DATA_WORDS, callback },
-    MB_REGISTER_MAP_END
+MB_Address_t addressMap[] = {
+    { ADDR_HOLDING_REGISTER, 1000, &data, 1, NULL },
+    { ADDR_INPUT_REGISTER,   2000, &data, 1, callback },
+    MB_ADDRESS_MAP_END
 };
 /*----------------------------------------------------------------------------*/
 
@@ -41,10 +41,10 @@ void setup( void )
      *          e.g.: ModbusServer.begin( 1, 9600, &Serial, SERIAL_8N1 ); */
     ModbusServer.begin( 1, 9600 );
 
-    ModbusServer.setRegisterMap( registerMap );
-    if( ModbusServer.checkRegisterMap() != MB_OK )
+    ModbusServer.setAddressMap( addressMap );
+    if( ModbusServer.checkAddressMap() != MB_OK )
     {
-        /* React to an error in the register map. */
+        /* React to an error in the address map. */
     }
 
     /* The following functions can be used to get and set timings.

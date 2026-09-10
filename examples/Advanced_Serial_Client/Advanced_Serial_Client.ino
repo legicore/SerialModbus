@@ -24,8 +24,8 @@ void callback( void );
 /*----------------------------------------------------------------------------*/
 
 MB_Request_t requestMap[] = {
-    { 1, FC_WRITE_SINGLE_REGISTER,  1000, &data, 1, callback },
-    { 1, FC_READ_HOLDING_REGISTERS, 2000, &data, 1, NULL },
+    { 1, FC_WRITE_SINGLE_REGISTER, 1000, &data, 1, callback },
+    { 1, FC_READ_INPUT_REGISTERS,  2000, &data, 1, NULL },
     MB_REQUEST_MAP_END
 };
 /*----------------------------------------------------------------------------*/

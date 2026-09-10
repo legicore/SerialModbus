@@ -60,7 +60,6 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     /* Extended exception codes for server replies. */
     { MB_SERVER_ILLEGAL_FUNCTION,                   "SERVER_ILLEGAL_FUNCTION" },
     { MB_SERVER_ILLEGAL_STATE,                      "SERVER_ILLEGAL_STATE" },
-    { MB_SERVER_ILLEGAL_ACCESS,                     "SERVER_ILLEGAL_ACCESS" },
     { MB_SERVER_ILLEGAL_QUANTITY,                   "SERVER_ILLEGAL_QUANTITY" },
     { MB_SERVER_ILLEGAL_COIL_VALUE,                 "SERVER_ILLEGAL_COIL_VALUE" },
     { MB_SERVER_ILLEGAL_INPUT_DELIMITER,            "SERVER_ILLEGAL_INPUT_DELIMITER" },
@@ -86,9 +85,9 @@ static const MB_ExceptionString_t pxExceptionStrings[] = {
     { MB_NO_REQUEST,                                "NO_REQUEST" },
 
     /* Non-standard exception codes (server only). */
-    { MB_SERVER_REG_DATA,                           "SERVER_REG_DATA" },
-    { MB_SERVER_REG_DATA_SIZE,                      "SERVER_REG_DATA_SIZE" },
-    { MB_SERVER_REG_OVERLAP,                        "SERVER_REG_OVERLAP" },
+    { MB_SERVER_ADDR_DATA,                          "SERVER_ADDR_DATA" },
+    { MB_SERVER_ADDR_DATA_SIZE,                     "SERVER_ADDR_DATA_SIZE" },
+    { MB_SERVER_ADDR_OVERLAP,                       "SERVER_ADDR_OVERLAP" },
 
     { MB_NOK, "NOK" },
 

@@ -30,83 +30,30 @@
 
 /*----------------------------------------------------------------------------*/
 
-struct MB_AccessRights_s
+struct MB_AddressAccess_s
 {
-    MB_DataType_t xDataType;
-    MB_Access_t xAccess;
     MB_FunctionCode_t xFunctionCode;
+    MB_AddrType_t xAddressType;
 };
 
-typedef struct MB_AccessRights_s MB_AccessRights_t;
+typedef struct MB_AddressAccess_s MB_AddrAccess_t;
 
 /*----------------------------------------------------------------------------*/
 
-static const MB_AccessRights_t pxAccessRights[] = {
-
-    /* Bit Data Access */
-#if( configMB_FC01 == 1 )
-    { MB_DATA_BITS, MB_RO, FC_READ_COILS },
-#endif
-#if( configMB_FC02 == 1 )
-    { MB_DATA_BITS, MB_RO, FC_READ_DISCRETE_INPUTS },
-#endif
-#if( configMB_FC05 == 1 )
-    { MB_DATA_BITS, MB_WO, FC_WRITE_SINGLE_COIL },
-#endif
-#if( configMB_FC15 == 1 )
-    { MB_DATA_BITS, MB_WO, FC_WRITE_MULTIPLE_COILS },
-#endif
-
-    /* Word Data Access */
-#if( configMB_FC03 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_READ_HOLDING_REGISTERS },
-#endif
-#if( configMB_FC04 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_READ_INPUT_REGISTERS },
-#endif
-#if( configMB_FC06 == 1 )
-    { MB_DATA_WORDS, MB_WO, FC_WRITE_SINGLE_REGISTER },
-#endif
-#if( configMB_FC16 == 1 )
-    { MB_DATA_WORDS, MB_WO, FC_WRITE_MULTIPLE_REGISTERS },
-#endif
-#if( configMB_FC22 == 1 )
-    { MB_DATA_WORDS, MB_WO, FC_MASK_WRITE_REGISTER },
-#endif
-#if( configMB_FC23 == 1 )
-    { MB_DATA_WORDS, MB_RW, FC_READ_WRITE_MULTIPLE_REGISTERS },
-#endif
-#if( configMB_FC24 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_READ_FIFO_QUEUE },
-#endif
-
-    /* File Record Data Access */
-#if( configMB_FC20 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_READ_FILE_RECORD },
-#endif
-#if( configMB_FC21 == 1 )
-    { MB_DATA_WORDS, MB_WO, FC_WRITE_FILE_RECORD },
-#endif
-
-    /* Diagnostics */
-#if( configMB_FC07 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_READ_EXCEPTION_STATUS },
-#endif
-#if( configMB_FC08 == 1 )
-    { MB_DATA_WORDS, MB_RW, FC_DIAGNOSTIC },
-#endif
-#if( configMB_FC11 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_GET_COM_EVENT_COUNTER },
-#endif
-#if( configMB_FC12 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_GET_COM_EVENT_LOG },
-#endif
-#if( configMB_FC17 == 1 )
-    { MB_DATA_WORDS, MB_RO, FC_REPORT_SERVER_ID },
-#endif
+static const MB_AddrAccess_t pxAddressAccessMap[] = {
+    { FC_READ_COILS,                    ADDR_COIL },
+    { FC_READ_DISCRETE_INPUTS,          ADDR_DISCRETE_INPUT },
+    { FC_WRITE_SINGLE_COIL,             ADDR_COIL },
+    { FC_WRITE_MULTIPLE_COILS,          ADDR_COIL },
+    { FC_READ_HOLDING_REGISTERS,        ADDR_HOLDING_REGISTER },
+    { FC_READ_INPUT_REGISTERS,          ADDR_INPUT_REGISTER },
+    { FC_WRITE_SINGLE_REGISTER,         ADDR_HOLDING_REGISTER },
+    { FC_WRITE_MULTIPLE_REGISTERS,      ADDR_HOLDING_REGISTER },
+    { FC_MASK_WRITE_REGISTER,           ADDR_HOLDING_REGISTER },
+    { FC_READ_WRITE_MULTIPLE_REGISTERS, ADDR_HOLDING_REGISTER },
 
     /* Marks the end of the list. */
-    { MB_DATA_NONE, MB_NA, ( MB_FunctionCode_t ) 0x00 }
+    { ( MB_FunctionCode_t ) 0x00, ADDR_NO_DATA }
 };
 /*----------------------------------------------------------------------------*/
 
@@ -123,8 +70,8 @@ SerialModbusServer::SerialModbusServer()
 
     bListenOnlyMode = false;
 
-    pxRegisterMap = NULL;
-    xRegisterMapIndex = 0;
+    pxAddressMap = NULL;
+    xAddressMapIndex = 0;
 
     ucServerId = configMB_ID_SERVER_MAX;
 
@@ -134,10 +81,10 @@ SerialModbusServer::SerialModbusServer()
     }
     #endif
 
-    xRegisterMapSize = 0;
+    xAddressMapSize = 0;
 
-    bRegisterMapLock_sAPI = false;
-    bRegisterMapLock = false;
+    bAddressMapLock_sAPI = false;
+    bAddressMapLock = false;
 }
 /*----------------------------------------------------------------------------*/
 
@@ -177,30 +124,30 @@ void SerialModbusServer::vSetState( MB_ServerState_t xStatePar )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::setRegisterMap( MB_Register_t * registerMap )
+bool SerialModbusServer::setAddressMap( MB_Address_t * addressMap )
 {
-    if( registerMap == NULL )
+    if( addressMap == NULL )
     {
-        if( bRegisterMapLock_sAPI == true )
+        if( bAddressMapLock_sAPI == true )
         {
-            bRegisterMapLock_sAPI = false;
-            if( pxRegisterMap != NULL )
+            bAddressMapLock_sAPI = false;
+            if( pxAddressMap != NULL )
             {
-                free( pxRegisterMap );
+                free( pxAddressMap );
             }
         }
 
-        pxRegisterMap = NULL;
-        bRegisterMapLock = false;
+        pxAddressMap = NULL;
+        bAddressMapLock = false;
 
         return true;
     }
-    else /* if( registerMap != NULL ) */
+    else /* if( addressMap != NULL ) */
     {
-        if( ( pxRegisterMap == NULL ) && ( bRegisterMapLock_sAPI == false ) )
+        if( ( pxAddressMap == NULL ) && ( bAddressMapLock_sAPI == false ) )
         {
-            pxRegisterMap = registerMap;
-            bRegisterMapLock = true;
+            pxAddressMap = addressMap;
+            bAddressMapLock = true;
 
             return true;
         }
@@ -210,37 +157,37 @@ bool SerialModbusServer::setRegisterMap( MB_Register_t * registerMap )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::resetRegisterMap( void )
+bool SerialModbusServer::resetAddressMap( void )
 {
-    return setRegisterMap( NULL );
+    return setAddressMap( NULL );
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Register_t * SerialModbusServer::getRegisterMap( void )
+MB_Address_t * SerialModbusServer::getAddressMap( void )
 {
-    return pxRegisterMap;
+    return pxAddressMap;
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusServer::checkRegisterMap( void )
+MB_Status_t SerialModbusServer::checkAddressMap( void )
 {
     size_t a = 0;
     size_t b = 0;
 
-    if( pxRegisterMap != NULL )
+    if( pxAddressMap != NULL )
     {
-        /* Count the number of entries in the register map and make sure that
-         * the data field is defined correctly. */
-        while( IS_REGISTER_MAP_END( pxRegisterMap[ a ] ) != true )
+        /* Count the number of entries in the address map and make sure that the
+         * data field is defined correctly. */
+        while( IS_ADDRESS_MAP_END( pxAddressMap[ a ] ) != true )
         {
-            if( pxRegisterMap[ a ].data == NULL )
+            if( pxAddressMap[ a ].data == NULL )
             {
-                return MB_SERVER_REG_DATA;
+                return MB_SERVER_ADDR_DATA;
             }
 
-            if( pxRegisterMap[ a ].dataSize == 0 )
+            if( pxAddressMap[ a ].dataSize == 0 )
             {
-                return MB_SERVER_REG_DATA_SIZE;
+                return MB_SERVER_ADDR_DATA_SIZE;
             }
 
             a++;
@@ -248,7 +195,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
 
         if( a == 1 )
         {
-            /* If there is only one entry in the register map, there is no need
+            /* If there is only one entry in the address map, there is no need
              * to perform a overlap check. */
             return MB_OK;
         }
@@ -258,14 +205,15 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
             {
                 for( b = 0; b < a; b++ )
                 {
-                    if( &pxRegisterMap[ a ] != &pxRegisterMap[ b ] )
+                    if( ( &pxAddressMap[ a ] != &pxAddressMap[ b ] ) &&
+                        ( pxAddressMap[ a ].addressType == pxAddressMap[ b ].addressType ) )
                     {
                         /* Simplified representation of the algorithm :
                          * ( b[ 0 ] > a[ n-1 ] ) NOR ( a[ 0 ] > b[ n-1 ] ) */
-                        if( !( ( pxRegisterMap[ b ].address > ( pxRegisterMap[ a ].address + pxRegisterMap[ a ].dataSize - 1 ) ) ||
-                               ( pxRegisterMap[ a ].address > ( pxRegisterMap[ b ].address + pxRegisterMap[ b ].dataSize - 1 ) ) ) )
+                        if( !( ( pxAddressMap[ b ].address > ( pxAddressMap[ a ].address + pxAddressMap[ a ].dataSize - 1 ) ) ||
+                               ( pxAddressMap[ a ].address > ( pxAddressMap[ b ].address + pxAddressMap[ b ].dataSize - 1 ) ) ) )
                         {
-                            return MB_SERVER_REG_OVERLAP;
+                            return MB_SERVER_ADDR_OVERLAP;
                         }
                     }
                 }
@@ -287,11 +235,11 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
 
         xIdCount = 0;
 
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
             for( size_t j = 0; j < xIdCount; j++ )
             {
-                if( ucIdMap[ j ] == pxRegisterMap[ i ].id )
+                if( ucIdMap[ j ] == pxAddressMap[ i ].id )
                 {
                     bIdFound = true;
                 }
@@ -299,7 +247,7 @@ MB_Status_t SerialModbusServer::checkRegisterMap( void )
 
             if( bIdFound == false )
             {
-                ucIdMap[ xIdCount++ ] = pxRegisterMap[ i ].id;
+                ucIdMap[ xIdCount++ ] = pxAddressMap[ i ].id;
             }
 
             bIdFound = false;
@@ -344,7 +292,7 @@ MB_Status_t SerialModbusServer::process( void )
         /* Get the current state and select the associated action. */
         switch( xState )
         {
-            case SERVER_IDLE :
+            case SERVER_IDLE:
             {
                 if( xReplyLength >= configMB_FRAME_LEN_MIN )
                 {
@@ -492,7 +440,7 @@ MB_Status_t SerialModbusServer::process( void )
                 break;
             }
 
-            case CHECKING_REQUEST :
+            case CHECKING_REQUEST:
             {
                 /* We received a valid request that is a broadcast or is
                  * addressed to the Id of this deveice -> Increment the server
@@ -511,7 +459,7 @@ MB_Status_t SerialModbusServer::process( void )
                 break;
             }
 
-            case PROCESSING_REQUIRED_ACTION :
+            case PROCESSING_REQUIRED_ACTION:
             {
 #if( configMB_FC08 == 1 )
                 /* If the Listen Only Mode is active we monitor all bus
@@ -613,7 +561,7 @@ MB_Status_t SerialModbusServer::process( void )
                 break;
             }
 
-            case FORMATTING_NORMAL_REPLY :
+            case FORMATTING_NORMAL_REPLY:
             {
                 ucREPLY_ID = ucServerId;
                 ( void ) xSetChecksum( pucReplyFrame, &xReplyLength );
@@ -624,7 +572,7 @@ MB_Status_t SerialModbusServer::process( void )
                 break;
             }
 
-            case FORMATTING_ERROR_REPLY :
+            case FORMATTING_ERROR_REPLY:
             {
                 vIncCPT3();
 
@@ -642,7 +590,7 @@ MB_Status_t SerialModbusServer::process( void )
                 break;
             }
 
-            default :
+            default:
             {
                 #if( configMB_EXT_EXCEPTION_CODES == 1 )
                 {
@@ -678,10 +626,12 @@ MB_Status_t SerialModbusServer::process( void )
 
 MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
 {
-    /* Do nothing if the register map is not set. */
-    if( pxRegisterMap == NULL )
+    MB_AddrType_t xReqAddressType = ADDR_NO_DATA;
+
+    /* Do nothing if the address map is not set. */
+    if( pxAddressMap == NULL )
     {
-        return MB_NOK;
+        return xSetException( MB_SERVER_DEVICE_FAILURE );
     }
 
     /* If any Modbus diagnostics are enabled we don't need to do the normal
@@ -696,77 +646,57 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
         return MB_OK;
     }
 
-    /* Reset the register map index. */
-    xRegisterMapIndex = 0;
+    /* Scan the access map for the address type of the given function code. */
+    for( size_t i = 0; pxAddressAccessMap[ i ].xAddressType != ADDR_NO_DATA; i++ )
+    {
+        if( pxAddressAccessMap[ i ].xFunctionCode == ucReqFunctionCode )
+        {
+            xReqAddressType = pxAddressAccessMap[ i ].xAddressType;
+        }
+    }
 
-    /* Before we find a matching register map entry the exception will be set by
-     * default. If successful the exception is reset to 'MB_OK' or will be
-     * overwritten if another error occurs. Otherwise it persists which means
-     * that we could not find a matching register map entry. */
-    ( void ) xSetException( MB_ILLEGAL_DATA_ADDRESS );
+    if( xReqAddressType == ADDR_NO_DATA )
+    {
+        /* We could not find the function code in the address access map, so we
+         * set the exception and abort the request check. */
+        #if( configMB_EXT_EXCEPTION_CODES == 1 )
+        {
+            return xSetException( MB_SERVER_ILLEGAL_FUNCTION );
+        }
+        #else
+        {
+            return xSetException( MB_ILLEGAL_FUNCTION );
+        }
+        #endif
+    }
 
-    /* Scan the register map and check if the request address value lies in the
+    /* Reset the address map index. */
+    xAddressMapIndex = 0;
+
+    /* Scan the address map and check if the request address value lies in the
      * range of one of the mapped register entries. */
-    for( ; IS_REGISTER_MAP_END( pxRegisterMap[ xRegisterMapIndex ] ) != true; xRegisterMapIndex++ )
+    for( ; IS_ADDRESS_MAP_END( pxAddressMap[ xAddressMapIndex ] ) != true; xAddressMapIndex++ )
     {
 #if( configMB_SERVER_MULTI_ID == 1 )
-        if( pxRegisterMap[ xRegisterMapIndex ].id == ucServerId )
+        if( pxAddressMap[ xAddressMapIndex ].id == ucServerId )
         {
 #endif
-            if( ( usReqAddress >= pxRegisterMap[ xRegisterMapIndex ].address ) &&
-                ( usReqAddress < ( pxRegisterMap[ xRegisterMapIndex ].address + ( uint16_t ) pxRegisterMap[ xRegisterMapIndex ].dataSize ) ) )
+            if( pxAddressMap[ xAddressMapIndex ].addressType == xReqAddressType )
             {
-                /* Scan the access rights map for the request function code. */
-                for( size_t i = 0; pxAccessRights[ i ].xAccess != MB_NA; i++ )
+                if( ( usReqAddress >= pxAddressMap[ xAddressMapIndex ].address ) &&
+                    ( usReqAddress < ( pxAddressMap[ xAddressMapIndex ].address + ( uint16_t ) pxAddressMap[ xAddressMapIndex ].dataSize ) ) )
                 {
-                    if( ucReqFunctionCode == ( uint8_t ) pxAccessRights[ i ].xFunctionCode )
-                    {
-                        /* Check if the type of the request function code has
-                         * the right to access the destination register. */
-                        if( ( ( pxRegisterMap[ xRegisterMapIndex ].access & pxAccessRights[ i ].xAccess ) != 0 ) &&
-                            ( pxRegisterMap[ xRegisterMapIndex ].dataType == pxAccessRights[ i ].xDataType ) )
-                        {
-                            /* Reset the exception which was set from start. */
-                            return xSetException( MB_OK );
-                        }
-
-                        /* While register access rights are not a standard
-                         * feature of Modbus we will set a non standard
-                         * exception and abort the for loop. */
-                        #if( configMB_EXT_EXCEPTION_CODES == 1 )
-                        {
-                            ( void ) xSetException( MB_SERVER_ILLEGAL_ACCESS );
-                        }
-                        #else
-                        {
-                            ( void ) xSetException( MB_ILLEGAL_FUNCTION );
-                        }
-                        #endif
-
-                        return MB_NOK;
-                    }
+                    /* Reset the exception which was set from start. */
+                    return MB_OK;
                 }
-
-                /* We could not find the function code in the access rights map
-                 * so we set the exception and abort the for loop. */
-                #if( configMB_EXT_EXCEPTION_CODES == 1 )
-                {
-                    ( void ) xSetException( MB_SERVER_ILLEGAL_FUNCTION );
-                }
-                #else
-                {
-                    ( void ) xSetException( MB_ILLEGAL_FUNCTION );
-                }
-                #endif
-
-                break;
             }
 #if( configMB_SERVER_MULTI_ID == 1 )
         }
 #endif
     }
 
-    return MB_NOK;
+    /* At this point, the requested address is not defined/assigned. */
+    return xSetException( MB_ILLEGAL_DATA_ADDRESS );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -776,14 +706,14 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
     if( ( usREQUEST_QUANTITY >= 0x0001 ) && ( usREQUEST_QUANTITY <= 0x007D ) )
     {
-        xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
+        xOffset = ( size_t ) usREQUEST_ADDRESS - pxAddressMap[ xAddressMapIndex ].address;
 
-        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].dataSize )
+        if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxAddressMap[ xAddressMapIndex ].dataSize )
         {
             for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
             {
-                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] );
-                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 3 ] = highByte( ( ( uint16_t * ) pxAddressMap[ xAddressMapIndex ].data )[ i + xOffset ] );
+                pucReplyFrame[ ( i * 2 ) + 4 ] =  lowByte( ( ( uint16_t * ) pxAddressMap[ xAddressMapIndex ].data )[ i + xOffset ] );
             }
 
             ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -791,9 +721,9 @@ void SerialModbusServer::vHandlerFC03_04( void )
 
             xReplyLength = ( size_t ) ucREPLY_BYTE_COUNT + 3;
 
-            if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+            if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
             {
-                ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+                ( pxAddressMap[ xAddressMapIndex ].callback )();
             }
 
             return;
@@ -823,16 +753,16 @@ void SerialModbusServer::vHandlerFC05( void )
 
     if( ( usREQUEST_COIL_VALUE == MB_COIL_ON ) || ( usREQUEST_COIL_VALUE == MB_COIL_OFF ) )
     {
-        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) / 8;
-        xBit    = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address ) % 8;
+        xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxAddressMap[ xAddressMapIndex ].address ) / 8;
+        xBit    = ( size_t ) ( usREQUEST_ADDRESS - pxAddressMap[ xAddressMapIndex ].address ) % 8;
 
         if( usREQUEST_COIL_VALUE == MB_COIL_ON )
         {
-            bitSet( ( ( uint8_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ], xBit );
+            bitSet( ( ( uint8_t * ) pxAddressMap[ xAddressMapIndex ].data )[ xOffset ], xBit );
         }
         else
         {
-            bitClear( ( ( uint8_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ], xBit );
+            bitClear( ( ( uint8_t * ) pxAddressMap[ xAddressMapIndex ].data )[ xOffset ], xBit );
         }
 
         ucREPLY_FUNCTION_CODE   = ucREQUEST_FUNCTION_CODE;
@@ -843,9 +773,9 @@ void SerialModbusServer::vHandlerFC05( void )
 
         xReplyLength = 6;
 
-        if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+        if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
         {
-            ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+            ( pxAddressMap[ xAddressMapIndex ].callback )();
         }
 
         return;
@@ -865,9 +795,9 @@ void SerialModbusServer::vHandlerFC05( void )
 
 void SerialModbusServer::vHandlerFC06( void )
 {
-    size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address;
+    size_t xOffset = ( size_t ) usREQUEST_ADDRESS - pxAddressMap[ xAddressMapIndex ].address;
 
-    ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ xOffset ] = usREQUEST_REGISTER_VALUE;
+    ( ( uint16_t * ) pxAddressMap[ xAddressMapIndex ].data )[ xOffset ] = usREQUEST_REGISTER_VALUE;
 
     ucREPLY_FUNCTION_CODE     = ucREQUEST_FUNCTION_CODE;
     ucREPLY_ADDRESS_HI        = ucREQUEST_ADDRESS_HI;
@@ -877,9 +807,9 @@ void SerialModbusServer::vHandlerFC06( void )
 
     xReplyLength = 6;
 
-    if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+    if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
     {
-        ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+        ( pxAddressMap[ xAddressMapIndex ].callback )();
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -891,9 +821,9 @@ void SerialModbusServer::vHandlerFC07( void )
 
     xReplyLength = 3;
 
-    if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+    if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
     {
-        ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+        ( pxAddressMap[ xAddressMapIndex ].callback )();
     }
 }
 /*----------------------------------------------------------------------------*/
@@ -911,6 +841,7 @@ void SerialModbusServer::vHandlerFC08( void )
      * specific cases - the same goes for the reply length. */
     ucREPLY_DATA_HI = ucREQUEST_DATA_HI;
     ucREPLY_DATA_LO = ucREQUEST_DATA_LO;
+
     xReplyLength = 6;
 
     switch( usREQUEST_SUB_FUNCTION_CODE )
@@ -1230,9 +1161,9 @@ void SerialModbusServer::vHandlerFC08( void )
 
     if( xStatus == MB_OK )
     {
-        if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+        if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
         {
-            ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+            ( pxAddressMap[ xAddressMapIndex ].callback )();
         }
     }
 }
@@ -1309,13 +1240,13 @@ void SerialModbusServer::vHandlerFC16( void )
     {
         if( ucREQUEST_BYTE_COUNT_FC16 == ( ( uint8_t ) usREQUEST_QUANTITY * 2 ) )
         {
-            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxRegisterMap[ xRegisterMapIndex ].address );
+            xOffset = ( size_t ) ( usREQUEST_ADDRESS - pxAddressMap[ xAddressMapIndex ].address );
 
-            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxRegisterMap[ xRegisterMapIndex ].dataSize )
+            if( ( ( size_t ) usREQUEST_QUANTITY + xOffset ) <= pxAddressMap[ xAddressMapIndex ].dataSize )
             {
                 for( size_t i = 0; i < ( size_t ) usREQUEST_QUANTITY; i++ )
                 {
-                    ( ( uint16_t * ) pxRegisterMap[ xRegisterMapIndex ].data )[ i + xOffset ] = usRequestWord( i, 7 );
+                    ( ( uint16_t * ) pxAddressMap[ xAddressMapIndex ].data )[ i + xOffset ] = usRequestWord( i, 7 );
                 }
 
                 ucREPLY_FUNCTION_CODE = ucREQUEST_FUNCTION_CODE;
@@ -1326,9 +1257,9 @@ void SerialModbusServer::vHandlerFC16( void )
 
                 xReplyLength = 6;
 
-                if( pxRegisterMap[ xRegisterMapIndex ].callback != NULL )
+                if( pxAddressMap[ xAddressMapIndex ].callback != NULL )
                 {
-                    ( pxRegisterMap[ xRegisterMapIndex ].callback )();
+                    ( pxAddressMap[ xAddressMapIndex ].callback )();
                 }
 
                 return;
@@ -1352,70 +1283,59 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-#if( configMB_SERVER_MULTI_ID == 0 )
-
-    bool SerialModbusServer::createRegister( MB_Access_t access, uint16_t address, size_t dataSize, MB_DataType_t dataType, MB_Callback_f callback )
-    {
-        return createRegister( configMB_ID_SERVER_MAX, access, address, dataSize, dataType, callback );
-    }
-
-#endif
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::createRegister( uint8_t id, MB_Access_t access, uint16_t address, size_t dataSize, MB_DataType_t dataType, MB_Callback_f callback )
+bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddrType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    MB_Register_t * pxRegisterMapTmp = NULL;
+    MB_Address_t * pxAddressMapTmp = NULL;
 
-    if( ( access == MB_NA ) || ( dataSize == 0 ) ||
-        ( id == configMB_ID_BROADCAST ) || ( id > configMB_ID_SERVER_MAX ) ||
-        ( bRegisterMapLock == true ) ||
-        ( bFindAddress( id, address ) == true ) ||
-        ( bFindAddress( id, address + ( uint16_t ) dataSize - 1 ) == true ) ||
-        ( address > ( address + ( uint16_t ) dataSize - 1 ) ) )
+    if( ( id == configMB_ID_BROADCAST ) || ( id > configMB_ID_SERVER_MAX ) ||
+        ( dataSize == 0 ) ||
+        ( address > ( address + ( uint16_t ) dataSize - 1 ) ) ||
+        ( bFindAddress( id, addressType, address ) == true ) ||
+        ( bFindAddress( id, addressType, address + ( uint16_t ) dataSize - 1 ) == true ) ||
+        ( bAddressMapLock == true ) )
     {
         return false;
     }
 
-    if( pxRegisterMap == NULL )
+    if( pxAddressMap == NULL )
     {
-        pxRegisterMapTmp = ( MB_Register_t * ) malloc( sizeof( MB_Register_t ) * 2 );
-        if( pxRegisterMapTmp != NULL )
+        pxAddressMapTmp = ( MB_Address_t * ) malloc( sizeof( MB_Address_t ) * 2 );
+        if( pxAddressMapTmp != NULL )
         {
-            ( void ) bClearRegisterMapEntry( &pxRegisterMapTmp[ 0 ] );
-            xRegisterMapSize = 1;
+            ( void ) bClearAddressMapEntry( &pxAddressMapTmp[ 0 ] );
+            xAddressMapSize = 1;
         }
     }
     else
     {
-        pxRegisterMapTmp = ( MB_Register_t * ) realloc( pxRegisterMap, sizeof( MB_Register_t ) * ( xRegisterMapSize + 1 ) );
+        pxAddressMapTmp = ( MB_Address_t * ) realloc( pxAddressMap, sizeof( MB_Address_t ) * ( xAddressMapSize + 1 ) );
     }
 
-    if( pxRegisterMapTmp != NULL )
+    if( pxAddressMapTmp != NULL )
     {
-        if( dataType == MB_DATA_BITS )
+        if( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) )
         {
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].data = ( uint8_t * ) calloc( mbBITS_TO_BYTES( dataSize ), sizeof( uint8_t ) );
+            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint8_t * ) calloc( mbBITS_TO_BYTES( dataSize ), sizeof( uint8_t ) );
         }
-        else
+        else /* if( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) */
         {
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].data = ( uint16_t * ) calloc( dataSize, sizeof( uint16_t ) );
+            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint16_t * ) calloc( dataSize, sizeof( uint16_t ) );
         }
 
-        if( pxRegisterMapTmp[ xRegisterMapSize - 1 ].data != NULL )
+        if( pxAddressMapTmp[ xAddressMapSize - 1 ].data != NULL )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].id       = id;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].id = id;
 #endif
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].access   = access;
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].address  = address;
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].dataSize = dataSize;
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].dataType = dataType;
-            pxRegisterMapTmp[ xRegisterMapSize - 1 ].callback = callback;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].addressType = addressType;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].address = address;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].dataSize = dataSize;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].callback = callback;
 
-            ( void ) bClearRegisterMapEntry( &pxRegisterMapTmp[ xRegisterMapSize ] );
-            pxRegisterMap = pxRegisterMapTmp;
-            bRegisterMapLock_sAPI = true;
-            xRegisterMapSize += 1;
+            ( void ) bClearAddressMapEntry( &pxAddressMapTmp[ xAddressMapSize ] );
+            pxAddressMap = pxAddressMapTmp;
+            bAddressMapLock_sAPI = true;
+            xAddressMapSize += 1;
 
             #if( configMB_SERVER_MULTI_ID == 1 )
             {
@@ -1433,53 +1353,30 @@ bool SerialModbusServer::createRegister( uint8_t id, MB_Access_t access, uint16_
 }
 /*----------------------------------------------------------------------------*/
 
-#if( configMB_SERVER_MULTI_ID == 0 )
-
-    bool SerialModbusServer::createCoil( uint16_t address, size_t dataSize, MB_Callback_f callback )
-    {
-        return createCoil( configMB_ID_SERVER_MAX, address, dataSize, callback );
-    }
-
-#endif
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
-{
-    return createRegister( id, MB_RW, address, dataSize, MB_DATA_BITS, callback );
-}
-/*----------------------------------------------------------------------------*/
-
-#if( configMB_SERVER_MULTI_ID == 0 )
-
-    bool SerialModbusServer::getCoil( uint16_t address, uint16_t * data )
-    {
-        return getCoil( configMB_ID_SERVER_MAX, address, data );
-    }
-
-#endif
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::getCoil( uint8_t id, uint16_t address, uint16_t * data )
+bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data )
 {
     size_t xOffset = 0;
     size_t xBit = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) && ( data != NULL ) && ( pxRegisterMap != NULL ) )
+    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
+        ( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) ) &&
+        ( data != NULL ) &&
+        ( pxAddressMap != NULL ) )
     {
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxRegisterMap[ i ].id )
+            if( id == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( address >= pxRegisterMap[ i ].address ) &&
-                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
-                    ( pxRegisterMap[ i ].dataType == MB_DATA_BITS ) )
+                if( ( address >= pxAddressMap[ i ].address ) &&
+                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == addressType ) )
                 {
-                    xOffset = ( address - pxRegisterMap[ i ].address ) / 8;
-                    xBit    = ( address - pxRegisterMap[ i ].address ) % 8;
+                    xOffset = ( address - pxAddressMap[ i ].address ) / 8;
+                    xBit    = ( address - pxAddressMap[ i ].address ) % 8;
 
-                    if( bitRead( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit ) == 1 )
+                    if( bitRead( ( ( uint8_t * ) pxAddressMap[ i ].data )[ xOffset ], xBit ) == 1 )
                     {
                         *data = MB_COIL_ON;
                     }
@@ -1500,6 +1397,149 @@ bool SerialModbusServer::getCoil( uint8_t id, uint16_t address, uint16_t * data 
 }
 /*----------------------------------------------------------------------------*/
 
+bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value )
+{
+    size_t xOffset = 0;
+    size_t xBit = 0;
+
+    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
+        ( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) ) &&
+        ( ( value == 0 ) || ( value == 1 ) || ( value == MB_COIL_ON ) ) &&
+        ( pxAddressMap != NULL ) )
+    {
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
+        {
+#if( configMB_SERVER_MULTI_ID == 1 )
+            if( id == pxAddressMap[ i ].id )
+            {
+#endif
+                if( ( address >= pxAddressMap[ i ].address ) &&
+                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == addressType ) )
+                {
+                    xOffset = ( address - pxAddressMap[ i ].address ) / 8;
+                    xBit    = ( address - pxAddressMap[ i ].address ) % 8;
+
+                    if( ( value == 1 ) || ( value == MB_COIL_ON ) )
+                    {
+                        bitSet( ( ( uint8_t * ) pxAddressMap[ i ].data )[ xOffset ], xBit );
+                    }
+                    else
+                    {
+                        bitClear( ( ( uint8_t * ) pxAddressMap[ i ].data )[ xOffset ], xBit );
+                    }
+
+                    return true;
+                }
+#if( configMB_SERVER_MULTI_ID == 1 )
+            }
+#endif
+        }
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data )
+{
+    size_t xOffset = 0;
+
+    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
+        ( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) &&
+        ( data != NULL ) &&
+        ( pxAddressMap != NULL ) )
+    {
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
+        {
+#if( configMB_SERVER_MULTI_ID == 1 )
+            if( id == pxAddressMap[ i ].id )
+            {
+#endif
+                if( ( address >= pxAddressMap[ i ].address ) &&
+                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == addressType ) )
+                {
+                    xOffset = address - pxAddressMap[ i ].address;
+                    *data = ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ];
+
+                    return true;
+                }
+#if( configMB_SERVER_MULTI_ID == 1 )
+            }
+#endif
+        }
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::bSetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value )
+{
+    size_t xOffset = 0;
+
+    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
+        ( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) &&
+        ( pxAddressMap != NULL ) )
+    {
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
+        {
+#if( configMB_SERVER_MULTI_ID == 1 )
+            if( id == pxAddressMap[ i ].id )
+            {
+#endif
+                if( ( address >= pxAddressMap[ i ].address ) &&
+                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == addressType ) )
+                {
+                    xOffset = address - pxAddressMap[ i ].address;
+                    ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ] = value;
+
+                    return true;
+                }
+#if( configMB_SERVER_MULTI_ID == 1 )
+            }
+#endif
+        }
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createCoil( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createCoil( configMB_ID_SERVER_MAX, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
+{
+    return bCreateAddress( id, ADDR_COIL, address, dataSize, callback );
+}
+/*----------------------------------------------------------------------------*/
+
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::getCoil( uint16_t address, uint16_t * data )
+    {
+        return getCoil( configMB_ID_SERVER_MAX, address, data );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::getCoil( uint8_t id, uint16_t address, uint16_t * data )
+{
+    return bGetAddressBit( id, ADDR_COIL, address, data );
+}
+/*----------------------------------------------------------------------------*/
+
 #if( configMB_SERVER_MULTI_ID == 0 )
 
     bool SerialModbusServer::setCoil( uint16_t address, uint16_t value )
@@ -1512,43 +1552,7 @@ bool SerialModbusServer::getCoil( uint8_t id, uint16_t address, uint16_t * data 
 
 bool SerialModbusServer::setCoil( uint8_t id, uint16_t address, uint16_t value )
 {
-    size_t xOffset = 0;
-    size_t xBit = 0;
-
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) && ( pxRegisterMap != NULL ) &&
-        ( ( value == 0 ) || ( value == 1 ) || ( value == MB_COIL_ON ) ) )
-    {
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
-        {
-#if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxRegisterMap[ i ].id )
-            {
-#endif
-                if( ( address >= pxRegisterMap[ i ].address ) &&
-                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
-                    ( pxRegisterMap[ i ].dataType == MB_DATA_BITS ) )
-                {
-                    xOffset = ( address - pxRegisterMap[ i ].address ) / 8;
-                    xBit    = ( address - pxRegisterMap[ i ].address ) % 8;
-
-                    if( ( value == 1 ) || ( value == MB_COIL_ON ) )
-                    {
-                        bitSet( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit );
-                    }
-                    else
-                    {
-                        bitClear( ( ( uint8_t * ) pxRegisterMap[ i ].data )[ xOffset ], xBit );
-                    }
-
-                    return true;
-                }
-#if( configMB_SERVER_MULTI_ID == 1 )
-            }
-#endif
-        }
-    }
-
-    return false;
+    return bSetAddressBit( id, ADDR_COIL, address, value );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -1564,7 +1568,7 @@ bool SerialModbusServer::setCoil( uint8_t id, uint16_t address, uint16_t value )
 
 bool SerialModbusServer::createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    return createRegister( id, MB_RO, address, dataSize, MB_DATA_BITS, callback );
+    return bCreateAddress( id, ADDR_DISCRETE_INPUT, address, dataSize, callback );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -1580,7 +1584,7 @@ bool SerialModbusServer::createDiscreteInput( uint8_t id, uint16_t address, size
 
 bool SerialModbusServer::getDiscreteInput( uint8_t id, uint16_t address, uint16_t * data )
 {
-    return getCoil( id, address, data );
+    return bGetAddressBit( id, ADDR_DISCRETE_INPUT, address, data );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -1588,7 +1592,7 @@ bool SerialModbusServer::getDiscreteInput( uint8_t id, uint16_t address, uint16_
 
     bool SerialModbusServer::setDiscreteInput( uint16_t address, uint16_t value )
     {
-        return setCoil( configMB_ID_SERVER_MAX, address, value );
+        return setDiscreteInput( configMB_ID_SERVER_MAX, address, value );
     }
 
 #endif
@@ -1596,23 +1600,7 @@ bool SerialModbusServer::getDiscreteInput( uint8_t id, uint16_t address, uint16_
 
 bool SerialModbusServer::setDiscreteInput( uint8_t id, uint16_t address, uint16_t value )
 {
-    return setCoil( id, address, value );
-}
-/*----------------------------------------------------------------------------*/
-
-#if( configMB_SERVER_MULTI_ID == 0 )
-
-    bool SerialModbusServer::createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback )
-    {
-        return createInputRegister( configMB_ID_SERVER_MAX, address, dataSize, callback );
-    }
-
-#endif
-/*----------------------------------------------------------------------------*/
-
-bool SerialModbusServer::createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
-{
-    return createRegister( id, MB_RO, address, dataSize, MB_DATA_WORDS, callback );
+    return bSetAddressBit( id, ADDR_DISCRETE_INPUT, address, value );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -1628,103 +1616,102 @@ bool SerialModbusServer::createInputRegister( uint8_t id, uint16_t address, size
 
 bool SerialModbusServer::createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    return createRegister( id, MB_RW, address, dataSize, MB_DATA_WORDS, callback );
+    return bCreateAddress( id, ADDR_HOLDING_REGISTER, address, dataSize, callback );
 }
 /*----------------------------------------------------------------------------*/
 
 #if( configMB_SERVER_MULTI_ID == 0 )
 
-    bool SerialModbusServer::getRegister( uint16_t address, uint16_t * data )
+    bool SerialModbusServer::getHoldingRegister( uint16_t address, uint16_t * data )
     {
-        return getRegister( configMB_ID_SERVER_MAX, address, data );
+        return getHoldingRegister( configMB_ID_SERVER_MAX, address, data );
     }
 
 #endif
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::getRegister( uint8_t id, uint16_t address, uint16_t * data )
+bool SerialModbusServer::getHoldingRegister( uint8_t id, uint16_t address, uint16_t * data )
 {
-    size_t xOffset = 0;
-
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) && ( data != NULL ) && ( pxRegisterMap != NULL ) )
-    {
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
-        {
-#if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxRegisterMap[ i ].id )
-            {
-#endif
-                if( ( address >= pxRegisterMap[ i ].address ) &&
-                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
-                    ( pxRegisterMap[ i ].dataType == MB_DATA_WORDS ) )
-                {
-                    xOffset = address - pxRegisterMap[ i ].address;
-                    *data = ( ( uint16_t * ) pxRegisterMap[ i ].data )[ xOffset ];
-                    return true;
-                }
-#if( configMB_SERVER_MULTI_ID == 1 )
-            }
-#endif
-        }
-    }
-
-    return false;
+    return bGetAddressWord( id, ADDR_HOLDING_REGISTER, address, data );
 }
 /*----------------------------------------------------------------------------*/
 
 #if( configMB_SERVER_MULTI_ID == 0 )
 
-    bool SerialModbusServer::setRegister( uint16_t address, uint16_t value )
+    bool SerialModbusServer::setHoldingRegister( uint16_t address, uint16_t value )
     {
-        return setRegister( configMB_ID_SERVER_MAX, address, value );
+        return setHoldingRegister( configMB_ID_SERVER_MAX, address, value );
     }
 
 #endif
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::setRegister( uint8_t id, uint16_t address, uint16_t value )
+bool SerialModbusServer::setHoldingRegister( uint8_t id, uint16_t address, uint16_t value )
 {
-    size_t xOffset = 0;
-
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) && ( pxRegisterMap != NULL ) )
-    {
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
-        {
-#if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxRegisterMap[ i ].id )
-            {
-#endif
-                if( ( address >= pxRegisterMap[ i ].address ) &&
-                    ( address < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) &&
-                    ( pxRegisterMap[ i ].dataType == MB_DATA_WORDS ) )
-                {
-                    xOffset = address - pxRegisterMap[ i ].address;
-                    ( ( uint16_t * ) pxRegisterMap[ i ].data )[ xOffset ] = value;
-                    return true;
-                }
-#if( configMB_SERVER_MULTI_ID == 1 )
-            }
-#endif
-        }
-    }
-
-    return false;
+    return bSetAddressWord( id, ADDR_HOLDING_REGISTER, address, value );
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEntry )
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback )
+    {
+        return createInputRegister( configMB_ID_SERVER_MAX, address, dataSize, callback );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
-    if( pxRegisterMapEntry != NULL )
+    return bCreateAddress( id, ADDR_INPUT_REGISTER, address, dataSize, callback );
+}
+/*----------------------------------------------------------------------------*/
+
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::getInputRegister( uint16_t address, uint16_t * data )
+    {
+        return getInputRegister( configMB_ID_SERVER_MAX, address, data );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::getInputRegister( uint8_t id, uint16_t address, uint16_t * data )
+{
+    return bGetAddressWord( id, ADDR_INPUT_REGISTER, address, data );
+}
+/*----------------------------------------------------------------------------*/
+
+#if( configMB_SERVER_MULTI_ID == 0 )
+
+    bool SerialModbusServer::setInputRegister( uint16_t address, uint16_t value )
+    {
+        return setInputRegister( configMB_ID_SERVER_MAX, address, value );
+    }
+
+#endif
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::setInputRegister( uint8_t id, uint16_t address, uint16_t value )
+{
+    return bSetAddressWord( id, ADDR_INPUT_REGISTER, address, value );
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry )
+{
+    if( pxAddressMapEntry != NULL )
     {
 #if( configMB_SERVER_MULTI_ID == 1 )
-        pxRegisterMapEntry->id       = REG_MAP_END_ID;
+        pxAddressMapEntry->id       = ADDR_MAP_END_ID;
 #endif
-        pxRegisterMapEntry->access   = REG_MAP_END_ACCESS;
-        pxRegisterMapEntry->address  = REG_MAP_END_ADDRESS;
-        pxRegisterMapEntry->data     = REG_MAP_END_DATA;
-        pxRegisterMapEntry->dataSize = REG_MAP_END_DATA_SIZE;
-        pxRegisterMapEntry->dataType = REG_MAP_END_DATA_TYPE;
-        pxRegisterMapEntry->callback = REG_MAP_END_CALLBACK;
+        pxAddressMapEntry->addressType = ADDR_MAP_END_ADDRESS_TYPE;
+        pxAddressMapEntry->address     = ADDR_MAP_END_ADDRESS;
+        pxAddressMapEntry->data        = ADDR_MAP_END_DATA;
+        pxAddressMapEntry->dataSize    = ADDR_MAP_END_DATA_SIZE;
+        pxAddressMapEntry->callback    = ADDR_MAP_END_CALLBACK;
 
         return true;
     }
@@ -1733,20 +1720,23 @@ bool SerialModbusServer::bClearRegisterMapEntry( MB_Register_t * pxRegisterMapEn
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bFindAddress( uint8_t ucId, int16_t usAddress )
+bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, int16_t usAddress )
 {
-    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) && ( pxRegisterMap != NULL ) )
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) && ( pxAddressMap != NULL ) )
     {
-        for( size_t i = 0; IS_REGISTER_MAP_END( pxRegisterMap[ i ] ) != true; i++ )
+        for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( ucId == pxRegisterMap[ i ].id )
+            if( ucId == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( usAddress >= pxRegisterMap[ i ].address ) &&
-                    ( usAddress < ( pxRegisterMap[ i ].address + ( uint16_t ) pxRegisterMap[ i ].dataSize ) ) )
+                if( pxAddressMap[ i ].addressType == xAddressType )
                 {
-                    return true;
+                    if( ( usAddress >= pxAddressMap[ i ].address ) &&
+                        ( usAddress < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) )
+                    {
+                        return true;
+                    }
                 }
 #if( configMB_SERVER_MULTI_ID == 1 )
             }

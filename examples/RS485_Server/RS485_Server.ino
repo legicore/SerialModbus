@@ -38,7 +38,6 @@ void setup( void )
     ModbusServer.begin( 1, 9600 );
 
     ModbusServer.createHoldingRegister( 1000, 1 );
-    ModbusServer.setRegister( 1000, 0 );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -48,7 +47,7 @@ void loop( void )
 
     ModbusServer.process();
 
-    ModbusServer.getRegister( 1000, &data );
+    ModbusServer.getHoldingRegister( 1000, &data );
     if( data == 1 )
     {
         digitalWrite( LED_BUILTIN, HIGH );

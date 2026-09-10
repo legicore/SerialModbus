@@ -109,11 +109,10 @@ enum MB_Status_e
     /* Extended exception codes for server replies. */
     MB_SERVER_ILLEGAL_FUNCTION                  = 0x11,
     MB_SERVER_ILLEGAL_STATE                     = 0x12,
-    MB_SERVER_ILLEGAL_ACCESS                    = 0x13,
-    MB_SERVER_ILLEGAL_QUANTITY                  = 0x14,
-    MB_SERVER_ILLEGAL_COIL_VALUE                = 0x15,
-    MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x16,
-    MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x17,
+    MB_SERVER_ILLEGAL_QUANTITY                  = 0x13,
+    MB_SERVER_ILLEGAL_COIL_VALUE                = 0x14,
+    MB_SERVER_ILLEGAL_INPUT_DELIMITER           = 0x15,
+    MB_SERVER_ILLEGAL_SUB_FUNCTION              = 0x16,
 
 #endif
 
@@ -135,9 +134,9 @@ enum MB_Status_e
     MB_NO_REQUEST                               = 0x3F,
 
     /* Non-standard exception codes (server only). */
-    MB_SERVER_REG_DATA                          = 0x50,
-    MB_SERVER_REG_DATA_SIZE                     = 0x51,
-    MB_SERVER_REG_OVERLAP                       = 0x52,
+    MB_SERVER_ADDR_DATA                         = 0x50,
+    MB_SERVER_ADDR_DATA_SIZE                    = 0x51,
+    MB_SERVER_ADDR_OVERLAP                      = 0x52,
 
     MB_NOK = 0xFE
 };
