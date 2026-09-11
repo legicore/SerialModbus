@@ -875,7 +875,7 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t * data, size_t size, MB_Callback_f callback )
+MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback )
 {
     MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 
@@ -910,7 +910,7 @@ MB_Status_t SerialModbusClient::writeSingleRegister( uint8_t id, uint16_t addres
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::readExceptionStaus( uint8_t id, uint16_t * data, MB_Callback_f callback )
+MB_Status_t SerialModbusClient::readExceptionStaus( uint8_t id, uint8_t * data, MB_Callback_f callback )
 {
     return sendRequest( id, FC_READ_EXCEPTION_STATUS, 0x0000, data, 1, callback );
 }

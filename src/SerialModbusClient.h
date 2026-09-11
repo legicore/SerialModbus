@@ -91,12 +91,12 @@ public:
 
     /* Simplified API functions. */
 
-    MB_Status_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, uint16_t * data, size_t size, MB_Callback_f callback = NULL );
+    MB_Status_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback = NULL );
     MB_Status_t readHoldingRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t readInputRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleRegister( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );
-    MB_Status_t readExceptionStaus( uint8_t id, uint16_t * data, MB_Callback_f callback = NULL );
+    MB_Status_t readExceptionStaus( uint8_t id, uint8_t * data, MB_Callback_f callback = NULL );
 
 private:
 
