@@ -41,18 +41,39 @@ typedef struct MB_AddressAccess_s MB_AddrAccess_t;
 /*----------------------------------------------------------------------------*/
 
 static const MB_AddrAccess_t pxAddressAccessMap[] = {
-    { FC_READ_COILS,                    ADDR_COIL },
-    { FC_READ_DISCRETE_INPUTS,          ADDR_DISCRETE_INPUT },
-    { FC_WRITE_SINGLE_COIL,             ADDR_COIL },
-    { FC_WRITE_MULTIPLE_COILS,          ADDR_COIL },
-    { FC_READ_HOLDING_REGISTERS,        ADDR_HOLDING_REGISTER },
-    { FC_READ_INPUT_REGISTERS,          ADDR_INPUT_REGISTER },
-    { FC_WRITE_SINGLE_REGISTER,         ADDR_HOLDING_REGISTER },
-    { FC_WRITE_MULTIPLE_REGISTERS,      ADDR_HOLDING_REGISTER },
-    { FC_MASK_WRITE_REGISTER,           ADDR_HOLDING_REGISTER },
-    { FC_READ_WRITE_MULTIPLE_REGISTERS, ADDR_HOLDING_REGISTER },
 
-    /* Marks the end of the list. */
+#if( configMB_FC01 == 1 )
+    { FC_READ_COILS,                    ADDR_COIL },
+#endif
+#if( configMB_FC02 == 1 )
+    { FC_READ_DISCRETE_INPUTS,          ADDR_DISCRETE_INPUT },
+#endif
+#if( configMB_FC03 == 1 )
+    { FC_READ_HOLDING_REGISTERS,        ADDR_HOLDING_REGISTER },
+#endif
+#if( configMB_FC04 == 1 )
+    { FC_READ_INPUT_REGISTERS,          ADDR_INPUT_REGISTER },
+#endif
+#if( configMB_FC05 == 1 )
+    { FC_WRITE_SINGLE_COIL,             ADDR_COIL },
+#endif
+#if( configMB_FC06 == 1 )
+    { FC_WRITE_SINGLE_REGISTER,         ADDR_HOLDING_REGISTER },
+#endif
+#if( configMB_FC15 == 1 )
+    { FC_WRITE_MULTIPLE_COILS,          ADDR_COIL },
+#endif
+#if( configMB_FC16 == 1 )
+    { FC_WRITE_MULTIPLE_REGISTERS,      ADDR_HOLDING_REGISTER },
+#endif
+#if( configMB_FC22 == 1 )
+    { FC_MASK_WRITE_REGISTER,           ADDR_HOLDING_REGISTER },
+#endif
+#if( configMB_FC23 == 1 )
+    { FC_READ_WRITE_MULTIPLE_REGISTERS, ADDR_HOLDING_REGISTER },
+#endif
+
+    /* Marks the end of the map. */
     { ( MB_FunctionCode_t ) 0x00, ADDR_NO_DATA }
 };
 /*----------------------------------------------------------------------------*/
