@@ -177,6 +177,8 @@ private:
     uint8_t ucServerId;
     MB_ServerState_t xState;
     void vSetState( MB_ServerState_t xStatePar );
+    MB_Status_t xExceptionStatus;
+    MB_Status_t xSetException( MB_Exception_t xException );
     MB_Address_t * pxAddressMap;
     size_t xAddressMapIndex;
     MB_Status_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );

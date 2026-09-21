@@ -145,6 +145,17 @@ void SerialModbusServer::vSetState( MB_ServerState_t xStatePar )
 }
 /*----------------------------------------------------------------------------*/
 
+MB_Status_t SerialModbusServer::xSetException( MB_Exception_t xException )
+{
+    if( xException != MB_OK )
+    {
+        xExceptionStatus = xException;
+    }
+
+    return SerialModbusBase::xSetException( xException );
+}
+/*----------------------------------------------------------------------------*/
+
 bool SerialModbusServer::setAddressMap( MB_Address_t * addressMap )
 {
     if( addressMap == NULL )
@@ -838,7 +849,7 @@ void SerialModbusServer::vHandlerFC06( void )
 void SerialModbusServer::vHandlerFC07( void )
 {
     ucREPLY_FUNCTION_CODE    = ucREQUEST_FUNCTION_CODE;
-    ucREPLY_EXCEPTION_STATUS = ( uint8_t ) xStatus;
+    ucREPLY_EXCEPTION_STATUS = ( uint8_t ) xExceptionStatus;
 
     xReplyLength = 3;
 
