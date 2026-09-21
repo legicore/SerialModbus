@@ -209,7 +209,7 @@ private:
     bool bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry );
     bool bAddressMapLock_sAPI;
     bool bAddressMapLock;
-    bool bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, int16_t usAddress );
+    bool bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, uint16_t usAddress );
 
     /* Simplified API functions. */
 

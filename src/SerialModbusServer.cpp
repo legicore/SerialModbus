@@ -1752,7 +1752,7 @@ bool SerialModbusServer::bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, int16_t usAddress )
+bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, uint16_t usAddress )
 {
     if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) && ( pxAddressMap != NULL ) )
     {
