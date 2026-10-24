@@ -82,6 +82,12 @@ SerialModbusServer::SerialModbusServer()
 {
     xState = SERVER_IDLE;
 
+    #if( configMB_FC07 == 1 )
+    {
+        ucExceptionStatus = 0x00;
+    }
+    #endif
+
     #if( configMB_FC08 == 1 )
     {
         vClearDiagnosticCounters();
@@ -142,17 +148,6 @@ bool SerialModbusServer::begin( uint8_t id, uint32_t baud, MB_Serial_t * serial,
 void SerialModbusServer::vSetState( MB_ServerState_t xStatePar )
 {
     xState = xStatePar;
-}
-/*----------------------------------------------------------------------------*/
-
-MB_Status_t SerialModbusServer::xSetException( MB_Exception_t xException )
-{
-    if( xException != MB_OK )
-    {
-        xExceptionStatus = xException;
-    }
-
-    return SerialModbusBase::xSetException( xException );
 }
 /*----------------------------------------------------------------------------*/
 
@@ -849,7 +844,7 @@ void SerialModbusServer::vHandlerFC06( void )
 void SerialModbusServer::vHandlerFC07( void )
 {
     ucREPLY_FUNCTION_CODE    = ucREQUEST_FUNCTION_CODE;
-    ucREPLY_EXCEPTION_STATUS = ( uint8_t ) xExceptionStatus;
+    ucREPLY_EXCEPTION_STATUS = ucExceptionStatus;
 
     xReplyLength = 3;
 
@@ -857,6 +852,62 @@ void SerialModbusServer::vHandlerFC07( void )
     {
         ( pxAddressMap[ xAddressMapIndex ].callback )();
     }
+}
+/*----------------------------------------------------------------------------*/
+
+uint8_t SerialModbusServer::exceptionStatusGet( void )
+{
+    return ucExceptionStatus;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::exceptionStatusGet( size_t bit )
+{
+    if( bit <= 7 )
+    {
+        if( bitRead( ucExceptionStatus, bit ) == 1 )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+void SerialModbusServer::exceptionStatusSet( uint8_t byte )
+{
+    ucExceptionStatus = byte;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::exceptionStatusSet( size_t bit )
+{
+    if( bit <= 7 )
+    {
+        bitSet( ucExceptionStatus, bit );
+        return true;
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+bool SerialModbusServer::exceptionStatusClear( size_t bit )
+{
+    if( bit <= 7 )
+    {
+        bitClear( ucExceptionStatus, bit );
+        return true;
+    }
+
+    return false;
+}
+/*----------------------------------------------------------------------------*/
+
+void SerialModbusServer::exceptionStatusClear( void )
+{
+    ucExceptionStatus = 0x00;
 }
 /*----------------------------------------------------------------------------*/
 

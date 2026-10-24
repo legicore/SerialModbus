@@ -128,7 +128,16 @@ public:
     MB_Address_t * getAddressMap( void );
     MB_Status_t checkAddressMap( void );
 
-    /* Only for function code 8 (MB_DIAGNOSTIC). */
+    /* Only for function code 7 (FC_READ_EXCEPTION_STATUS). */
+
+    uint8_t exceptionStatusGet( void );
+    bool exceptionStatusGet( size_t bit );
+    void exceptionStatusSet( uint8_t byte );
+    bool exceptionStatusSet( size_t bit );
+    bool exceptionStatusClear( size_t bit );
+    void exceptionStatusClear( void );
+
+    /* Only for function code 8 (FC_DIAGNOSTIC). */
 
     uint16_t diagRegGet( void );
     bool diagRegGet( size_t bit );
@@ -177,8 +186,6 @@ private:
     uint8_t ucServerId;
     MB_ServerState_t xState;
     void vSetState( MB_ServerState_t xStatePar );
-    MB_Status_t xExceptionStatus;
-    MB_Status_t xSetException( MB_Exception_t xException );
     MB_Address_t * pxAddressMap;
     size_t xAddressMapIndex;
     MB_Status_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
@@ -188,6 +195,7 @@ private:
     void vHandlerFC07( void );
     void vHandlerFC16( void );
     void vHandlerFC08( void );
+    uint8_t ucExceptionStatus;
     void vClearDiagnosticCounters( void );
     uint16_t usBusMessageCount;
     uint16_t usBusCommunicationErrorCount;
