@@ -37,7 +37,7 @@ void setup( void )
     ModbusServer.setSerialCtrl( rs485Tx, rs485Rx );
     ModbusServer.begin( 1, 9600 );
 
-    ModbusServer.createHoldingRegister( 1000, 1 );
+    ModbusServer.createHoldingRegister( 1000 );
 }
 /*----------------------------------------------------------------------------*/
 

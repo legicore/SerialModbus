@@ -148,35 +148,35 @@ public:
     /* Simplified API functions. */
 
 #if( configMB_SERVER_MULTI_ID == 0 )
-    bool createCoil( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createCoil( uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getCoil( uint16_t address, uint16_t * data );
     bool setCoil( uint16_t address, uint16_t value );
 
-    bool createDiscreteInput( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createDiscreteInput( uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getDiscreteInput( uint16_t address, uint16_t * data );
     bool setDiscreteInput( uint16_t address, uint16_t value );
 
-    bool createHoldingRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getHoldingRegister( uint16_t address, uint16_t * data );
     bool setHoldingRegister( uint16_t address, uint16_t value );
 
-    bool createInputRegister( uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getInputRegister( uint16_t address, uint16_t * data );
     bool setInputRegister( uint16_t address, uint16_t value );
 #else
-    bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createCoil( uint8_t id, uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getCoil( uint8_t id, uint16_t address, uint16_t * data );
     bool setCoil( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getDiscreteInput( uint8_t id, uint16_t address, uint16_t * data );
     bool setDiscreteInput( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getHoldingRegister( uint8_t id, uint16_t address, uint16_t * data );
     bool setHoldingRegister( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize = 1, MB_Callback_f callback = NULL );
     bool getInputRegister( uint8_t id, uint16_t address, uint16_t * data );
     bool setInputRegister( uint8_t id, uint16_t address, uint16_t value );
 #endif
@@ -221,26 +221,26 @@ private:
 
     /* Simplified API functions. */
 
-    bool bCreateAddress( uint8_t id, MB_AddrType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool bCreateAddress( uint8_t id, MB_AddrType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback );
     bool bGetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data );
     bool bSetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value );
     bool bGetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data );
     bool bSetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value );
 
 #if( configMB_SERVER_MULTI_ID == 0 )
-    bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );
     bool getCoil( uint8_t id, uint16_t address, uint16_t * data );
     bool setCoil( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createDiscreteInput( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );
     bool getDiscreteInput( uint8_t id, uint16_t address, uint16_t * data );
     bool setDiscreteInput( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createHoldingRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );
     bool getHoldingRegister( uint8_t id, uint16_t address, uint16_t * data );
     bool setHoldingRegister( uint8_t id, uint16_t address, uint16_t value );
 
-    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback = NULL );
+    bool createInputRegister( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );
     bool getInputRegister( uint8_t id, uint16_t address, uint16_t * data );
     bool setInputRegister( uint8_t id, uint16_t address, uint16_t value );
 #endif
