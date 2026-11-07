@@ -55,7 +55,7 @@ enum MB_AddressType_e
     ADDR_INPUT_REGISTER   = 4   /* Word access read only */
 };
 
-typedef enum MB_AddressType_e MB_AddrType_t;
+typedef enum MB_AddressType_e MB_AddressType_t;
 
 /*----------------------------------------------------------------------------*/
 
@@ -64,7 +64,7 @@ struct MB_Address_s
 #if( configMB_SERVER_MULTI_ID == 1 )
     uint8_t id;
 #endif
-    MB_AddrType_t addressType;
+    MB_AddressType_t addressType;
     uint16_t address;
     void * data;
     size_t dataSize;
@@ -217,15 +217,15 @@ private:
     bool bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry );
     bool bAddressMapLock_sAPI;
     bool bAddressMapLock;
-    bool bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, uint16_t usAddress );
+    bool bFindAddress( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress );
 
     /* Simplified API functions. */
 
-    bool bCreateAddress( uint8_t id, MB_AddrType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback );
-    bool bGetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data );
-    bool bSetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value );
-    bool bGetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data );
-    bool bSetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value );
+    bool bCreateAddress( uint8_t id, MB_AddressType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback );
+    bool bGetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data );
+    bool bSetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value );
+    bool bGetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data );
+    bool bSetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value );
 
 #if( configMB_SERVER_MULTI_ID == 0 )
     bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );

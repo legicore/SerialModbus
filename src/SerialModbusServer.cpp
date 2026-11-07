@@ -33,7 +33,7 @@
 struct MB_AddressAccess_s
 {
     MB_FunctionCode_t xFunctionCode;
-    MB_AddrType_t xAddressType;
+    MB_AddressType_t xAddressType;
 };
 
 typedef struct MB_AddressAccess_s MB_AddrAccess_t;
@@ -653,7 +653,7 @@ MB_Status_t SerialModbusServer::process( void )
 
 MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
 {
-    MB_AddrType_t xReqAddressType = ADDR_NO_DATA;
+    MB_AddressType_t xReqAddressType = ADDR_NO_DATA;
 
     /* Do nothing if the address map is not set. */
     if( pxAddressMap == NULL )
@@ -1366,7 +1366,7 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddrType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback )
+bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddressType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback )
 {
     MB_Address_t * pxAddressMapTmp = NULL;
 
@@ -1436,7 +1436,7 @@ bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddrType_t addressType, 
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data )
+bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data )
 {
     size_t xOffset = 0;
     size_t xBit = 0;
@@ -1480,7 +1480,7 @@ bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddrType_t addressType, 
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value )
+bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value )
 {
     size_t xOffset = 0;
     size_t xBit = 0;
@@ -1524,7 +1524,7 @@ bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddrType_t addressType, 
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t * data )
+bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data )
 {
     size_t xOffset = 0;
 
@@ -1558,7 +1558,7 @@ bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddrType_t addressType,
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bSetAddressWord( uint8_t id, MB_AddrType_t addressType, uint16_t address, uint16_t value )
+bool SerialModbusServer::bSetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value )
 {
     size_t xOffset = 0;
 
@@ -1803,7 +1803,7 @@ bool SerialModbusServer::bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddrType_t xAddressType, uint16_t usAddress )
+bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress )
 {
     if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) && ( pxAddressMap != NULL ) )
     {
