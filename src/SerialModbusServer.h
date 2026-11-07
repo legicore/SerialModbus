@@ -57,6 +57,11 @@ enum MB_AddressType_e
 
 typedef enum MB_AddressType_e MB_AddressType_t;
 
+#define IS_ADDRESS_TYPE( TYPE )     ( ( ( TYPE ) == ADDR_COIL             ) || \
+                                      ( ( TYPE ) == ADDR_DISCRETE_INPUT   ) || \
+                                      ( ( TYPE ) == ADDR_HOLDING_REGISTER ) || \
+                                      ( ( TYPE ) == ADDR_INPUT_REGISTER   ) )
+
 /*----------------------------------------------------------------------------*/
 
 struct MB_Address_s

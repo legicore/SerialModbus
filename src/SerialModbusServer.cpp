@@ -1371,10 +1371,10 @@ bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddressType_t addressTyp
     MB_Address_t * pxAddressMapTmp = NULL;
 
     if( ( id == configMB_ID_BROADCAST ) || ( id > configMB_ID_SERVER_MAX ) ||
-        ( dataSize == 0 ) ||
-        ( address > ( address + ( uint16_t ) dataSize - 1 ) ) ||
+        ( IS_ADDRESS_TYPE( addressType ) == false ) ||
         ( bFindAddress( id, addressType, address ) == true ) ||
         ( bFindAddress( id, addressType, address + ( uint16_t ) dataSize - 1 ) == true ) ||
+        ( dataSize == 0 ) ||
         ( bAddressMapLock == true ) )
     {
         return false;
@@ -1805,7 +1805,9 @@ bool SerialModbusServer::bClearAddressMapEntry( MB_Address_t * pxAddressMapEntry
 
 bool SerialModbusServer::bFindAddress( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress )
 {
-    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) && ( pxAddressMap != NULL ) )
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) &&
+        ( IS_ADDRESS_TYPE( xAddressType ) == true ) &&
+        ( pxAddressMap != NULL ) )
     {
         for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
