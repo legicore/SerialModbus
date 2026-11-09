@@ -36,11 +36,15 @@ struct MB_AddressAccess_s
     MB_AddressType_t xAddressType;
 };
 
-typedef struct MB_AddressAccess_s MB_AddrAccess_t;
+typedef struct MB_AddressAccess_s MB_AddressAccess_t;
 
-/*----------------------------------------------------------------------------*/
+#define ADDRESS_ACCESS_MAP_END_FUNCTION_CODE    ( ( MB_FunctionCode_t ) 0x00 )
+#define ADDRESS_ACCESS_MAP_END_ADDRESS_TYPE     ADDR_NO_DATA
 
-static const MB_AddrAccess_t pxAddressAccessMap[] = {
+#define ADDRESS_ACCESS_MAP_END      { ADDRESS_ACCESS_MAP_END_FUNCTION_CODE, \
+                                      ADDRESS_ACCESS_MAP_END_ADDRESS_TYPE }
+
+static const MB_AddressAccess_t pxAddressAccessMap[] = {
 
 #if( configMB_FC01 == 1 )
     { FC_READ_COILS,                    ADDR_COIL },
@@ -73,9 +77,13 @@ static const MB_AddrAccess_t pxAddressAccessMap[] = {
     { FC_READ_WRITE_MULTIPLE_REGISTERS, ADDR_HOLDING_REGISTER },
 #endif
 
-    /* Marks the end of the map. */
-    { ( MB_FunctionCode_t ) 0x00, ADDR_NO_DATA }
+    ADDRESS_ACCESS_MAP_END
 };
+
+#define IS_ADDRESS_ACCES_MAP_END( ENTRY ) \
+    ( ( ( ENTRY ).xFunctionCode == ADDRESS_ACCESS_MAP_END_FUNCTION_CODE ) && \
+      ( ( ENTRY ).xAddressType  == ADDRESS_ACCESS_MAP_END_ADDRESS_TYPE  ) )
+
 /*----------------------------------------------------------------------------*/
 
 SerialModbusServer::SerialModbusServer()
@@ -674,7 +682,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
     }
 
     /* Scan the access map for the address type of the given function code. */
-    for( size_t i = 0; pxAddressAccessMap[ i ].xAddressType != ADDR_NO_DATA; i++ )
+    for( size_t i = 0; IS_ADDRESS_ACCES_MAP_END( pxAddressAccessMap[ i ] ) != true; i++ )
     {
         if( pxAddressAccessMap[ i ].xFunctionCode == ucReqFunctionCode )
         {
