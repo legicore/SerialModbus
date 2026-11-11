@@ -45,7 +45,7 @@ typedef enum MB_ClientState_e MB_ClientState_t;
 struct MB_Request_s
 {
     uint8_t id;
-    uint8_t functionCode;
+    MB_FunctionCode_t functionCode;
     uint16_t address;
     void * data;
     size_t dataSize;
@@ -55,7 +55,7 @@ struct MB_Request_s
 typedef struct MB_Request_s MB_Request_t;
 
 #define REQ_MAP_END_ID              0xFF
-#define REQ_MAP_END_FUNCTION_CODE   0x00
+#define REQ_MAP_END_FUNCTION_CODE   ( ( MB_FunctionCode_t ) 0x00 )
 #define REQ_MAP_END_ADDRESS         0xFFFF
 #define REQ_MAP_END_DATA            NULL
 #define REQ_MAP_END_DATA_SIZE       0
@@ -91,7 +91,7 @@ public:
 
     /* Simplified API functions. */
 
-    MB_Status_t sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback = NULL );
+    MB_Status_t sendRequest( uint8_t id, MB_FunctionCode_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback = NULL );
     MB_Status_t readHoldingRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t readInputRegister( uint8_t id, uint16_t address, uint16_t * data, size_t quantity = 1, MB_Callback_f callback = NULL );
     MB_Status_t writeSingleCoil( uint8_t id, uint16_t address, uint16_t value, MB_Callback_f callback = NULL );

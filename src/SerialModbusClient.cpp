@@ -875,7 +875,7 @@ void SerialModbusClient::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusClient::sendRequest( uint8_t id, uint8_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback )
+MB_Status_t SerialModbusClient::sendRequest( uint8_t id, MB_FunctionCode_t functionCode, uint16_t address, void * data, size_t size, MB_Callback_f callback )
 {
     MB_Request_t xRequest = { id, functionCode, address, data, size, callback };
 

@@ -193,7 +193,7 @@ private:
     void vSetState( MB_ServerState_t xStatePar );
     MB_Address_t * pxAddressMap;
     size_t xAddressMapIndex;
-    MB_Status_t xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode );
+    MB_Status_t xCheckRequest( uint16_t usReqAddress, MB_FunctionCode_t xReqFunctionCode );
     void vHandlerFC03_04( void );
     void vHandlerFC05( void );
     void vHandlerFC06( void );

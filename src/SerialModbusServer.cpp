@@ -482,7 +482,7 @@ MB_Status_t SerialModbusServer::process( void )
                  * message counter. */
                 vIncCPT4();
 
-                if( xCheckRequest( usREQUEST_ADDRESS, ucREQUEST_FUNCTION_CODE ) == MB_OK )
+                if( xCheckRequest( usREQUEST_ADDRESS, ( MB_FunctionCode_t ) ucREQUEST_FUNCTION_CODE ) == MB_OK )
                 {
                     vSetState( PROCESSING_REQUIRED_ACTION );
                 }
@@ -659,7 +659,7 @@ MB_Status_t SerialModbusServer::process( void )
 }
 /*----------------------------------------------------------------------------*/
 
-MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t ucReqFunctionCode )
+MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, MB_FunctionCode_t xReqFunctionCode )
 {
     MB_AddressType_t xReqAddressType = ADDR_NO_DATA;
 
@@ -684,7 +684,7 @@ MB_Status_t SerialModbusServer::xCheckRequest( uint16_t usReqAddress, uint8_t uc
     /* Scan the access map for the address type of the given function code. */
     for( size_t i = 0; IS_ADDRESS_ACCES_MAP_END( pxAddressAccessMap[ i ] ) != true; i++ )
     {
-        if( pxAddressAccessMap[ i ].xFunctionCode == ucReqFunctionCode )
+        if( pxAddressAccessMap[ i ].xFunctionCode == xReqFunctionCode )
         {
             xReqAddressType = pxAddressAccessMap[ i ].xAddressType;
         }
