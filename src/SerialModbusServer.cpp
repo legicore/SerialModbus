@@ -1374,15 +1374,15 @@ void SerialModbusServer::vHandlerFC16( void )
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddressType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback )
+bool SerialModbusServer::bCreateAddress( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, size_t xDataSize, MB_Callback_f fCallback )
 {
     MB_Address_t * pxAddressMapTmp = NULL;
 
-    if( ( id == configMB_ID_BROADCAST ) || ( id > configMB_ID_SERVER_MAX ) ||
-        ( IS_ADDRESS_TYPE( addressType ) == false ) ||
-        ( bFindAddress( id, addressType, address ) == true ) ||
-        ( bFindAddress( id, addressType, address + ( uint16_t ) dataSize - 1 ) == true ) ||
-        ( dataSize == 0 ) ||
+    if( ( ucId == configMB_ID_BROADCAST ) || ( ucId > configMB_ID_SERVER_MAX ) ||
+        ( IS_ADDRESS_TYPE( xAddressType ) == false ) ||
+        ( bFindAddress( ucId, xAddressType, usAddress ) == true ) ||
+        ( bFindAddress( ucId, xAddressType, usAddress + ( uint16_t ) xDataSize - 1 ) == true ) ||
+        ( xDataSize == 0 ) ||
         ( bAddressMapLock == true ) )
     {
         return false;
@@ -1404,24 +1404,24 @@ bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddressType_t addressTyp
 
     if( pxAddressMapTmp != NULL )
     {
-        if( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) )
+        if( ( xAddressType == ADDR_COIL ) || ( xAddressType == ADDR_DISCRETE_INPUT ) )
         {
-            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint8_t * ) calloc( mbBITS_TO_BYTES( dataSize ), sizeof( uint8_t ) );
+            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint8_t * ) calloc( mbBITS_TO_BYTES( xDataSize ), sizeof( uint8_t ) );
         }
-        else /* if( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) */
+        else /* if( ( xAddressType == ADDR_HOLDING_REGISTER ) || ( xAddressType == ADDR_INPUT_REGISTER ) ) */
         {
-            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint16_t * ) calloc( dataSize, sizeof( uint16_t ) );
+            pxAddressMapTmp[ xAddressMapSize - 1 ].data = ( uint16_t * ) calloc( xDataSize, sizeof( uint16_t ) );
         }
 
         if( pxAddressMapTmp[ xAddressMapSize - 1 ].data != NULL )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            pxAddressMapTmp[ xAddressMapSize - 1 ].id = id;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].id = ucId;
 #endif
-            pxAddressMapTmp[ xAddressMapSize - 1 ].addressType = addressType;
-            pxAddressMapTmp[ xAddressMapSize - 1 ].address = address;
-            pxAddressMapTmp[ xAddressMapSize - 1 ].dataSize = dataSize;
-            pxAddressMapTmp[ xAddressMapSize - 1 ].callback = callback;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].addressType = xAddressType;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].address = usAddress;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].dataSize = xDataSize;
+            pxAddressMapTmp[ xAddressMapSize - 1 ].callback = fCallback;
 
             ( void ) bClearAddressMapEntry( &pxAddressMapTmp[ xAddressMapSize ] );
             pxAddressMap = pxAddressMapTmp;
@@ -1444,36 +1444,36 @@ bool SerialModbusServer::bCreateAddress( uint8_t id, MB_AddressType_t addressTyp
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data )
+bool SerialModbusServer::bGetAddressBit( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t * pusData )
 {
     size_t xOffset = 0;
     size_t xBit = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
-        ( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) ) &&
-        ( data != NULL ) &&
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) &&
+        ( ( xAddressType == ADDR_COIL ) || ( xAddressType == ADDR_DISCRETE_INPUT ) ) &&
+        ( pusData != NULL ) &&
         ( pxAddressMap != NULL ) )
     {
         for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxAddressMap[ i ].id )
+            if( ucId == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( address >= pxAddressMap[ i ].address ) &&
-                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
-                    ( pxAddressMap[ i ].addressType == addressType ) )
+                if( ( usAddress >= pxAddressMap[ i ].address ) &&
+                    ( usAddress < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == xAddressType ) )
                 {
-                    xOffset = ( address - pxAddressMap[ i ].address ) / 8;
-                    xBit    = ( address - pxAddressMap[ i ].address ) % 8;
+                    xOffset = ( usAddress - pxAddressMap[ i ].address ) / 8;
+                    xBit    = ( usAddress - pxAddressMap[ i ].address ) % 8;
 
                     if( bitRead( ( ( uint8_t * ) pxAddressMap[ i ].data )[ xOffset ], xBit ) == 1 )
                     {
-                        *data = MB_COIL_ON;
+                        *pusData = MB_COIL_ON;
                     }
                     else
                     {
-                        *data = MB_COIL_OFF;
+                        *pusData = MB_COIL_OFF;
                     }
 
                     return true;
@@ -1488,30 +1488,30 @@ bool SerialModbusServer::bGetAddressBit( uint8_t id, MB_AddressType_t addressTyp
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value )
+bool SerialModbusServer::bSetAddressBit( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t usValue )
 {
     size_t xOffset = 0;
     size_t xBit = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
-        ( ( addressType == ADDR_COIL ) || ( addressType == ADDR_DISCRETE_INPUT ) ) &&
-        ( ( value == 0 ) || ( value == 1 ) || ( value == MB_COIL_ON ) ) &&
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) &&
+        ( ( xAddressType == ADDR_COIL ) || ( xAddressType == ADDR_DISCRETE_INPUT ) ) &&
+        ( ( usValue == 0 ) || ( usValue == 1 ) || ( usValue == MB_COIL_ON ) ) &&
         ( pxAddressMap != NULL ) )
     {
         for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxAddressMap[ i ].id )
+            if( ucId == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( address >= pxAddressMap[ i ].address ) &&
-                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
-                    ( pxAddressMap[ i ].addressType == addressType ) )
+                if( ( usAddress >= pxAddressMap[ i ].address ) &&
+                    ( usAddress < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == xAddressType ) )
                 {
-                    xOffset = ( address - pxAddressMap[ i ].address ) / 8;
-                    xBit    = ( address - pxAddressMap[ i ].address ) % 8;
+                    xOffset = ( usAddress - pxAddressMap[ i ].address ) / 8;
+                    xBit    = ( usAddress - pxAddressMap[ i ].address ) % 8;
 
-                    if( ( value == 1 ) || ( value == MB_COIL_ON ) )
+                    if( ( usValue == 1 ) || ( usValue == MB_COIL_ON ) )
                     {
                         bitSet( ( ( uint8_t * ) pxAddressMap[ i ].data )[ xOffset ], xBit );
                     }
@@ -1532,27 +1532,27 @@ bool SerialModbusServer::bSetAddressBit( uint8_t id, MB_AddressType_t addressTyp
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data )
+bool SerialModbusServer::bGetAddressWord( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t * pusData )
 {
     size_t xOffset = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
-        ( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) &&
-        ( data != NULL ) &&
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) &&
+        ( ( xAddressType == ADDR_HOLDING_REGISTER ) || ( xAddressType == ADDR_INPUT_REGISTER ) ) &&
+        ( pusData != NULL ) &&
         ( pxAddressMap != NULL ) )
     {
         for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxAddressMap[ i ].id )
+            if( ucId == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( address >= pxAddressMap[ i ].address ) &&
-                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
-                    ( pxAddressMap[ i ].addressType == addressType ) )
+                if( ( usAddress >= pxAddressMap[ i ].address ) &&
+                    ( usAddress < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == xAddressType ) )
                 {
-                    xOffset = address - pxAddressMap[ i ].address;
-                    *data = ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ];
+                    xOffset = usAddress - pxAddressMap[ i ].address;
+                    *pusData = ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ];
 
                     return true;
                 }
@@ -1566,26 +1566,26 @@ bool SerialModbusServer::bGetAddressWord( uint8_t id, MB_AddressType_t addressTy
 }
 /*----------------------------------------------------------------------------*/
 
-bool SerialModbusServer::bSetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value )
+bool SerialModbusServer::bSetAddressWord( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t usValue )
 {
     size_t xOffset = 0;
 
-    if( ( id != 0 ) && ( id <= configMB_ID_SERVER_MAX ) &&
-        ( ( addressType == ADDR_HOLDING_REGISTER ) || ( addressType == ADDR_INPUT_REGISTER ) ) &&
+    if( ( ucId != 0 ) && ( ucId <= configMB_ID_SERVER_MAX ) &&
+        ( ( xAddressType == ADDR_HOLDING_REGISTER ) || ( xAddressType == ADDR_INPUT_REGISTER ) ) &&
         ( pxAddressMap != NULL ) )
     {
         for( size_t i = 0; IS_ADDRESS_MAP_END( pxAddressMap[ i ] ) != true; i++ )
         {
 #if( configMB_SERVER_MULTI_ID == 1 )
-            if( id == pxAddressMap[ i ].id )
+            if( ucId == pxAddressMap[ i ].id )
             {
 #endif
-                if( ( address >= pxAddressMap[ i ].address ) &&
-                    ( address < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
-                    ( pxAddressMap[ i ].addressType == addressType ) )
+                if( ( usAddress >= pxAddressMap[ i ].address ) &&
+                    ( usAddress < ( pxAddressMap[ i ].address + ( uint16_t ) pxAddressMap[ i ].dataSize ) ) &&
+                    ( pxAddressMap[ i ].addressType == xAddressType ) )
                 {
-                    xOffset = address - pxAddressMap[ i ].address;
-                    ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ] = value;
+                    xOffset = usAddress - pxAddressMap[ i ].address;
+                    ( ( uint16_t * ) pxAddressMap[ i ].data )[ xOffset ] = usValue;
 
                     return true;
                 }

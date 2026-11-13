@@ -226,11 +226,11 @@ private:
 
     /* Simplified API functions. */
 
-    bool bCreateAddress( uint8_t id, MB_AddressType_t addressType, uint16_t address, size_t dataSize, MB_Callback_f callback );
-    bool bGetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data );
-    bool bSetAddressBit( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value );
-    bool bGetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t * data );
-    bool bSetAddressWord( uint8_t id, MB_AddressType_t addressType, uint16_t address, uint16_t value );
+    bool bCreateAddress( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, size_t xDataSize, MB_Callback_f fCallback );
+    bool bGetAddressBit( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t * pusData );
+    bool bSetAddressBit( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t usValue );
+    bool bGetAddressWord( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t * pusData );
+    bool bSetAddressWord( uint8_t ucId, MB_AddressType_t xAddressType, uint16_t usAddress, uint16_t usValue );
 
 #if( configMB_SERVER_MULTI_ID == 0 )
     bool createCoil( uint8_t id, uint16_t address, size_t dataSize, MB_Callback_f callback );
